@@ -16,6 +16,13 @@ const eslintConfig = [
       "@typescript-eslint/no-this-alias": "off",
     },
   },
+  {
+    ignores: [
+      "lib/generated/**/*",
+      "**/generated/**/*",
+      "prisma/generated/**/*",
+    ],
+  },
 ];
 
 export default eslintConfig;
