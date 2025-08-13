@@ -1,12 +1,17 @@
 import { NextRequest } from "next/server";
 import { stripe } from "@/lib/stripe";
 import prisma from "@/lib/prisma";
+import {
+  Category,
+  GeologicalPeriod,
+  ProductStatus,
+} from "@/lib/generated/prisma";
 
-// Types pour les objets Stripe
+// Types corrigés pour les objets Stripe avec propriétés nullables
 interface StripeProduct {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   metadata: Record<string, string>;
   active: boolean;
   created: number;
@@ -20,6 +25,21 @@ interface StripePrice {
   currency: string;
   active: boolean;
   metadata: Record<string, string>;
+}
+
+interface StripeCustomer {
+  id: string;
+  email: string | null;
+  name?: string | null;
+  metadata?: Record<string, string>;
+}
+
+interface StripeSession {
+  id: string;
+  amount_total: number | null;
+  currency?: string | null;
+  customer?: string | null;
+  metadata?: Record<string, string>;
 }
 
 export async function POST(req: NextRequest) {
@@ -40,39 +60,32 @@ export async function POST(req: NextRequest) {
     console.log("🔵 Stripe webhook:", event.type);
 
     switch (event.type) {
-      // 🆕 PRODUIT CRÉÉ DANS STRIPE
       case "product.created":
         await handleProductCreated(event.data.object as StripeProduct);
         break;
 
-      // ✏️ PRODUIT MODIFIÉ DANS STRIPE
       case "product.updated":
         await handleProductUpdated(event.data.object as StripeProduct);
         break;
 
-      // 🗑️ PRODUIT SUPPRIMÉ/ARCHIVÉ DANS STRIPE
       case "product.deleted":
         await handleProductDeleted(event.data.object as StripeProduct);
         break;
 
-      // 💰 PRIX CRÉÉ POUR UN PRODUIT
       case "price.created":
         await handlePriceCreated(event.data.object as StripePrice);
         break;
 
-      // ✏️ PRIX MODIFIÉ
       case "price.updated":
         await handlePriceUpdated(event.data.object as StripePrice);
         break;
 
-      // 👤 CUSTOMER CRÉÉ (pour votre système d'utilisateurs)
       case "customer.created":
-        await handleCustomerCreated(event.data.object);
+        await handleCustomerCreated(event.data.object as StripeCustomer);
         break;
 
-      // ✅ PAIEMENT RÉUSSI (pour gérer les ventes)
       case "checkout.session.completed":
-        await handleCheckoutCompleted(event.data.object);
+        await handleCheckoutCompleted(event.data.object as StripeSession);
         break;
 
       default:
@@ -80,9 +93,10 @@ export async function POST(req: NextRequest) {
     }
 
     return new Response("Webhook traité avec succès", { status: 200 });
-  } catch (error: any) {
-    console.error("❌ Stripe webhook error:", error);
-    return new Response(`Webhook error: ${error.message}`, { status: 400 });
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error("❌ Stripe webhook error:", err);
+    return new Response(`Webhook error: ${err.message}`, { status: 400 });
   }
 }
 
@@ -91,31 +105,22 @@ async function handleProductCreated(product: StripeProduct) {
   console.log("🆕 Produit créé dans Stripe:", product.id);
 
   try {
-    // Extraire les informations depuis les métadonnées Stripe
-    const {
-      category = "AUTRES", // Valeur par défaut
-      genre = "",
-      species = "",
-      countryOfOrigin = "",
-      locality = "",
-      geologicalPeriod = "QUATERNAIRE", // Valeur par défaut
-      geologicalStage = "",
-    } = product.metadata;
+    const { validCategory, validGeologicalPeriod, validStatus } =
+      validateProductMetadata(product.metadata, product.active);
 
-    // Créer le produit dans votre BDD
     const newProduct = await prisma.product.create({
       data: {
         title: product.name,
-        category: category as any, // Cast vers votre enum
-        genre,
-        species,
+        category: validCategory,
+        genre: product.metadata.genre || "",
+        species: product.metadata.species || "",
         price: 0, // Sera mis à jour quand le prix sera créé
-        countryOfOrigin,
-        locality,
-        geologicalPeriod: geologicalPeriod as any,
-        geologicalStage,
+        countryOfOrigin: product.metadata.countryOfOrigin || "",
+        locality: product.metadata.locality || "",
+        geologicalPeriod: validGeologicalPeriod,
+        geologicalStage: product.metadata.geologicalStage || "",
         stripeProductId: product.id,
-        status: product.active ? "AVAILABLE" : "INACTIVE",
+        status: validStatus,
       },
     });
 
@@ -135,31 +140,50 @@ async function handleProductUpdated(product: StripeProduct) {
     });
 
     if (existingProduct) {
-      const {
-        category,
-        genre,
-        species,
-        countryOfOrigin,
-        locality,
-        geologicalPeriod,
-        geologicalStage,
-      } = product.metadata;
+      const { validCategory, validGeologicalPeriod, validStatus } =
+        validateProductMetadata(product.metadata, product.active);
+
+      const updateData: {
+        title: string;
+        category?: Category;
+        genre?: string;
+        species?: string;
+        countryOfOrigin?: string;
+        locality?: string;
+        geologicalPeriod?: GeologicalPeriod;
+        geologicalStage?: string;
+        status: ProductStatus;
+      } = {
+        title: product.name,
+        status: validStatus,
+      };
+
+      // Ajouter les champs optionnels seulement s'ils existent
+      if (product.metadata.category) {
+        updateData.category = validCategory;
+      }
+      if (product.metadata.genre) {
+        updateData.genre = product.metadata.genre;
+      }
+      if (product.metadata.species) {
+        updateData.species = product.metadata.species;
+      }
+      if (product.metadata.countryOfOrigin) {
+        updateData.countryOfOrigin = product.metadata.countryOfOrigin;
+      }
+      if (product.metadata.locality) {
+        updateData.locality = product.metadata.locality;
+      }
+      if (product.metadata.geologicalPeriod) {
+        updateData.geologicalPeriod = validGeologicalPeriod;
+      }
+      if (product.metadata.geologicalStage) {
+        updateData.geologicalStage = product.metadata.geologicalStage;
+      }
 
       await prisma.product.update({
         where: { stripeProductId: product.id },
-        data: {
-          title: product.name,
-          ...(category && { category: category as any }),
-          ...(genre && { genre }),
-          ...(species && { species }),
-          ...(countryOfOrigin && { countryOfOrigin }),
-          ...(locality && { locality }),
-          ...(geologicalPeriod && {
-            geologicalPeriod: geologicalPeriod as any,
-          }),
-          ...(geologicalStage && { geologicalStage }),
-          status: product.active ? "AVAILABLE" : "INACTIVE",
-        },
+        data: updateData,
       });
 
       console.log("✅ Produit mis à jour dans la BDD");
@@ -174,10 +198,9 @@ async function handleProductDeleted(product: StripeProduct) {
   console.log("🗑️ Produit archivé dans Stripe:", product.id);
 
   try {
-    // Marquer comme inactif au lieu de supprimer
     await prisma.product.updateMany({
       where: { stripeProductId: product.id },
-      data: { status: "INACTIVE" },
+      data: { status: ProductStatus.INACTIVE },
     });
 
     console.log("✅ Produit archivé dans la BDD");
@@ -192,11 +215,10 @@ async function handlePriceCreated(price: StripePrice) {
 
   try {
     if (price.unit_amount) {
-      // Mettre à jour le prix du produit
       await prisma.product.updateMany({
         where: { stripeProductId: price.product },
         data: {
-          price: price.unit_amount / 100, // Convertir centimes en euros
+          price: price.unit_amount / 100,
           stripePriceId: price.id,
         },
       });
@@ -213,34 +235,114 @@ async function handlePriceUpdated(price: StripePrice) {
   console.log("✏️ Prix modifié dans Stripe:", price.id);
 
   if (price.active && price.unit_amount) {
-    await handlePriceCreated(price); // Même logique
+    await handlePriceCreated(price);
   }
 }
 
-// 👤 CUSTOMER CRÉÉ (pour vos utilisateurs)
-async function handleCustomerCreated(customer: any) {
+// 👤 CUSTOMER CRÉÉ - GESTION DES VALEURS NULLABLES
+async function handleCustomerCreated(customer: StripeCustomer) {
   console.log("👤 Customer créé:", customer.id);
 
-  // Associer à un utilisateur existant par email
-  const user = await prisma.user.findFirst({
-    where: { email: customer.email },
-  });
+  // ✅ Vérifier que l'email n'est pas null
+  if (!customer.email) {
+    console.log("⚠️ Customer créé sans email, ignoré");
+    return;
+  }
 
-  if (user) {
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { stripeCustomerId: customer.id },
+  try {
+    const user = await prisma.user.findFirst({
+      where: { email: customer.email },
     });
-    console.log("✅ Customer associé à l'utilisateur");
+
+    if (user) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { stripeCustomerId: customer.id },
+      });
+      console.log("✅ Customer associé à l'utilisateur");
+    } else {
+      console.log(
+        "ℹ️ Aucun utilisateur trouvé avec cet email:",
+        customer.email
+      );
+    }
+  } catch (error) {
+    console.error("❌ Erreur association customer:", error);
   }
 }
 
-// ✅ CHECKOUT COMPLÉTÉ (vente réalisée)
-async function handleCheckoutCompleted(session: any) {
+// ✅ CHECKOUT COMPLÉTÉ - GESTION DES VALEURS NULLABLES
+async function handleCheckoutCompleted(session: StripeSession) {
   console.log("✅ Checkout complété:", session.id);
 
-  // Ici vous pourrez gérer les ventes depuis le panier
-  // Logique à implémenter plus tard avec le système de panier
+  // ✅ Vérifier que amount_total n'est pas null
+  if (!session.amount_total) {
+    console.log("⚠️ Session sans montant, ignorée");
+    return;
+  }
 
-  console.log("💰 Vente réalisée pour:", session.amount_total / 100, "€");
+  try {
+    const amountInEuros = session.amount_total / 100;
+    console.log("💰 Vente réalisée pour:", amountInEuros, "€");
+
+    // Si vous avez des métadonnées avec des infos sur les produits
+    if (session.metadata?.productIds) {
+      const productIds = session.metadata.productIds.split(",");
+
+      // Marquer les produits comme vendus
+      await prisma.product.updateMany({
+        where: {
+          id: {
+            in: productIds.map((id) => parseInt(id)),
+          },
+        },
+        data: {
+          status: ProductStatus.SOLD,
+        },
+      });
+
+      console.log(
+        `✅ ${productIds.length} produit(s) marqué(s) comme vendu(s)`
+      );
+    }
+  } catch (error) {
+    console.error("❌ Erreur traitement checkout:", error);
+  }
+}
+
+// 🔧 FONCTION HELPER POUR VALIDER LES MÉTADONNÉES
+function validateProductMetadata(
+  metadata: Record<string, string>,
+  isActive: boolean
+): {
+  validCategory: Category;
+  validGeologicalPeriod: GeologicalPeriod;
+  validStatus: ProductStatus;
+} {
+  // Valider Category
+  const categoryValue = metadata.category?.toUpperCase();
+  const validCategory = Object.values(Category).includes(
+    categoryValue as Category
+  )
+    ? (categoryValue as Category)
+    : Category.COQUILLAGE; // Valeur par défaut
+
+  // Valider GeologicalPeriod
+  const periodValue = metadata.geologicalPeriod?.toUpperCase();
+  const validGeologicalPeriod = Object.values(GeologicalPeriod).includes(
+    periodValue as GeologicalPeriod
+  )
+    ? (periodValue as GeologicalPeriod)
+    : GeologicalPeriod.QUATERNAIRE; // Valeur par défaut
+
+  // Valider ProductStatus
+  const validStatus = isActive
+    ? ProductStatus.AVAILABLE
+    : ProductStatus.INACTIVE;
+
+  return {
+    validCategory,
+    validGeologicalPeriod,
+    validStatus,
+  };
 }

@@ -48,7 +48,7 @@ export async function POST() {
     return NextResponse.json({
       customerId: customer.id,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("❌ Error creating Stripe customer:", error);
     return NextResponse.json(
       { error: "Erreur lors de la création du customer" },
