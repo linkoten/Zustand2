@@ -15,11 +15,20 @@ datasource db {
 }
 
 model User {
-  id      Int      @id @default(autoincrement())
-  clerkId String   @unique
-  email   String   @unique
-  name    String?
-  role    UserRole @default(USER)
+  id        Int      @id @default(autoincrement())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Stripe
+  stripeCustomerId String? @unique
+
+  // Relations
+  cart    Cart?
+  Payment Payment[]
 }
 
 model Product {
@@ -34,6 +43,67 @@ model Product {
   geologicalPeriod GeologicalPeriod
   geologicalStage  String
   createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  // Stripe
+  stripeProductId String? @unique
+  stripePriceId   String? @unique
+
+  // Statut du produit
+  status ProductStatus @default(AVAILABLE)
+
+  // Pas de relation user car les produits sont indépendants
+
+  // Relations futures pour le panier
+  cartItems CartItem[]
+  Payment   Payment[]
+}
+
+// Modèle pour le panier (à venir)
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String   @unique // Un panier par utilisateur
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [clerkId])
+  items CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  productId Int
+  quantity  Int      @default(1)
+  addedAt   DateTime @default(now())
+
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId]) // Un produit une seule fois par panier
+}
+
+// Nouveau modèle pour les transactions
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  stripePaymentId String        @unique
+  amount          Decimal       @db.Decimal(10, 2)
+  currency        String        @default("eur")
+  status          PaymentStatus
+  productId       Int?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user    User     @relation(fields: [userId], references: [clerkId])
+  product Product? @relation(fields: [productId], references: [id])
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
 }
 
 enum UserRole {
@@ -62,4 +132,11 @@ enum GeologicalPeriod {
   PALEOGENE
   NEOGENE
   QUATERNAIRE
+}
+
+enum ProductStatus {
+  AVAILABLE
+  SOLD
+  INACTIVE
+  RESERVED
 }
