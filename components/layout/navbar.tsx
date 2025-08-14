@@ -76,7 +76,7 @@ export function Navbar() {
                 </Button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <Button size="sm">S'inscrire</Button>
+                <Button size="sm">S&apos;inscrire</Button>
               </SignUpButton>
             </SignedOut>
 
