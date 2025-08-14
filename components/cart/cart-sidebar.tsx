@@ -78,7 +78,7 @@ export function CartSidebar() {
                 </div>
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Livraison</span>
-                  <span>Calculée à l'étape suivante</span>
+                  <span>Calculée à l&apos;étape suivante</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold text-lg">
