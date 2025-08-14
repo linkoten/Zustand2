@@ -112,6 +112,14 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
+/* Classe utilitaire pour tronquer le texte */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

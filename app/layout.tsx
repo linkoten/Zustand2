@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import {
-  ClerkProvider,
-  UserButton,
-  SignInButton,
-  SignUpButton,
-  SignedOut,
-  SignedIn,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
+import { Navbar } from "@/components/layout/navbar";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,23 +32,15 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <Navbar />
-          {children}
+          <main className="flex-1">{children}</main> {/* Footer optionnel */}
+          <footer className="border-t bg-muted/50 py-6 mt-12">
+            <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+              <p>© 2024 FossilShop. Tous droits réservés.</p>
+            </div>
+          </footer>
+          <Toaster position="bottom-right" />
         </body>
       </html>
     </ClerkProvider>
   );
 }
-
-const Navbar = () => {
-  return (
-    <header className="flex justify-end items-center p-4 gap-4 h-16">
-      <SignedOut>
-        <SignInButton />
-        <SignUpButton />
-      </SignedOut>
-      <SignedIn>
-        <UserButton />
-      </SignedIn>
-    </header>
-  );
-};
