@@ -12,6 +12,7 @@ import {
   StripeProduct,
   StripeSession,
 } from "@/types/type";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: NextRequest) {
   try {
@@ -96,6 +97,11 @@ async function handleProductCreated(product: StripeProduct) {
     });
 
     console.log("✅ Produit ajouté à la BDD:", newProduct.id);
+
+    // ✅ FORCER LA REVALIDATION DU CACHE
+    revalidatePath("/fossiles");
+    revalidatePath("/");
+    console.log("🔄 Cache invalidé pour /fossiles");
   } catch (error) {
     console.error("❌ Erreur création produit BDD:", error);
   }
@@ -158,6 +164,11 @@ async function handleProductUpdated(product: StripeProduct) {
       });
 
       console.log("✅ Produit mis à jour dans la BDD");
+
+      // ✅ FORCER LA REVALIDATION DU CACHE
+      revalidatePath("/fossiles");
+      revalidatePath("/");
+      console.log("🔄 Cache invalidé après mise à jour prix");
     }
   } catch (error) {
     console.error("❌ Erreur mise à jour produit:", error);
@@ -195,6 +206,11 @@ async function handlePriceCreated(price: StripePrice) {
       });
 
       console.log("✅ Prix mis à jour dans la BDD");
+
+      // ✅ FORCER LA REVALIDATION DU CACHE
+      revalidatePath("/fossiles");
+      revalidatePath("/");
+      console.log("🔄 Cache invalidé après mise à jour prix");
     }
   } catch (error) {
     console.error("❌ Erreur mise à jour prix:", error);

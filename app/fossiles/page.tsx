@@ -1,6 +1,5 @@
 import { FossilCard } from "@/components/fossils/fossil-card";
 import prisma from "@/lib/prisma";
-import { Product } from "@/lib/generated/prisma";
 import { SerializedProduct } from "@/types/type";
 
 async function getFossils(): Promise<SerializedProduct[]> {
