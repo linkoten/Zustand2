@@ -16,15 +16,19 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getCartAction, clearCartAction } from "@/lib/actions/cart-actions";
 import { CartItem } from "./cart-item";
-import { CartSidebarProps } from "@/types/type";
+import {
+  CartSidebarProps,
+  SerializedCart,
+  SerializedCartItem,
+} from "@/types/type";
 
 export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const router = useRouter();
-  const [cart, setCart] = useState<any>(null);
+  const [cart, setCart] = useState<SerializedCart | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Charger le panier
-  const loadCart = async () => {
+  const loadCart = async (): Promise<void> => {
     setLoading(true);
     try {
       const cartData = await getCartAction();
@@ -43,31 +47,57 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   }, [isOpen]);
 
   // ✅ Fonction callback pour les enfants
-  const handleCartUpdate = async () => {
+  const handleCartUpdate = async (): Promise<void> => {
     await loadCart();
   };
 
-  const totalItems =
-    cart?.items?.reduce((sum: number, item: any) => sum + item.quantity, 0) ||
-    0;
-  const totalPrice =
+  // ✅ Fonction pour adapter les données pour CartItem
+  const adaptItemForCartItem = (item: SerializedCartItem) => ({
+    id: item.id,
+    productId: item.productId,
+    title: item.product.title, // ✅ Extraire du produit
+    price: item.product.price, // ✅ Extraire du produit
+    quantity: item.quantity,
+    category: item.product.category, // ✅ Extraire du produit
+    product: {
+      title: item.product.title,
+      price: item.product.price,
+      category: item.product.category,
+    },
+  });
+
+  // ✅ Calculs typés
+  const totalItems: number =
     cart?.items?.reduce(
-      (sum: number, item: any) => sum + item.product.price * item.quantity,
+      (sum: number, item: SerializedCartItem) => sum + item.quantity,
       0
     ) || 0;
 
-  const formatPrice = (price: number) => {
+  const totalPrice: number =
+    cart?.items?.reduce(
+      (sum: number, item: SerializedCartItem) =>
+        sum + item.product.price * item.quantity,
+      0
+    ) || 0;
+
+  const formatPrice = (price: number): string => {
     return new Intl.NumberFormat("fr-FR", {
       style: "currency",
       currency: "EUR",
     }).format(price);
   };
 
-  const handleClearCart = async () => {
+  const handleClearCart = async (): Promise<void> => {
     try {
       const result = await clearCartAction();
       if (result.success) {
-        setCart({ items: [] });
+        setCart({
+          id: cart?.id || "",
+          userId: cart?.userId || 0,
+          createdAt: cart?.createdAt || "",
+          updatedAt: cart?.updatedAt || "",
+          items: [],
+        });
         toast.success(`${result.data?.removedItems} articles supprimés`);
       } else {
         toast.error(result.error);
@@ -77,7 +107,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = (): void => {
     if (!cart?.items?.length) return;
     onClose();
     router.push("/checkout");
@@ -114,11 +144,11 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
           <>
             <ScrollArea className="flex-1 -mx-6 px-6">
               <div className="space-y-4 py-4">
-                {cart.items.map((item: any) => (
+                {cart.items.map((item: SerializedCartItem) => (
                   <CartItem
                     key={item.id}
-                    item={item}
-                    onUpdate={handleCartUpdate} // ✅ Passer la fonction callback
+                    item={adaptItemForCartItem(item)} // ✅ Adapter les données
+                    onUpdate={handleCartUpdate}
                   />
                 ))}
               </div>
@@ -134,7 +164,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                 </div>
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Livraison</span>
-                  <span>Calculée à l'étape suivante</span>
+                  <span>Calculée à l&apos;étape suivante</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold text-lg">

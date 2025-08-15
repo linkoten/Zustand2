@@ -164,3 +164,12 @@ export interface SerializedCartItem {
   addedAt: string;
   product: SerializedProduct;
 }
+
+// ✅ Type pour le panier sérialisé
+export interface SerializedCart {
+  id: string;
+  userId: number;
+  createdAt: string;
+  updatedAt: string;
+  items: SerializedCartItem[];
+}
