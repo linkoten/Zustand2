@@ -1,32 +1,6 @@
+import { CartState, ClientCartItem } from "@/types/type"; // ✅ Import depuis types
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-interface CartItem {
-  id: string;
-  productId: number;
-  title: string;
-  price: number;
-  quantity: number;
-  category: string;
-  stripeProductId: string | null;
-  stripePriceId: string | null;
-}
-
-interface CartState {
-  items: CartItem[];
-  isOpen: boolean;
-  totalItems: number;
-  totalPrice: number;
-
-  // Actions
-  addItem: (product: any) => void;
-  removeItem: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
-  clearCart: () => void;
-  toggleCart: () => void;
-  openCart: () => void;
-  closeCart: () => void;
-}
 
 export const useCartStore = create<CartState>()(
   persist(
@@ -52,8 +26,8 @@ export const useCartStore = create<CartState>()(
             ),
           }));
         } else {
-          // Sinon on ajoute le nouveau produit
-          const newItem: CartItem = {
+          // ✅ Utiliser ClientCartItem au lieu de CartItem de Prisma
+          const newItem: ClientCartItem = {
             id: `${product.id}-${Date.now()}`,
             productId: product.id,
             title: product.title,

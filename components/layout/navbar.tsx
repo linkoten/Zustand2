@@ -12,10 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Home, ShoppingCart } from "lucide-react";
 import { useCartStore } from "@/stores/cart-store";
-import { CartSidebar } from "../cart/cart-sidebar";
+import { CartSidebar } from "@/components/cart/cart-sidebar";
 
 export function Navbar() {
-  const { totalItems, openCart } = useCartStore();
+  const { totalItems, openCart, closeCart, isOpen } = useCartStore();
 
   return (
     <>
@@ -76,7 +76,7 @@ export function Navbar() {
                 </Button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <Button size="sm">S&apos;inscrire</Button>
+                <Button size="sm">S'inscrire</Button>
               </SignUpButton>
             </SignedOut>
 
@@ -94,7 +94,7 @@ export function Navbar() {
       </header>
 
       {/* Sidebar du panier */}
-      <CartSidebar />
+      <CartSidebar isOpen={isOpen} onClose={closeCart} />
     </>
   );
 }

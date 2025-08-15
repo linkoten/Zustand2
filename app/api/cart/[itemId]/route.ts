@@ -2,30 +2,47 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 
+// ✅ Fonction utilitaire réutilisable
+async function getCurrentUser() {
+  const { userId: clerkUserId } = await auth();
+
+  if (!clerkUserId) {
+    return null;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { clerkId: clerkUserId },
+    select: { id: true },
+  });
+
+  return user;
+}
+
 // PUT - Mettre à jour la quantité
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ itemId: string }> } // ✅ Type inline
+  { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    // ✅ Utiliser getCurrentUser au lieu de auth directement
+    const user = await getCurrentUser();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const { itemId } = await params; // ✅ Await params
+    const { itemId } = await params;
     const { quantity }: { quantity: number } = await req.json();
 
     if (quantity < 1) {
       return NextResponse.json({ error: "Quantité invalide" }, { status: 400 });
     }
 
-    // Vérifier que l'item appartient à l'utilisateur
+    // ✅ Utiliser user.id au lieu de userId
     const cartItem = await prisma.cartItem.findFirst({
       where: {
         id: itemId,
-        cart: { userId },
+        cart: { userId: user.id }, // ✅ Corriger ici
       },
     });
 
@@ -56,19 +73,20 @@ export async function DELETE(
   { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    // ✅ Utiliser getCurrentUser au lieu de auth directement
+    const user = await getCurrentUser();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const { itemId } = await params;
 
-    // Vérifier que l'item appartient à l'utilisateur
+    // ✅ Utiliser user.id au lieu de userId
     const cartItem = await prisma.cartItem.findFirst({
       where: {
         id: itemId,
-        cart: { userId },
+        cart: { userId: user.id }, // ✅ Corriger ici
       },
     });
 

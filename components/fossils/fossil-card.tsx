@@ -10,38 +10,15 @@ import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { ProductStatus } from "@/lib/generated/prisma";
-import { ShoppingCart, Eye, CheckCircle } from "lucide-react";
+import { ShoppingCart, Eye, CheckCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
-import { useCartStore } from "@/stores/cart-store";
-
-// ✅ Interface avec price en number
-interface SerializedProduct {
-  id: number;
-  title: string;
-  category: string;
-  genre: string;
-  species: string;
-  price: number; // ✅ number au lieu de Decimal
-  countryOfOrigin: string;
-  locality: string;
-  geologicalPeriod: string;
-  geologicalStage: string;
-  createdAt: string;
-  updatedAt: string;
-  stripeProductId: string | null;
-  stripePriceId: string | null;
-  status: ProductStatus;
-}
-
-interface FossilCardProps {
-  fossil: SerializedProduct;
-}
+import { addToCartAction } from "@/lib/actions/cart-actions"; // ✅ Import Server Action
+import { FossilCardProps, SerializedProduct } from "@/types/type";
 
 export function FossilCard({ fossil }: FossilCardProps) {
-  const { addItem } = useCartStore();
-  const [isAdding, setIsAdding] = useState(false);
+  const [isPending, startTransition] = useTransition(); // ✅ Hook pour Server Actions
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-FR", {
@@ -76,23 +53,26 @@ export function FossilCard({ fossil }: FossilCardProps) {
 
   const isAvailable = fossil.status === ProductStatus.AVAILABLE;
 
-  const handleAddToCart = async () => {
-    if (!isAvailable || isAdding) return;
+  // ✅ Fonction avec Server Action
+  const handleAddToCart = () => {
+    if (!isAvailable || isPending) return;
 
-    setIsAdding(true);
+    startTransition(async () => {
+      try {
+        const result = await addToCartAction(fossil.id);
 
-    try {
-      // Ajouter au store Zustand (côté client)
-      addItem(fossil);
-
-      toast.success(`${fossil.title} ajouté au panier !`, {
-        icon: <CheckCircle className="w-4 h-4" />,
-      });
-    } catch (error) {
-      toast.error("Erreur lors de l'ajout au panier");
-    } finally {
-      setIsAdding(false);
-    }
+        if (result.success) {
+          toast.success(`${result.data?.productTitle} ajouté au panier !`, {
+            icon: <CheckCircle className="w-4 h-4" />,
+          });
+        } else {
+          toast.error(result.error || "Erreur lors de l'ajout");
+        }
+      } catch (error) {
+        toast.error("Une erreur est survenue");
+        console.error("Erreur ajout panier:", error);
+      }
+    });
   };
 
   return (
@@ -121,7 +101,7 @@ export function FossilCard({ fossil }: FossilCardProps) {
             {fossil.title}
           </h3>
           <p className="text-2xl font-bold text-primary">
-            {formatPrice(fossil.price)} {/* ✅ Plus besoin de parseFloat */}
+            {formatPrice(fossil.price)}
           </p>
         </div>
 
@@ -176,12 +156,16 @@ export function FossilCard({ fossil }: FossilCardProps) {
 
         <Button
           size="sm"
-          disabled={!isAvailable || isAdding}
+          disabled={!isAvailable || isPending}
           onClick={handleAddToCart}
           className="flex-1"
         >
-          <ShoppingCart className="w-4 h-4 mr-2" />
-          {isAdding ? "..." : isAvailable ? "Ajouter" : "Indisponible"}
+          {isPending ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <ShoppingCart className="w-4 h-4 mr-2" />
+          )}
+          {isPending ? "Ajout..." : isAvailable ? "Ajouter" : "Indisponible"}
         </Button>
       </CardFooter>
     </Card>

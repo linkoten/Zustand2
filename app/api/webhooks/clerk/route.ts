@@ -1,29 +1,7 @@
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
-
-// Types pour les données Clerk
-interface ClerkEmailAddress {
-  id: string;
-  email_address: string;
-  verification?: {
-    status: string;
-    strategy: string;
-  };
-}
-
-interface ClerkUserData {
-  id: string;
-  email_addresses: ClerkEmailAddress[];
-  first_name?: string;
-  last_name?: string;
-  primary_email_address_id?: string;
-}
-
-interface ClerkWebhookEvent {
-  type: string;
-  data: ClerkUserData;
-}
+import { ClerkEmailAddress, ClerkWebhookEvent } from "@/types/type";
 
 export async function POST(req: NextRequest) {
   try {

@@ -7,17 +7,8 @@ import {
   GeologicalPeriod,
   ProductStatus,
 } from "@/lib/generated/prisma";
+import { FossilFiltersProps } from "@/types/type";
 import { X } from "lucide-react";
-
-interface FossilFiltersProps {
-  selectedCategory?: Category;
-  selectedStatus?: ProductStatus;
-  selectedPeriod?: GeologicalPeriod;
-  onCategoryChange: (category?: Category) => void;
-  onStatusChange: (status?: ProductStatus) => void;
-  onPeriodChange: (period?: GeologicalPeriod) => void;
-  onClearFilters: () => void;
-}
 
 export function FossilFilters({
   selectedCategory,

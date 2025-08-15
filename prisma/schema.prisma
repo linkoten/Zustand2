@@ -62,11 +62,11 @@ model Product {
 // Modèle pour le panier (à venir)
 model Cart {
   id        String   @id @default(cuid())
-  userId    String   @unique // Un panier par utilisateur
+  userId    Int      @unique // Un panier par utilisateur
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user  User       @relation(fields: [userId], references: [clerkId])
+  user  User       @relation(fields: [userId], references: [id])
   items CartItem[]
 }
 

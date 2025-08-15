@@ -1,14 +1,7 @@
 import { FossilCard } from "@/components/fossils/fossil-card";
 import prisma from "@/lib/prisma";
 import { Product } from "@/lib/generated/prisma";
-
-// ✅ Type avec price converti en number
-interface SerializedProduct
-  extends Omit<Product, "price" | "createdAt" | "updatedAt"> {
-  price: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { SerializedProduct } from "@/types/type";
 
 async function getFossils(): Promise<SerializedProduct[]> {
   try {

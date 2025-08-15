@@ -6,41 +6,12 @@ import {
   GeologicalPeriod,
   ProductStatus,
 } from "@/lib/generated/prisma";
-
-// Types corrigés pour les objets Stripe avec propriétés nullables
-interface StripeProduct {
-  id: string;
-  name: string;
-  description?: string | null;
-  metadata: Record<string, string>;
-  active: boolean;
-  created: number;
-  updated: number;
-}
-
-interface StripePrice {
-  id: string;
-  product: string;
-  unit_amount: number | null;
-  currency: string;
-  active: boolean;
-  metadata: Record<string, string>;
-}
-
-interface StripeCustomer {
-  id: string;
-  email: string | null;
-  name?: string | null;
-  metadata?: Record<string, string>;
-}
-
-interface StripeSession {
-  id: string;
-  amount_total: number | null;
-  currency?: string | null;
-  customer?: string | null;
-  metadata?: Record<string, string>;
-}
+import {
+  StripeCustomer,
+  StripePrice,
+  StripeProduct,
+  StripeSession,
+} from "@/types/type";
 
 export async function POST(req: NextRequest) {
   try {

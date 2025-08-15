@@ -3,22 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Minus, Plus, Trash2 } from "lucide-react";
-import { useCartStore } from "@/stores/cart-store";
+import { Minus, Plus, Trash2, Loader2 } from "lucide-react";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
+import {
+  updateCartItemQuantityAction,
+  removeCartItemAction,
+} from "@/lib/actions/cart-actions";
+import { CartItemProps } from "@/types/type";
 
-interface CartItemProps {
-  item: {
-    id: string;
-    productId: number;
-    title: string;
-    price: number;
-    quantity: number;
-    category: string;
-  };
-}
-
-export function CartItem({ item }: CartItemProps) {
-  const { updateQuantity, removeItem } = useCartStore();
+export function CartItem({ item, onUpdate }: CartItemProps) {
+  const [isPending, startTransition] = useTransition();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-FR", {
@@ -39,6 +34,50 @@ export function CartItem({ item }: CartItemProps) {
     );
   };
 
+  // ✅ Mise à jour de la quantité avec Server Action
+  const handleUpdateQuantity = (newQuantity: number) => {
+    if (isPending) return;
+
+    startTransition(async () => {
+      try {
+        const result = await updateCartItemQuantityAction(item.id, newQuantity);
+
+        if (result.success) {
+          await onUpdate(); // Recharger le panier
+          if (newQuantity === 0) {
+            toast.success("Article supprimé du panier");
+          }
+        } else {
+          toast.error(result.error || "Erreur lors de la mise à jour");
+        }
+      } catch (error) {
+        toast.error("Une erreur est survenue");
+        console.error("Erreur mise à jour quantité:", error);
+      }
+    });
+  };
+
+  // ✅ Suppression avec Server Action
+  const handleRemove = () => {
+    if (isPending) return;
+
+    startTransition(async () => {
+      try {
+        const result = await removeCartItemAction(item.id);
+
+        if (result.success) {
+          await onUpdate(); // Recharger le panier
+          toast.success(`${result.data?.productTitle} supprimé du panier`);
+        } else {
+          toast.error(result.error || "Erreur lors de la suppression");
+        }
+      } catch (error) {
+        toast.error("Une erreur est survenue");
+        console.error("Erreur suppression:", error);
+      }
+    });
+  };
+
   return (
     <div className="flex gap-4 p-3 border rounded-lg">
       {/* Image placeholder */}
@@ -52,58 +91,70 @@ export function CartItem({ item }: CartItemProps) {
 
       {/* Informations */}
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-sm line-clamp-2 mb-1">{item.title}</h4>
+        <h4 className="font-medium text-sm line-clamp-2 mb-1">
+          {item.product.title}
+        </h4>
 
         <Badge
           variant="secondary"
-          className={`text-xs mb-2 ${getCategoryColor(item.category)}`}
+          className={`text-xs mb-2 ${getCategoryColor(item.product.category)}`}
         >
-          {item.category}
+          {item.product.category}
         </Badge>
 
         <div className="flex items-center justify-between">
-          <div className="text-sm font-semibold">{formatPrice(item.price)}</div>
+          <div className="text-sm font-semibold">
+            {formatPrice(item.product.price)}
+          </div>
 
           {/* Contrôles quantité */}
           <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-              disabled={item.quantity <= 1}
-              className="w-6 h-6 p-0"
-            >
-              <Minus className="w-3 h-3" />
-            </Button>
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleUpdateQuantity(item.quantity - 1)}
+                  disabled={item.quantity <= 1 || isPending}
+                  className="w-6 h-6 p-0"
+                >
+                  <Minus className="w-3 h-3" />
+                </Button>
 
-            <span className="text-sm font-medium w-8 text-center">
-              {item.quantity}
-            </span>
+                <span className="text-sm font-medium w-8 text-center">
+                  {item.quantity}
+                </span>
 
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-              className="w-6 h-6 p-0"
-            >
-              <Plus className="w-3 h-3" />
-            </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleUpdateQuantity(item.quantity + 1)}
+                  disabled={isPending}
+                  className="w-6 h-6 p-0"
+                >
+                  <Plus className="w-3 h-3" />
+                </Button>
 
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => removeItem(item.productId)}
-              className="w-6 h-6 p-0 text-destructive hover:text-destructive"
-            >
-              <Trash2 className="w-3 h-3" />
-            </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleRemove}
+                  disabled={isPending}
+                  className="w-6 h-6 p-0 text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
         {/* Prix total pour cet item */}
         {item.quantity > 1 && (
           <div className="text-xs text-muted-foreground mt-1">
-            Total: {formatPrice(item.price * item.quantity)}
+            Total: {formatPrice(item.product.price * item.quantity)}
           </div>
         )}
       </div>
