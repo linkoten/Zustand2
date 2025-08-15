@@ -3,27 +3,57 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { ProductStatus } from "@/lib/generated/prisma";
 
+// ✅ Fonction utilitaire réutilisable
+async function getCurrentUser() {
+  const { userId: clerkUserId } = await auth();
+
+  if (!clerkUserId) {
+    return null;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { clerkId: clerkUserId },
+    select: { id: true },
+  });
+
+  return user;
+}
+
 // GET - Récupérer le panier de l'utilisateur
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = await auth();
+    // ✅ Utiliser getCurrentUser au lieu de auth directement
+    const user = await getCurrentUser();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
     const cart = await prisma.cart.findUnique({
-      where: { userId },
+      where: { userId: user.id }, // ✅ Utiliser user.id au lieu de userId
       include: {
         items: {
           include: {
             product: true,
           },
+          orderBy: {
+            addedAt: "desc",
+          },
         },
       },
     });
 
-    return NextResponse.json({ cart: cart || { items: [] } });
+    return NextResponse.json({
+      cart: cart || { items: [] },
+      totalItems:
+        cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0,
+      totalPrice:
+        cart?.items?.reduce(
+          (sum, item) =>
+            sum + parseFloat(item.product.price.toString()) * item.quantity,
+          0
+        ) || 0,
+    });
   } catch (error: unknown) {
     const err = error as Error;
     console.error("❌ Erreur récupération panier:", err);
@@ -34,9 +64,10 @@ export async function GET(req: NextRequest) {
 // POST - Ajouter un produit au panier
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth();
+    // ✅ Utiliser getCurrentUser au lieu de auth directement
+    const user = await getCurrentUser();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
@@ -68,15 +99,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Créer le panier s'il n'existe pas
+    // ✅ Utiliser user.id
     let cart = await prisma.cart.findUnique({
-      where: { userId },
+      where: { userId: user.id },
     });
 
     if (!cart) {
       cart = await prisma.cart.create({
-        data: { userId },
+        data: { userId: user.id },
       });
+      console.log(`✅ Nouveau panier créé pour l'utilisateur: ${user.id}`);
     }
 
     // Vérifier si le produit est déjà dans le panier
@@ -108,7 +140,7 @@ export async function POST(req: NextRequest) {
 
     // Retourner le panier mis à jour
     const updatedCart = await prisma.cart.findUnique({
-      where: { userId },
+      where: { userId: user.id }, // ✅ Utiliser user.id
       include: {
         items: {
           include: {
