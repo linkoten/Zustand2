@@ -186,6 +186,9 @@ async function handleProductDeleted(product: StripeProduct) {
     });
 
     console.log("✅ Produit archivé dans la BDD");
+
+    revalidatePath("/fossiles");
+    revalidatePath("/");
   } catch (error) {
     console.error("❌ Erreur archivage produit:", error);
   }
@@ -212,6 +215,9 @@ async function handlePriceCreated(price: StripePrice) {
       revalidatePath("/");
       console.log("🔄 Cache invalidé après mise à jour prix");
     }
+
+    revalidatePath("/fossiles");
+    revalidatePath("/");
   } catch (error) {
     console.error("❌ Erreur mise à jour prix:", error);
   }
@@ -224,6 +230,9 @@ async function handlePriceUpdated(price: StripePrice) {
   if (price.active && price.unit_amount) {
     await handlePriceCreated(price);
   }
+
+  revalidatePath("/fossiles");
+  revalidatePath("/");
 }
 
 // 👤 CUSTOMER CRÉÉ - GESTION DES VALEURS NULLABLES
@@ -253,6 +262,9 @@ async function handleCustomerCreated(customer: StripeCustomer) {
         customer.email
       );
     }
+
+    revalidatePath("/fossiles");
+    revalidatePath("/");
   } catch (error) {
     console.error("❌ Erreur association customer:", error);
   }
@@ -292,6 +304,9 @@ async function handleCheckoutCompleted(session: StripeSession) {
         `✅ ${productIds.length} produit(s) marqué(s) comme vendu(s)`
       );
     }
+
+    revalidatePath("/fossiles");
+    revalidatePath("/");
   } catch (error) {
     console.error("❌ Erreur traitement checkout:", error);
   }
