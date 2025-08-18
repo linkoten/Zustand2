@@ -107,6 +107,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     }
   };
 
+  // Dans handleCheckout de cart-sidebar.tsx
   const handleCheckout = (): void => {
     if (!cart?.items?.length) return;
     onClose();
