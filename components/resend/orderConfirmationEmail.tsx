@@ -107,7 +107,8 @@ export function OrderConfirmationEmail({
             <Text style={text}>
               • Votre commande sera préparée et expédiée sous 2-3 jours ouvrés
               <br />
-              • Vous recevrez un email avec le numéro de suivi dès l'expédition
+              • Vous recevrez un email avec le numéro de suivi dès
+              l&apos;expédition
               <br />• La livraison prend généralement 3-5 jours ouvrés
             </Text>
           </Section>
@@ -122,7 +123,7 @@ export function OrderConfirmationEmail({
             </Text>
             <Text style={footerText}>
               Merci de votre confiance !<br />
-              L'équipe Fossiles & Merveilles
+              L&apos;équipe Fossiles & Merveilles
             </Text>
           </Section>
         </Container>
