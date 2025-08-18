@@ -57,7 +57,7 @@ export async function sendAdminNotificationEmail(data: OrderEmailData) {
   try {
     await resend.emails.send({
       from: EMAIL_CONFIG.from,
-      to: "admin@votre-domaine.com",
+      to: "francoiscatto@paleolitho.com",
       subject: `Nouvelle commande #${data.orderNumber}`,
       html: `
         <h2>Nouvelle commande reçue</h2>

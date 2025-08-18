@@ -209,8 +209,6 @@ export async function clearCartAction(): Promise<
       where: { cart: { userId: user.id } },
     });
 
-    revalidatePath("/fossiles");
-
     return {
       success: true,
       data: { removedItems: itemCount },
