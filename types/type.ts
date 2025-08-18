@@ -173,3 +173,29 @@ export interface SerializedCart {
   updatedAt: string;
   items: SerializedCartItem[];
 }
+
+export interface CheckoutRequest {
+  cartItems: SerializedCartItem[];
+  customerInfo: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    address: string;
+    city: string;
+    postalCode: string;
+    country: string;
+    phone?: string;
+  };
+}
+
+export interface CheckoutFormProps {
+  cart: SerializedCart;
+}
+
+export interface OrderSummaryProps {
+  cart: SerializedCart;
+}
+
+export interface SuccessPageProps {
+  searchParams: Promise<{ session_id?: string }>;
+}
