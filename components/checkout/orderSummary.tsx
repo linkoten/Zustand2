@@ -109,7 +109,7 @@ export function OrderSummary({ cart }: OrderSummaryProps) {
 
           {subtotal < 100 && (
             <div className="text-xs text-muted-foreground">
-              Livraison gratuite dès 100€ d'achat
+              Livraison gratuite dès 100€ d&apos;achat
             </div>
           )}
         </div>

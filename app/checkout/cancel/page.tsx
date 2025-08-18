@@ -17,8 +17,8 @@ export default function CheckoutCancelPage() {
           <CardContent className="space-y-6">
             <div className="text-center text-muted-foreground">
               <p>
-                Votre commande a été annulée. Aucun paiement n'a été effectué.
-                Vos articles sont toujours dans votre panier.
+                Votre commande a été annulée. Aucun paiement n&apos;a été
+                effectué. Vos articles sont toujours dans votre panier.
               </p>
             </div>
 
