@@ -65,10 +65,20 @@ export interface StripeCustomer {
 
 export interface StripeSession {
   id: string;
-  amount_total: number | null;
-  currency?: string | null;
-  customer?: string | null;
-  metadata?: Record<string, string>;
+  amount_total?: number | null;
+  metadata?: Record<string, string> | null;
+  // ✅ Ajouter shipping_details
+  shipping_details?: {
+    address?: {
+      country?: string | null;
+      city?: string | null;
+      line1?: string | null;
+      line2?: string | null;
+      postal_code?: string | null;
+      state?: string | null;
+    } | null;
+    name?: string | null;
+  } | null;
 }
 
 // ✅ Type avec price converti en number

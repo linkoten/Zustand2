@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       case "checkout.session.async_payment_succeeded":
       case "checkout.session.async_payment_failed":
         // Ces événements se déclenchent quand l'adresse change
-        await handleCheckoutSessionUpdated(event.data.object);
+        await handleCheckoutSessionUpdated(event.data.object as StripeSession);
         break;
 
       default:
@@ -320,7 +320,7 @@ async function handleCheckoutCompleted(session: StripeSession) {
   }
 }
 
-async function handleCheckoutSessionUpdated(session: any) {
+async function handleCheckoutSessionUpdated(session: StripeSession) {
   try {
     console.log("🔄 Session mise à jour:", session.id);
 
