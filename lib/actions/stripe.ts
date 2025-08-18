@@ -6,10 +6,7 @@ import { stripe } from "../../lib/stripe";
 import { getCartAction } from "./cart-actions";
 import prisma from "../prisma";
 import Stripe from "stripe";
-import {
-  ALL_SHIPPING_COUNTRIES,
-  calculateShippingCost,
-} from "@/lib/config/shipping-zones";
+import { ALL_SHIPPING_COUNTRIES } from "../config/Shipping-zone";
 
 export async function fetchClientSecret(): Promise<string> {
   try {
