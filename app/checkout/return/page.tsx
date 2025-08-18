@@ -5,6 +5,10 @@ import { CheckCircle, ArrowRight, XCircle } from "lucide-react";
 import Link from "next/link";
 import { stripe } from "@/lib/stripe";
 import { clearCartAction } from "@/lib/actions/cart-actions";
+import {
+  sendAdminNotificationEmail,
+  sendOrderConfirmationEmail,
+} from "@/components/resend/sendOrderConfirmationEmail";
 
 interface ReturnPageProps {
   searchParams: Promise<{ session_id?: string }>;
@@ -24,8 +28,9 @@ export default async function CheckoutReturnPage({
       expand: ["line_items", "payment_intent"],
     });
 
-    const { status, customer_details } = session;
+    const { status, customer_details, line_items } = session;
     const customerEmail = customer_details?.email;
+    const customerName = customer_details?.name;
 
     // Rediriger si la session est toujours ouverte
     if (status === "open") {
@@ -36,6 +41,47 @@ export default async function CheckoutReturnPage({
     if (status === "complete") {
       // Vider le panier après paiement réussi
       await clearCartAction();
+
+      // Envoyer l'email de confirmation
+      if (customerEmail && customerName && line_items) {
+        try {
+          const orderItems = line_items.data.map((item) => ({
+            name: item.description || "Article",
+            price: new Intl.NumberFormat("fr-FR", {
+              style: "currency",
+              currency: "EUR",
+            }).format((item.amount_total || 0) / 100),
+            quantity: item.quantity || 1,
+          }));
+
+          const emailData = {
+            customerEmail,
+            customerName,
+            orderNumber: session_id.slice(-8).toUpperCase(),
+            orderTotal: new Intl.NumberFormat("fr-FR", {
+              style: "currency",
+              currency: "EUR",
+            }).format((session.amount_total || 0) / 100),
+            orderItems,
+            // ✅ Simplifier l'adresse de livraison pour éviter les erreurs TypeScript
+            shippingAddress: {
+              name: customerName,
+              line1: customer_details?.address?.line1 || "Adresse à préciser",
+              city: customer_details?.address?.city || "Ville à préciser",
+              postal_code: customer_details?.address?.postal_code || "",
+              country: customer_details?.address?.country || "France",
+            },
+          };
+
+          // Envoyer email client
+          await sendOrderConfirmationEmail(emailData);
+
+          // Envoyer notification admin (optionnel)
+          await sendAdminNotificationEmail(emailData);
+        } catch (emailError) {
+          console.error("❌ Erreur envoi email:", emailError);
+        }
+      }
 
       return (
         <div className="container mx-auto px-4 py-16">
@@ -67,7 +113,7 @@ export default async function CheckoutReturnPage({
                     <div>
                       <span className="font-medium">Numéro de commande :</span>
                       <p className="text-muted-foreground font-mono text-xs">
-                        {session_id}
+                        #{session_id.slice(-8).toUpperCase()}
                       </p>
                     </div>
                     <div>
@@ -88,10 +134,10 @@ export default async function CheckoutReturnPage({
                   <p>
                     Si vous avez des questions, contactez-nous à{" "}
                     <a
-                      href="mailto:support@votre-site.com"
+                      href="mailto:support@votre-domaine.com"
                       className="font-medium text-primary hover:underline"
                     >
-                      support@votre-site.com
+                      support@votre-domaine.com
                     </a>
                   </p>
                 </div>
@@ -114,7 +160,7 @@ export default async function CheckoutReturnPage({
       );
     }
 
-    // Autres statuts (expired, etc.)
+    // Autres statuts...
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto">

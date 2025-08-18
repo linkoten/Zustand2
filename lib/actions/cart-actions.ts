@@ -90,7 +90,6 @@ export async function addToCartAction(
     }
 
     // Revalider les pages qui affichent le panier
-    revalidatePath("/panier");
     revalidatePath("/fossiles");
 
     return {
@@ -138,7 +137,6 @@ export async function updateCartItemQuantityAction(
       data: { quantity },
     });
 
-    revalidatePath("/panier");
     revalidatePath("/fossiles");
 
     return { success: true };
@@ -211,7 +209,6 @@ export async function clearCartAction(): Promise<
       where: { cart: { userId: user.id } },
     });
 
-    revalidatePath("/panier");
     revalidatePath("/fossiles");
 
     return {
