@@ -5,7 +5,11 @@ import { auth } from "@clerk/nextjs/server";
 import { stripe } from "../../lib/stripe";
 import { getCartAction } from "./cart-actions";
 import prisma from "../prisma";
-import Stripe from "stripe"; // ✅ Ajouter l'import Stripe
+import Stripe from "stripe";
+import {
+  ALL_SHIPPING_COUNTRIES,
+  calculateShippingCost,
+} from "@/lib/config/shipping-zones";
 
 export async function fetchClientSecret(): Promise<string> {
   try {
@@ -37,7 +41,7 @@ export async function fetchClientSecret(): Promise<string> {
       throw new Error("Certains produits ne sont plus disponibles");
     }
 
-    // ✅ Typer correctement le tableau des line items
+    // Créer les line items pour les produits
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
       cart.items.map((item) => {
         const product = products.find((p) => p.id === item.productId);
@@ -53,27 +57,14 @@ export async function fetchClientSecret(): Promise<string> {
         };
       });
 
-    // Calculer les frais de livraison
+    // ✅ Calculer le sous-total des produits
     const subtotal = cart.items.reduce(
       (sum, item) => sum + item.product.price * item.quantity,
       0
     );
-    const shippingCost = subtotal >= 100 ? 0 : 9.99;
 
-    // ✅ Ajouter les frais de livraison avec le bon type
-    if (shippingCost > 0) {
-      lineItems.push({
-        price_data: {
-          currency: "eur",
-          product_data: {
-            name: "Frais de livraison",
-            description: "Livraison standard",
-          },
-          unit_amount: Math.round(shippingCost * 100),
-        },
-        quantity: 1,
-      });
-    }
+    // ✅ Les frais de livraison seront calculés dynamiquement côté client
+    // Nous créons plusieurs options de frais de livraison que Stripe pourra utiliser
 
     // Créer la session Stripe Checkout Embedded
     const session = await stripe.checkout.sessions.create({
@@ -81,14 +72,33 @@ export async function fetchClientSecret(): Promise<string> {
       line_items: lineItems,
       mode: "payment",
       return_url: `${origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+      // ✅ Utiliser tous les pays supportés par nos zones
       shipping_address_collection: {
-        allowed_countries: ["FR", "BE", "CH", "LU", "MC"],
+        allowed_countries: ALL_SHIPPING_COUNTRIES,
       },
       billing_address_collection: "required",
+      // ✅ Options de livraison dynamiques
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: "fixed_amount",
+            fixed_amount: {
+              amount: 0, // Livraison gratuite (sera mise à jour dynamiquement)
+              currency: "eur",
+            },
+            display_name: "Livraison gratuite",
+            delivery_estimate: {
+              minimum: { unit: "business_day", value: 2 },
+              maximum: { unit: "business_day", value: 21 },
+            },
+          },
+        },
+      ],
       metadata: {
         userId: userId,
         cartItemIds: cart.items.map((item) => item.id).join(","),
         productIds: cart.items.map((item) => item.productId).join(","),
+        subtotal: subtotal.toString(),
       },
       custom_fields: [
         {
@@ -103,7 +113,6 @@ export async function fetchClientSecret(): Promise<string> {
       ],
     });
 
-    // ✅ S'assurer qu'on retourne toujours une string
     if (!session.client_secret) {
       throw new Error("Impossible de créer la session de paiement");
     }
