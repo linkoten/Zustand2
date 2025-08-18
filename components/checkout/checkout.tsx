@@ -19,17 +19,24 @@ const stripePromise = loadStripe(
 
 type CheckoutState = "loading" | "ready" | "error";
 
-export default function CheckoutComponent() {
+interface CheckoutComponentProps {
+  selectedCountry?: string; // ✅ Nouveau prop optionnel
+}
+
+export default function CheckoutComponent({
+  selectedCountry,
+}: CheckoutComponentProps) {
   const [state, setState] = useState<CheckoutState>("loading");
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ Utiliser useCallback pour optimiser les performances
+  // ✅ Passer le pays sélectionné à fetchClientSecret
   const handleFetchClientSecret = useCallback(async (): Promise<string> => {
     try {
       setState("loading");
       setError(null);
 
-      const clientSecret = await fetchClientSecret();
+      // ✅ Passer le pays à votre fonction
+      const clientSecret = await fetchClientSecret(selectedCountry);
 
       setState("ready");
       return clientSecret;
@@ -45,12 +52,11 @@ export default function CheckoutComponent() {
 
       throw new Error(errorMessage);
     }
-  }, []);
+  }, [selectedCountry]); // ✅ Ajouter selectedCountry aux dépendances
 
   const handleRetry = () => {
     setError(null);
     setState("loading");
-    // Le composant EmbeddedCheckout va automatiquement rappeler fetchClientSecret
   };
 
   if (state === "error" && error) {
@@ -82,38 +88,24 @@ export default function CheckoutComponent() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2 flex items-center justify-center gap-2">
-            <CreditCard className="w-8 h-8" />
-            Finaliser votre commande
-          </h1>
-          <p className="text-muted-foreground">
-            Sécurisé par Stripe - Paiement par carte bancaire
-          </p>
+    <div className="bg-white rounded-lg shadow-sm border min-h-[600px] relative">
+      {state === "loading" && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">
+              Chargement du formulaire de paiement...
+            </p>
+          </div>
         </div>
+      )}
 
-        <div className="bg-white rounded-lg shadow-sm border min-h-[600px] relative">
-          {state === "loading" && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
-              <div className="text-center">
-                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-                <p className="text-muted-foreground">
-                  Chargement du formulaire de paiement...
-                </p>
-              </div>
-            </div>
-          )}
-
-          <EmbeddedCheckoutProvider
-            stripe={stripePromise}
-            options={{ fetchClientSecret: handleFetchClientSecret }}
-          >
-            <EmbeddedCheckout />
-          </EmbeddedCheckoutProvider>
-        </div>
-      </div>
+      <EmbeddedCheckoutProvider
+        stripe={stripePromise}
+        options={{ fetchClientSecret: handleFetchClientSecret }}
+      >
+        <EmbeddedCheckout />
+      </EmbeddedCheckoutProvider>
     </div>
   );
 }
