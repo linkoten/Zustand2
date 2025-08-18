@@ -6,7 +6,11 @@ import { stripe } from "../../lib/stripe";
 import { getCartAction } from "./cart-actions";
 import prisma from "../prisma";
 import Stripe from "stripe";
-import { ALL_SHIPPING_COUNTRIES } from "../config/Shipping-zone";
+import {
+  ALL_SHIPPING_COUNTRIES,
+  calculateShippingByWeight,
+  estimateFossilWeight,
+} from "../config/shipping-zones";
 
 export async function fetchClientSecret(): Promise<string> {
   try {
@@ -54,14 +58,117 @@ export async function fetchClientSecret(): Promise<string> {
         };
       });
 
-    // ✅ Calculer le sous-total des produits
+    // ✅ Calculer le sous-total des produits (price est déjà un number)
     const subtotal = cart.items.reduce(
       (sum, item) => sum + item.product.price * item.quantity,
       0
     );
 
-    // ✅ Les frais de livraison seront calculés dynamiquement côté client
-    // Nous créons plusieurs options de frais de livraison que Stripe pourra utiliser
+    // ✅ Calculer le poids total estimé du panier
+    const totalWeight = cart.items.reduce((weight, item) => {
+      const product = products.find((p) => p.id === item.productId);
+      if (product) {
+        // ✅ Gérer les deux cas : Decimal ou number
+        const productPrice =
+          typeof product.price === "number"
+            ? product.price
+            : product.price.toNumber();
+
+        const itemWeight = estimateFossilWeight(product.category, productPrice);
+        return weight + itemWeight * item.quantity;
+      }
+      return weight;
+    }, 0);
+
+    // ✅ Créer les options de livraison avec tarifs Colissimo réels
+    const shippingFrance = calculateShippingByWeight(
+      subtotal,
+      totalWeight,
+      "FR"
+    );
+    const shippingEU = calculateShippingByWeight(subtotal, totalWeight, "DE");
+    const shippingWorld = calculateShippingByWeight(
+      subtotal,
+      totalWeight,
+      "US"
+    );
+
+    const shippingOptions = [
+      // France métropolitaine
+      {
+        shipping_rate_data: {
+          type: "fixed_amount" as const,
+          fixed_amount: {
+            amount: Math.round(shippingFrance.cost * 100), // Convertir en centimes
+            currency: "eur",
+          },
+          display_name:
+            shippingFrance.cost === 0
+              ? "🇫🇷 Livraison gratuite (France)"
+              : `🇫🇷 France - ${shippingFrance.service}`,
+          delivery_estimate: {
+            minimum: { unit: "business_day" as const, value: 2 },
+            maximum: { unit: "business_day" as const, value: 3 },
+          },
+        },
+      },
+      // Union Européenne
+      {
+        shipping_rate_data: {
+          type: "fixed_amount" as const,
+          fixed_amount: {
+            amount: Math.round(shippingEU.cost * 100),
+            currency: "eur",
+          },
+          display_name:
+            shippingEU.cost === 0
+              ? "🇪🇺 Livraison gratuite (UE)"
+              : `🇪🇺 Union Européenne - ${shippingEU.service}`,
+          delivery_estimate: {
+            minimum: { unit: "business_day" as const, value: 3 },
+            maximum: { unit: "business_day" as const, value: 6 },
+          },
+        },
+      },
+      // Europe hors UE + Maghreb
+      {
+        shipping_rate_data: {
+          type: "fixed_amount" as const,
+          fixed_amount: {
+            amount: Math.round(
+              calculateShippingByWeight(subtotal, totalWeight, "CH").cost * 100
+            ),
+            currency: "eur",
+          },
+          display_name:
+            calculateShippingByWeight(subtotal, totalWeight, "CH").cost === 0
+              ? "🇨🇭 Livraison gratuite (Europe élargie)"
+              : "🇨🇭 Europe hors UE + Maghreb",
+          delivery_estimate: {
+            minimum: { unit: "business_day" as const, value: 4 },
+            maximum: { unit: "business_day" as const, value: 8 },
+          },
+        },
+      },
+      // Reste du monde
+      {
+        shipping_rate_data: {
+          type: "fixed_amount" as const,
+          fixed_amount: {
+            amount: Math.round(shippingWorld.cost * 100),
+            currency: "eur",
+          },
+          display_name:
+            shippingWorld.cost === 0
+              ? "🌍 Livraison gratuite (International)"
+              : `🌍 International - ${shippingWorld.service}`,
+          delivery_estimate: {
+            minimum: { unit: "business_day" as const, value: 7 },
+            maximum: { unit: "business_day" as const, value: 14 },
+          },
+        },
+      },
+    ];
 
     // Créer la session Stripe Checkout Embedded
     const session = await stripe.checkout.sessions.create({
@@ -74,28 +181,14 @@ export async function fetchClientSecret(): Promise<string> {
         allowed_countries: ALL_SHIPPING_COUNTRIES,
       },
       billing_address_collection: "required",
-      // ✅ Options de livraison dynamiques
-      shipping_options: [
-        {
-          shipping_rate_data: {
-            type: "fixed_amount",
-            fixed_amount: {
-              amount: 0, // Livraison gratuite (sera mise à jour dynamiquement)
-              currency: "eur",
-            },
-            display_name: "Livraison gratuite",
-            delivery_estimate: {
-              minimum: { unit: "business_day", value: 2 },
-              maximum: { unit: "business_day", value: 21 },
-            },
-          },
-        },
-      ],
+      // ✅ Options de livraison avec tarifs Colissimo réels
+      shipping_options: shippingOptions,
       metadata: {
         userId: userId,
         cartItemIds: cart.items.map((item) => item.id).join(","),
         productIds: cart.items.map((item) => item.productId).join(","),
         subtotal: subtotal.toString(),
+        totalWeight: totalWeight.toString(), // ✅ Ajouter le poids dans les métadonnées
       },
       custom_fields: [
         {
@@ -113,6 +206,16 @@ export async function fetchClientSecret(): Promise<string> {
     if (!session.client_secret) {
       throw new Error("Impossible de créer la session de paiement");
     }
+
+    console.log("✅ Session créée avec options de livraison:", {
+      sessionId: session.id,
+      subtotal: subtotal,
+      totalWeight: `${totalWeight}g`,
+      shippingOptions: shippingOptions.map((opt) => ({
+        name: opt.shipping_rate_data.display_name,
+        cost: `${opt.shipping_rate_data.fixed_amount.amount / 100}€`,
+      })),
+    });
 
     return session.client_secret;
   } catch (error) {
