@@ -13,6 +13,7 @@ import {
   StripeSession,
 } from "@/types/type";
 import { revalidatePath } from "next/cache";
+import { calculateShippingByWeight } from "@/lib/config/shipping-zones";
 
 export async function POST(req: NextRequest) {
   try {
@@ -58,6 +59,13 @@ export async function POST(req: NextRequest) {
 
       case "checkout.session.completed":
         await handleCheckoutCompleted(event.data.object as StripeSession);
+        break;
+
+      // ✅ Ajouter ce nouveau cas
+      case "checkout.session.async_payment_succeeded":
+      case "checkout.session.async_payment_failed":
+        // Ces événements se déclenchent quand l'adresse change
+        await handleCheckoutSessionUpdated(event.data.object);
         break;
 
       default:
@@ -309,6 +317,61 @@ async function handleCheckoutCompleted(session: StripeSession) {
     revalidatePath("/");
   } catch (error) {
     console.error("❌ Erreur traitement checkout:", error);
+  }
+}
+
+async function handleCheckoutSessionUpdated(session: any) {
+  try {
+    console.log("🔄 Session mise à jour:", session.id);
+
+    // Vérifier si l'adresse de livraison a changé
+    if (session.shipping_details?.address?.country) {
+      const country = session.shipping_details.address.country;
+      const subtotal = parseFloat(session.metadata?.subtotal || "0");
+      const totalWeight = parseFloat(session.metadata?.totalWeight || "500");
+
+      console.log(`📍 Nouveau pays détecté: ${country}`);
+
+      // Calculer les nouveaux frais de livraison
+      const shipping = calculateShippingByWeight(
+        subtotal,
+        totalWeight,
+        country
+      );
+      const shippingAmountCents = Math.round(shipping.cost * 100);
+
+      // Créer une nouvelle option de livraison spécifique au pays
+      const newShippingOptions = [
+        {
+          shipping_rate_data: {
+            type: "fixed_amount" as const,
+            fixed_amount: {
+              amount: shippingAmountCents,
+              currency: "eur",
+            },
+            display_name:
+              shipping.cost === 0
+                ? `🚚 Livraison gratuite vers ${country}`
+                : `🚚 Livraison vers ${country} - ${shipping.service}`,
+            delivery_estimate: {
+              minimum: { unit: "business_day" as const, value: 2 },
+              maximum: { unit: "business_day" as const, value: 14 },
+            },
+          },
+        },
+      ];
+
+      // Mettre à jour la session avec les nouveaux frais
+      await stripe.checkout.sessions.update(session.id, {
+        shipping_options: newShippingOptions,
+      });
+
+      console.log(
+        `✅ Frais de livraison mis à jour: ${shipping.cost}€ pour ${country}`
+      );
+    }
+  } catch (error) {
+    console.error("❌ Erreur mise à jour frais livraison:", error);
   }
 }
 

@@ -182,7 +182,6 @@ export async function fetchClientSecret(): Promise<string> {
       },
       billing_address_collection: "required",
       // ✅ Options de livraison avec tarifs Colissimo réels
-      shipping_options: shippingOptions,
       metadata: {
         userId: userId,
         cartItemIds: cart.items.map((item) => item.id).join(","),
