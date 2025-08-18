@@ -80,101 +80,91 @@ export async function fetchClientSecret(): Promise<string> {
       return weight;
     }, 0);
 
-    const shippingOptions = [
-      // France - Différents poids
-      {
-        shipping_rate_data: {
-          type: "fixed_amount" as const,
-          fixed_amount: { amount: 680, currency: "eur" },
-          display_name: "🇫🇷 France (0-500g) - Colissimo",
-          delivery_estimate: {
-            minimum: { unit: "business_day" as const, value: 2 },
-            maximum: { unit: "business_day" as const, value: 3 },
-          },
-        },
-      },
-      {
-        shipping_rate_data: {
-          type: "fixed_amount" as const,
-          fixed_amount: { amount: 895, currency: "eur" },
-          display_name: "🇫🇷 France (500g-1kg) - Colissimo",
-          delivery_estimate: {
-            minimum: { unit: "business_day" as const, value: 2 },
-            maximum: { unit: "business_day" as const, value: 3 },
-          },
-        },
-      },
+    // ✅ Créer les options de livraison avec tarifs Colissimo réels
+    const shippingFrance = calculateShippingByWeight(
+      subtotal,
+      totalWeight,
+      "FR"
+    );
+    const shippingEU = calculateShippingByWeight(subtotal, totalWeight, "DE");
+    const shippingWorld = calculateShippingByWeight(
+      subtotal,
+      totalWeight,
+      "US"
+    );
 
+    const shippingOptions = [
+      // France métropolitaine
+      {
+        shipping_rate_data: {
+          type: "fixed_amount" as const,
+          fixed_amount: {
+            amount: Math.round(shippingFrance.cost * 100), // Convertir en centimes
+            currency: "eur",
+          },
+          display_name:
+            shippingFrance.cost === 0
+              ? "🇫🇷 Livraison gratuite (France)"
+              : `🇫🇷 France - ${shippingFrance.service}`,
+          delivery_estimate: {
+            minimum: { unit: "business_day" as const, value: 2 },
+            maximum: { unit: "business_day" as const, value: 3 },
+          },
+        },
+      },
       // Union Européenne
       {
         shipping_rate_data: {
           type: "fixed_amount" as const,
-          fixed_amount: { amount: 1395, currency: "eur" },
-          display_name: "🇪🇺 Union Européenne (0-500g)",
+          fixed_amount: {
+            amount: Math.round(shippingEU.cost * 100),
+            currency: "eur",
+          },
+          display_name:
+            shippingEU.cost === 0
+              ? "🇪🇺 Livraison gratuite (UE)"
+              : `🇪🇺 Union Européenne - ${shippingEU.service}`,
           delivery_estimate: {
             minimum: { unit: "business_day" as const, value: 3 },
             maximum: { unit: "business_day" as const, value: 6 },
           },
         },
       },
+      // Europe hors UE + Maghreb
       {
         shipping_rate_data: {
           type: "fixed_amount" as const,
-          fixed_amount: { amount: 1670, currency: "eur" },
-          display_name: "🇪🇺 Union Européenne (500g-1kg)",
-          delivery_estimate: {
-            minimum: { unit: "business_day" as const, value: 3 },
-            maximum: { unit: "business_day" as const, value: 6 },
+          fixed_amount: {
+            amount: Math.round(
+              calculateShippingByWeight(subtotal, totalWeight, "CH").cost * 100
+            ),
+            currency: "eur",
           },
-        },
-      },
-
-      // Europe hors UE
-      {
-        shipping_rate_data: {
-          type: "fixed_amount" as const,
-          fixed_amount: { amount: 1635, currency: "eur" },
-          display_name: "🇨🇭 Europe hors UE + Maghreb",
+          display_name:
+            calculateShippingByWeight(subtotal, totalWeight, "CH").cost === 0
+              ? "🇨🇭 Livraison gratuite (Europe élargie)"
+              : "🇨🇭 Europe hors UE + Maghreb",
           delivery_estimate: {
             minimum: { unit: "business_day" as const, value: 4 },
             maximum: { unit: "business_day" as const, value: 8 },
           },
         },
       },
-
-      // International
+      // Reste du monde
       {
         shipping_rate_data: {
           type: "fixed_amount" as const,
-          fixed_amount: { amount: 1885, currency: "eur" },
-          display_name: "🌍 International (Monde)",
+          fixed_amount: {
+            amount: Math.round(shippingWorld.cost * 100),
+            currency: "eur",
+          },
+          display_name:
+            shippingWorld.cost === 0
+              ? "🌍 Livraison gratuite (International)"
+              : `🌍 International - ${shippingWorld.service}`,
           delivery_estimate: {
             minimum: { unit: "business_day" as const, value: 7 },
             maximum: { unit: "business_day" as const, value: 14 },
-          },
-        },
-      },
-
-      // ✅ Options de livraison gratuite
-      {
-        shipping_rate_data: {
-          type: "fixed_amount" as const,
-          fixed_amount: { amount: 0, currency: "eur" },
-          display_name: "🆓 Livraison gratuite France (>100€)",
-          delivery_estimate: {
-            minimum: { unit: "business_day" as const, value: 2 },
-            maximum: { unit: "business_day" as const, value: 3 },
-          },
-        },
-      },
-      {
-        shipping_rate_data: {
-          type: "fixed_amount" as const,
-          fixed_amount: { amount: 0, currency: "eur" },
-          display_name: "🆓 Livraison gratuite UE (>150€)",
-          delivery_estimate: {
-            minimum: { unit: "business_day" as const, value: 3 },
-            maximum: { unit: "business_day" as const, value: 6 },
           },
         },
       },
