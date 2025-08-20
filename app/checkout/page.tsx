@@ -6,39 +6,7 @@ import { getCartAction } from "@/lib/actions/cart-actions";
 import CheckoutComponent from "@/components/checkout/checkout";
 import { CountrySelector } from "@/components/checkout/country-selector";
 import { estimateFossilWeight } from "@/lib/config/shipping-zones";
-
-// ✅ Types qui correspondent EXACTEMENT à votre schema.prisma
-interface CartItem {
-  id: string; // @default(cuid()) -> string
-  quantity: number;
-  productId: number; // Int
-  product: {
-    id: number; // Int @id @default(autoincrement())
-    title: string;
-    price: number; // Decimal mais converti en number côté client
-    category: string; // Category enum
-    genre: string;
-    species: string;
-    countryOfOrigin: string;
-    description?: string | null; // Pas dans le schéma mais peut être ajouté
-    imageUrl?: string | null; // Pas dans le schéma mais peut être ajouté
-    stripePriceId: string | null;
-    status: string; // ProductStatus enum
-    createdAt: string; // DateTime converti en string
-    updatedAt: string; // DateTime converti en string
-  };
-  cartId: string; // String
-  createdAt?: string; // addedAt dans le schéma
-  updatedAt?: string;
-}
-
-interface Cart {
-  id: string; // @id @default(cuid()) -> string
-  userId: number; // Int @unique - RÉFÉRENCE au User.id qui est Int
-  items: CartItem[];
-  createdAt: string; // DateTime converti en string
-  updatedAt: string; // DateTime converti en string
-}
+import { CartData, CartItemData } from "@/types/type"; // ✅ Importer les types existants
 
 // ✅ Données des pays pour l'affichage
 const countryGroups = [
@@ -228,7 +196,7 @@ const countryGroups = [
 
 export default function CheckoutPage() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-  const [cart, setCart] = useState<Cart | null>(null);
+  const [cart, setCart] = useState<CartData | null>(null); // ✅ Utiliser CartData
   const [loading, setLoading] = useState(true);
 
   // Charger le panier côté client
@@ -242,7 +210,7 @@ export default function CheckoutPage() {
           return;
         }
 
-        setCart(cartData);
+        setCart(cartData); // ✅ Maintenant compatible
       } catch (error) {
         console.error("Erreur chargement panier:", error);
         redirect("/fossiles");
@@ -268,19 +236,23 @@ export default function CheckoutPage() {
     return null;
   }
 
-  // Calculer le sous-total et le poids
+  // ✅ Calculer le sous-total et le poids avec les bons types
   const subtotal = cart.items.reduce(
-    (sum: number, item: CartItem) => sum + item.product.price * item.quantity,
+    (sum: number, item: CartItemData) =>
+      sum + item.product.price * item.quantity,
     0
   );
 
-  const totalWeight = cart.items.reduce((weight: number, item: CartItem) => {
-    const itemWeight = estimateFossilWeight(
-      item.product.category,
-      item.product.price
-    );
-    return weight + itemWeight * item.quantity;
-  }, 0);
+  const totalWeight = cart.items.reduce(
+    (weight: number, item: CartItemData) => {
+      const itemWeight = estimateFossilWeight(
+        item.product.category,
+        item.product.price
+      );
+      return weight + itemWeight * item.quantity;
+    },
+    0
+  );
 
   const handleCountrySelected = (country: string) => {
     setSelectedCountry(country);
