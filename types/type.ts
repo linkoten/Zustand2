@@ -102,7 +102,7 @@ export interface SerializedProduct {
   geologicalStage: string;
   description?: string;
   stripePriceId?: string | null;
-  status: string;
+  status: ProductStatus;
   createdAt: string;
   updatedAt: string;
   images: SerializedProductImage[]; // ✅ Array d'images au lieu d'une seule
@@ -275,23 +275,4 @@ export interface SerializedProductImage {
   altText?: string;
   order: number;
   createdAt: string;
-}
-
-export interface SerializedProduct {
-  id: number;
-  title: string;
-  price: number;
-  category: string;
-  genre: string;
-  species: string;
-  countryOfOrigin: string;
-  locality: string;
-  geologicalPeriod: string;
-  geologicalStage: string;
-  description?: string;
-  stripePriceId?: string | null;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  images: SerializedProductImage[];
 }

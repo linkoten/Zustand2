@@ -12,10 +12,10 @@ import { Button } from "@/components/ui/button";
 import { ProductStatus } from "@/lib/generated/prisma";
 import { ShoppingCart, Eye, CheckCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import Link from "next/link";
 import { addToCartAction } from "@/lib/actions/cart-actions"; // ✅ Import Server Action
-import { FossilCardProps, SerializedProduct } from "@/types/type";
+import { FossilCardProps } from "@/types/type";
 
 export function FossilCard({ fossil }: FossilCardProps) {
   const [isPending, startTransition] = useTransition(); // ✅ Hook pour Server Actions
