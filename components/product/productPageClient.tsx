@@ -122,7 +122,7 @@ export default function ProductPageClient({
 
                 <div className="grid grid-cols-1 gap-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="font-medium">Pays d'origine :</span>
+                    <span className="font-medium">Pays d&apos;origine :</span>
                     <span>{product.countryOfOrigin}</span>
                   </div>
                   <div className="flex justify-between">

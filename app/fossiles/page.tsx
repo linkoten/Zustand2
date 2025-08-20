@@ -4,7 +4,12 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { ProductStatus } from "@/lib/generated/prisma";
+import {
+  Category,
+  GeologicalPeriod,
+  Prisma,
+  ProductStatus,
+} from "@/lib/generated/prisma";
 import FossilesClient from "@/components/fossils/fossilesClient";
 
 interface SearchParams {
@@ -19,18 +24,26 @@ async function getFossils(
   filters: SearchParams = {}
 ): Promise<SerializedProduct[]> {
   try {
-    const whereConditions: any = {
+    const whereConditions: Prisma.ProductWhereInput = {
       status: ProductStatus.AVAILABLE,
     };
 
-    if (filters.category) whereConditions.category = filters.category;
-    if (filters.countryOfOrigin)
+    if (filters.category) {
+      whereConditions.category = filters.category as Category;
+    }
+    if (filters.countryOfOrigin) {
       whereConditions.countryOfOrigin = filters.countryOfOrigin;
-    if (filters.locality) whereConditions.locality = filters.locality;
-    if (filters.geologicalPeriod)
-      whereConditions.geologicalPeriod = filters.geologicalPeriod;
-    if (filters.geologicalStage)
+    }
+    if (filters.locality) {
+      whereConditions.locality = filters.locality;
+    }
+    if (filters.geologicalPeriod) {
+      whereConditions.geologicalPeriod =
+        filters.geologicalPeriod as GeologicalPeriod;
+    }
+    if (filters.geologicalStage) {
       whereConditions.geologicalStage = filters.geologicalStage;
+    }
 
     const fossils = await prisma.product.findMany({
       where: whereConditions,

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
-import { ProductStatus } from "@/lib/generated/prisma";
+import { Category, ProductStatus } from "@/lib/generated/prisma";
 import { SerializedProduct } from "@/types/type";
 import ProductPageClient from "@/components/product/productPageClient";
 
@@ -58,7 +58,7 @@ async function getSimilarProducts(
     const products = await prisma.product.findMany({
       where: {
         id: { not: currentProductId },
-        category: category as any,
+        category: category as Category,
         status: ProductStatus.AVAILABLE,
       },
       include: {

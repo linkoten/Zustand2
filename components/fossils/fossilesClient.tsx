@@ -16,6 +16,15 @@ interface FossilesClientProps {
   };
 }
 
+// ✅ Interface pour les filtres actifs
+interface ActiveFilters {
+  category?: string;
+  countryOfOrigin?: string;
+  locality?: string;
+  geologicalPeriod?: string;
+  geologicalStage?: string;
+}
+
 export default function FossilesClient({
   fossils,
   filterOptions,
@@ -24,7 +33,7 @@ export default function FossilesClient({
   const searchParams = useSearchParams();
 
   // ✅ Récupérer les filtres actifs depuis l'URL
-  const activeFilters = {
+  const activeFilters: ActiveFilters = {
     category: searchParams.get("category") || undefined,
     countryOfOrigin: searchParams.get("countryOfOrigin") || undefined,
     locality: searchParams.get("locality") || undefined,
@@ -35,14 +44,15 @@ export default function FossilesClient({
   // ✅ Nettoyer les valeurs undefined
   const cleanActiveFilters = Object.fromEntries(
     Object.entries(activeFilters).filter(([_, value]) => value !== undefined)
-  );
+  ) as Record<string, string>;
 
-  const handleFiltersChange = (newFilters: any) => {
+  // ✅ Type approprié pour handleFiltersChange
+  const handleFiltersChange = (newFilters: ActiveFilters) => {
     const params = new URLSearchParams();
 
     Object.entries(newFilters).forEach(([key, value]) => {
       if (value) {
-        params.set(key, value as string);
+        params.set(key, value);
       }
     });
 

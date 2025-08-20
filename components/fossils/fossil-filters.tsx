@@ -209,7 +209,7 @@ export default function FossilesFilters({
 
             {/* Pays d'origine */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Pays d'origine</label>
+              <label className="text-sm font-medium">Pays d&apos;origine</label>
               <Select
                 value={activeFilters.countryOfOrigin || "all"}
                 onValueChange={(value) =>
