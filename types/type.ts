@@ -228,3 +228,70 @@ export interface OrderSummaryProps {
 export interface SuccessPageProps {
   searchParams: Promise<{ session_id?: string }>;
 }
+
+// ✅ Type pour un produit dans le panier (sans images pour optimiser)
+export interface CartProduct {
+  id: number;
+  title: string;
+  price: number;
+  category: string;
+  genre: string;
+  species: string;
+  countryOfOrigin: string;
+  locality: string;
+  geologicalPeriod: string;
+  geologicalStage: string;
+  description?: string;
+  stripeProductId?: string | null;
+  stripePriceId?: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ✅ Type pour les items du panier (avec produit sans images)
+export interface CartItemData {
+  id: string;
+  cartId: string;
+  productId: number;
+  quantity: number;
+  addedAt: string;
+  product: CartProduct; // ✅ Produit sans images
+}
+
+// ✅ Type pour le panier complet
+export interface CartData {
+  id: string;
+  userId: number;
+  createdAt: string;
+  updatedAt: string;
+  items: CartItemData[];
+}
+
+// Garder les anciens types pour la compatibilité avec d'autres parties
+export interface SerializedProductImage {
+  id: string;
+  imageUrl: string;
+  altText?: string;
+  order: number;
+  createdAt: string;
+}
+
+export interface SerializedProduct {
+  id: number;
+  title: string;
+  price: number;
+  category: string;
+  genre: string;
+  species: string;
+  countryOfOrigin: string;
+  locality: string;
+  geologicalPeriod: string;
+  geologicalStage: string;
+  description?: string;
+  stripePriceId?: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  images: SerializedProductImage[];
+}

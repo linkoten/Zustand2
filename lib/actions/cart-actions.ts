@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { ProductStatus } from "@/lib/generated/prisma";
 import { revalidatePath } from "next/cache";
-import { ActionResult } from "@/types/type";
+import { ActionResult, CartData } from "@/types/type";
 
 // ✅ Fonction utilitaire pour récupérer l'utilisateur BDD
 async function getCurrentUser() {
@@ -220,21 +220,20 @@ export async function clearCartAction(): Promise<
 }
 
 // ✅ Récupérer le panier (pour affichage)
-export async function getCartAction() {
+export async function getCartAction(): Promise<CartData | null> {
   try {
-    const user = await getCurrentUser(); // ✅ Utiliser getCurrentUser
+    const user = await getCurrentUser();
 
     if (!user) {
       return null;
     }
 
-    // ✅ Utiliser user.id
     const cart = await prisma.cart.findUnique({
       where: { userId: user.id },
       include: {
         items: {
           include: {
-            product: true,
+            product: true, // ✅ Sans les images pour optimiser
           },
           orderBy: {
             addedAt: "desc",
@@ -245,21 +244,37 @@ export async function getCartAction() {
 
     if (!cart) return null;
 
-    // Sérialiser pour éviter les erreurs de type
+    // ✅ Sérialiser avec le bon type CartData
     return {
-      ...cart,
+      id: cart.id,
+      userId: cart.userId,
+      createdAt: cart.createdAt.toISOString(),
+      updatedAt: cart.updatedAt.toISOString(),
       items: cart.items.map((item) => ({
-        ...item,
+        id: item.id,
+        cartId: item.cartId,
+        productId: item.productId,
+        quantity: item.quantity,
+        addedAt: item.addedAt.toISOString(),
         product: {
-          ...item.product,
+          id: item.product.id,
+          title: item.product.title,
           price: item.product.price.toNumber(),
+          category: item.product.category,
+          genre: item.product.genre,
+          species: item.product.species,
+          countryOfOrigin: item.product.countryOfOrigin,
+          locality: item.product.locality,
+          geologicalPeriod: item.product.geologicalPeriod,
+          geologicalStage: item.product.geologicalStage,
+          description: item.product.description || undefined,
+          stripeProductId: item.product.stripeProductId,
+          stripePriceId: item.product.stripePriceId,
+          status: item.product.status,
           createdAt: item.product.createdAt.toISOString(),
           updatedAt: item.product.updatedAt.toISOString(),
         },
-        addedAt: item.addedAt.toISOString(),
       })),
-      createdAt: cart.createdAt.toISOString(),
-      updatedAt: cart.updatedAt.toISOString(),
     };
   } catch (error) {
     console.error("❌ Erreur récupération panier:", error);

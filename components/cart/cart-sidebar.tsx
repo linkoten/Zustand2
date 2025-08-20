@@ -16,22 +16,18 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getCartAction, clearCartAction } from "@/lib/actions/cart-actions";
 import { CartItem } from "./cart-item";
-import {
-  CartSidebarProps,
-  SerializedCart,
-  SerializedCartItem,
-} from "@/types/type";
+import { CartSidebarProps, CartData, CartItemData } from "@/types/type";
 
 export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const router = useRouter();
-  const [cart, setCart] = useState<SerializedCart | null>(null);
+  const [cart, setCart] = useState<CartData | null>(null); // ✅ Type corrigé
   const [loading, setLoading] = useState(false);
 
   // Charger le panier
   const loadCart = async (): Promise<void> => {
     setLoading(true);
     try {
-      const cartData = await getCartAction();
+      const cartData = await getCartAction(); // ✅ Maintenant compatible
       setCart(cartData);
     } catch (error) {
       console.error("Erreur chargement panier:", error);
@@ -46,19 +42,18 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     }
   }, [isOpen]);
 
-  // ✅ Fonction callback pour les enfants
   const handleCartUpdate = async (): Promise<void> => {
     await loadCart();
   };
 
   // ✅ Fonction pour adapter les données pour CartItem
-  const adaptItemForCartItem = (item: SerializedCartItem) => ({
+  const adaptItemForCartItem = (item: CartItemData) => ({
     id: item.id,
     productId: item.productId,
-    title: item.product.title, // ✅ Extraire du produit
-    price: item.product.price, // ✅ Extraire du produit
+    title: item.product.title,
+    price: item.product.price,
     quantity: item.quantity,
-    category: item.product.category, // ✅ Extraire du produit
+    category: item.product.category,
     product: {
       title: item.product.title,
       price: item.product.price,
@@ -69,13 +64,13 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   // ✅ Calculs typés
   const totalItems: number =
     cart?.items?.reduce(
-      (sum: number, item: SerializedCartItem) => sum + item.quantity,
+      (sum: number, item: CartItemData) => sum + item.quantity,
       0
     ) || 0;
 
   const totalPrice: number =
     cart?.items?.reduce(
-      (sum: number, item: SerializedCartItem) =>
+      (sum: number, item: CartItemData) =>
         sum + item.product.price * item.quantity,
       0
     ) || 0;
@@ -107,7 +102,6 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     }
   };
 
-  // Dans handleCheckout de cart-sidebar.tsx
   const handleCheckout = (): void => {
     if (!cart?.items?.length) return;
     onClose();
@@ -145,13 +139,17 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
           <>
             <ScrollArea className="flex-1 -mx-6 px-6">
               <div className="space-y-4 py-4">
-                {cart.items.map((item: SerializedCartItem) => (
-                  <CartItem
-                    key={item.id}
-                    item={adaptItemForCartItem(item)} // ✅ Adapter les données
-                    onUpdate={handleCartUpdate}
-                  />
-                ))}
+                {cart.items.map(
+                  (
+                    item: CartItemData // ✅ Type corrigé
+                  ) => (
+                    <CartItem
+                      key={item.id}
+                      item={adaptItemForCartItem(item)}
+                      onUpdate={handleCartUpdate}
+                    />
+                  )
+                )}
               </div>
             </ScrollArea>
 
