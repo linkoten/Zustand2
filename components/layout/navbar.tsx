@@ -10,7 +10,7 @@ import {
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingBag, Home, ShoppingCart } from "lucide-react";
+import { ShoppingBag, Home, ShoppingCart, Plus } from "lucide-react";
 import { useCartStore } from "@/stores/cart-store";
 import { CartSidebar } from "@/components/cart/cart-sidebar";
 
@@ -44,6 +44,18 @@ export function Navbar() {
               <ShoppingBag className="w-4 h-4" />
               Fossiles
             </Link>
+
+            {/* ✅ Lien admin visible seulement si connecté */}
+            <SignedIn>
+              <Link
+                href="/fossiles/create"
+                className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden lg:inline">Créer un produit</span>
+                <span className="lg:hidden">Admin</span>
+              </Link>
+            </SignedIn>
           </nav>
 
           {/* Authentification + Panier */}

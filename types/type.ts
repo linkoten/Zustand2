@@ -80,13 +80,32 @@ export interface StripeSession {
     name?: string | null;
   } | null;
 }
+export interface SerializedProductImage {
+  id: string;
+  imageUrl: string;
+  altText?: string;
+  order: number;
+  createdAt: string;
+}
 
 // ✅ Type avec price converti en number
-export interface SerializedProduct
-  extends Omit<Product, "price" | "createdAt" | "updatedAt"> {
+export interface SerializedProduct {
+  id: number;
+  title: string;
   price: number;
+  category: string;
+  genre: string;
+  species: string;
+  countryOfOrigin: string;
+  locality: string;
+  geologicalPeriod: string;
+  geologicalStage: string;
+  description?: string;
+  stripePriceId?: string | null;
+  status: string;
   createdAt: string;
   updatedAt: string;
+  images: SerializedProductImage[]; // ✅ Array d'images au lieu d'une seule
 }
 
 export interface FossilCardProps {

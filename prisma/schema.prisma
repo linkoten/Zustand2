@@ -42,6 +42,7 @@ model Product {
   locality         String
   geologicalPeriod GeologicalPeriod
   geologicalStage  String
+  description      String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
@@ -57,6 +58,19 @@ model Product {
   // Relations futures pour le panier
   cartItems CartItem[]
   Payment   Payment[]
+  images    ProductImage[] // ✅ Nouvelle relation pour les images
+}
+
+// ✅ Nouveau modèle pour les images
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId Int
+  imageUrl  String
+  altText   String?
+  order     Int      @default(0) // Pour définir l'ordre d'affichage
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 // Modèle pour le panier (à venir)
