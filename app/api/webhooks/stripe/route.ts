@@ -77,7 +77,7 @@ async function handleProductCreated(product: StripeProduct) {
   console.log("🆕 Produit créé dans Stripe:", product.id);
 
   try {
-    const { validCategory, validGeologicalPeriod, validStatus } =
+    const { validCategory, validGeologicalPeriod, validStatus, validWeight } =
       validateProductMetadata(product.metadata, product.active);
 
     const newProduct = await prisma.product.create({
@@ -91,12 +91,15 @@ async function handleProductCreated(product: StripeProduct) {
         locality: product.metadata.locality || "",
         geologicalPeriod: validGeologicalPeriod,
         geologicalStage: product.metadata.geologicalStage || "",
+        description: product.description || undefined, // ✅ Ajouter la description
+        weight: validWeight, // ✅ Ajouter le poids obligatoire
         stripeProductId: product.id,
         status: validStatus,
       },
     });
 
     console.log("✅ Produit ajouté à la BDD:", newProduct.id);
+    console.log("📏 Poids sauvegardé:", validWeight, "grammes");
 
     // ✅ FORCER LA REVALIDATION DU CACHE
     revalidatePath("/fossiles");
@@ -117,7 +120,7 @@ async function handleProductUpdated(product: StripeProduct) {
     });
 
     if (existingProduct) {
-      const { validCategory, validGeologicalPeriod, validStatus } =
+      const { validCategory, validGeologicalPeriod, validStatus, validWeight } =
         validateProductMetadata(product.metadata, product.active);
 
       const updateData: {
@@ -129,6 +132,8 @@ async function handleProductUpdated(product: StripeProduct) {
         locality?: string;
         geologicalPeriod?: GeologicalPeriod;
         geologicalStage?: string;
+        description?: string;
+        weight?: number; // ✅ Ajouter le poids
         status: ProductStatus;
       } = {
         title: product.name,
@@ -157,6 +162,12 @@ async function handleProductUpdated(product: StripeProduct) {
       if (product.metadata.geologicalStage) {
         updateData.geologicalStage = product.metadata.geologicalStage;
       }
+      if (product.description) {
+        updateData.description = product.description;
+      }
+      if (product.metadata.weight) {
+        updateData.weight = validWeight; // ✅ Mettre à jour le poids
+      }
 
       await prisma.product.update({
         where: { stripeProductId: product.id },
@@ -164,11 +175,12 @@ async function handleProductUpdated(product: StripeProduct) {
       });
 
       console.log("✅ Produit mis à jour dans la BDD");
+      console.log("📏 Poids mis à jour:", validWeight, "grammes");
 
       // ✅ FORCER LA REVALIDATION DU CACHE
       revalidatePath("/fossiles");
       revalidatePath("/");
-      console.log("🔄 Cache invalidé après mise à jour prix");
+      console.log("🔄 Cache invalidé après mise à jour");
     }
   } catch (error) {
     console.error("❌ Erreur mise à jour produit:", error);
@@ -320,6 +332,7 @@ function validateProductMetadata(
   validCategory: Category;
   validGeologicalPeriod: GeologicalPeriod;
   validStatus: ProductStatus;
+  validWeight: number; // ✅ Ajouter le poids
 } {
   // Valider Category
   const categoryValue = metadata.category?.toUpperCase();
@@ -342,9 +355,23 @@ function validateProductMetadata(
     ? ProductStatus.AVAILABLE
     : ProductStatus.INACTIVE;
 
+  // ✅ Valider le poids (obligatoire)
+  const weightValue = metadata.weight;
+  let validWeight = 500; // Valeur par défaut en grammes
+
+  if (weightValue) {
+    const parsedWeight = parseInt(weightValue);
+    if (!isNaN(parsedWeight) && parsedWeight > 0) {
+      validWeight = parsedWeight;
+    }
+  }
+
+  console.log("📏 Poids validé:", validWeight, "grammes");
+
   return {
     validCategory,
     validGeologicalPeriod,
     validStatus,
+    validWeight, // ✅ Retourner le poids validé
   };
 }

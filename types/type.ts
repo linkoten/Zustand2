@@ -3,7 +3,9 @@ import {
   GeologicalPeriod,
   Product,
   ProductStatus,
-  CartItem as PrismaCartItem, // ✅ Renommer pour éviter le conflit
+  CartItem as PrismaCartItem,
+  BlogCategory,
+  BlogStatus, // ✅ Renommer pour éviter le conflit
 } from "@/lib/generated/prisma";
 
 // Types pour les retours d'actions
@@ -102,6 +104,8 @@ export interface SerializedProduct {
   geologicalStage: string;
   description?: string;
   stripePriceId?: string | null;
+  weight: number; // ✅ Nouveau champ obligatoire en grammes
+
   status: ProductStatus;
   createdAt: string;
   updatedAt: string;
@@ -244,6 +248,7 @@ export interface CartProduct {
   description?: string;
   stripeProductId?: string | null;
   stripePriceId?: string | null;
+  weight: number; // ✅ Nouveau champ obligatoire en grammes
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -275,4 +280,57 @@ export interface SerializedProductImage {
   altText?: string;
   order: number;
   createdAt: string;
+}
+
+export interface SerializedBlogTag {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  color?: string;
+  createdAt: string;
+}
+
+export interface SerializedArticleBlog {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content: string;
+  featuredImage?: string;
+  imageAlt?: string;
+  category: BlogCategory;
+  status: BlogStatus;
+  publishedAt?: string;
+  readTime?: number;
+  views: number;
+  seoTitle?: string;
+  seoDescription?: string;
+  createdAt: string;
+  updatedAt: string;
+  authorId: number;
+  author: {
+    id: number;
+    name?: string;
+    email: string;
+  };
+  tags: SerializedBlogTag[];
+}
+
+export interface BlogListItem {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  featuredImage?: string;
+  imageAlt?: string;
+  category: BlogCategory;
+  publishedAt?: string;
+  readTime?: number;
+  views: number;
+  author: {
+    name?: string;
+    email: string;
+  };
+  tags: SerializedBlogTag[];
 }

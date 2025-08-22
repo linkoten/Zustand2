@@ -62,8 +62,12 @@ async function getFossils(
       ...fossil,
       price: fossil.price.toNumber(),
       description: fossil.description || undefined,
+      weight: fossil.weight, // ✅ Inclure le poids
       createdAt: fossil.createdAt.toISOString(),
       updatedAt: fossil.updatedAt.toISOString(),
+      category: fossil.category,
+      geologicalPeriod: fossil.geologicalPeriod,
+      status: fossil.status,
       images: fossil.images.map((image) => ({
         id: image.id,
         imageUrl: image.imageUrl,
@@ -163,7 +167,7 @@ export default async function FossilesPage({
 
           {userId && (
             <Button asChild>
-              <Link href="/admin/create-product">
+              <Link href="/fossiles/create">
                 <Plus className="mr-2 h-4 w-4" />
                 Créer un produit
               </Link>

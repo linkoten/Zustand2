@@ -30,7 +30,7 @@ import { toast } from "sonner";
 import { Loader2, Upload, X, Plus } from "lucide-react";
 import { createProductAction } from "@/lib/actions/productActions";
 
-// ✅ Schema de validation
+// ✅ Schema de validation avec weight
 const productSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
   category: z.enum(["TRILOBITE", "AMMONITE", "DENT", "COQUILLAGE"]),
@@ -55,6 +55,7 @@ const productSchema = z.object({
   ]),
   geologicalStage: z.string().min(1, "L'étage géologique est requis"),
   description: z.string().optional().or(z.literal("")),
+  weight: z.number().min(1, "Le poids doit être supérieur à 0 gramme"), // ✅ Nouveau champ
   images: z
     .array(
       z.object({
@@ -110,6 +111,7 @@ export default function CreateProductForm() {
       geologicalPeriod: "JURASSIQUE",
       geologicalStage: "",
       description: "",
+      weight: 0, // ✅ Valeur par défaut pour le poids
       images: [{ url: "", altText: "" }],
     },
   });
@@ -147,8 +149,6 @@ export default function CreateProductForm() {
       setIsLoading(true);
 
       console.log("📝 Données du formulaire:", data);
-      console.log("📝 Description:", data.description);
-      console.log("📝 Images:", data.images);
 
       // ✅ Nettoyer les données avant envoi
       const cleanData = {
@@ -210,7 +210,7 @@ export default function CreateProductForm() {
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="category"
@@ -256,6 +256,28 @@ export default function CreateProductForm() {
                         {...field}
                         onChange={(e) =>
                           field.onChange(parseFloat(e.target.value) || 0)
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* ✅ Nouveau champ poids */}
+              <FormField
+                control={form.control}
+                name="weight"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Poids (grammes)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="500"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value) || 0)
                         }
                       />
                     </FormControl>
@@ -379,7 +401,7 @@ export default function CreateProductForm() {
                 name="countryOfOrigin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pays d&apos;origine</FormLabel>
+                    <FormLabel>Pays d'origine</FormLabel>
                     <FormControl>
                       <Input placeholder="Ex: France" {...field} />
                     </FormControl>
@@ -432,9 +454,7 @@ export default function CreateProductForm() {
               >
                 <div className="flex-1 space-y-2">
                   <div>
-                    <Label htmlFor={`image-url-${index}`}>
-                      URL de l&apos;image
-                    </Label>
+                    <Label htmlFor={`image-url-${index}`}>URL de l'image</Label>
                     <Input
                       id={`image-url-${index}`}
                       placeholder="https://example.com/image.jpg"

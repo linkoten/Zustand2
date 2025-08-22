@@ -261,6 +261,7 @@ export async function getCartAction(): Promise<CartData | null> {
           title: item.product.title,
           price: item.product.price.toNumber(),
           category: item.product.category,
+          weight: item.product.weight,
           genre: item.product.genre,
           species: item.product.species,
           countryOfOrigin: item.product.countryOfOrigin,

@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { getCartAction } from "@/lib/actions/cart-actions";
 import CheckoutComponent from "@/components/checkout/checkout";
 import { CountrySelector } from "@/components/checkout/country-selector";
-import { estimateFossilWeight } from "@/lib/config/shipping-zones";
 import { CartData, CartItemData } from "@/types/type"; // ✅ Importer les types existants
 
 // ✅ Données des pays pour l'affichage
@@ -196,7 +195,7 @@ const countryGroups = [
 
 export default function CheckoutPage() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-  const [cart, setCart] = useState<CartData | null>(null); // ✅ Utiliser CartData
+  const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Charger le panier côté client
@@ -210,7 +209,7 @@ export default function CheckoutPage() {
           return;
         }
 
-        setCart(cartData); // ✅ Maintenant compatible
+        setCart(cartData);
       } catch (error) {
         console.error("Erreur chargement panier:", error);
         redirect("/fossiles");
@@ -236,20 +235,17 @@ export default function CheckoutPage() {
     return null;
   }
 
-  // ✅ Calculer le sous-total et le poids avec les bons types
+  // ✅ Calculer le sous-total et le poids avec les vrais poids des produits
   const subtotal = cart.items.reduce(
     (sum: number, item: CartItemData) =>
       sum + item.product.price * item.quantity,
     0
   );
 
+  // ✅ Utiliser le poids réel des produits au lieu d'estimation
   const totalWeight = cart.items.reduce(
     (weight: number, item: CartItemData) => {
-      const itemWeight = estimateFossilWeight(
-        item.product.category,
-        item.product.price
-      );
-      return weight + itemWeight * item.quantity;
+      return weight + item.product.weight * item.quantity; // ✅ Poids réel depuis la BDD
     },
     0
   );
@@ -294,6 +290,9 @@ export default function CheckoutPage() {
                   <p className="text-gray-600">
                     Livraison vers :{" "}
                     <strong>{getCountryName(selectedCountry)}</strong>
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Poids total : <strong>{totalWeight}g</strong>
                   </p>
                 </div>
                 <button

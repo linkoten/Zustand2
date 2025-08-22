@@ -172,7 +172,7 @@ export const SHIPPING_ZONES = {
 // ✅ Tous les pays combinés avec un type correct
 export const ALL_SHIPPING_COUNTRIES = Object.values(SHIPPING_ZONES).flatMap(
   (zone) => [...zone.countries]
-); // ✅ Spread pour éviter les types readonly
+);
 
 // ✅ Fonction pour déterminer la zone d'un pays avec types corrects
 export function getShippingZone(
@@ -234,34 +234,8 @@ export function calculateShippingByWeight(
   };
 }
 
-// ✅ Fonction pour estimer le poids d'un fossile
-export function estimateFossilWeight(category: string, price: number): number {
-  // Estimation basée sur la catégorie et le prix
-  switch (category) {
-    case "TRILOBITE":
-      if (price < 50) return 150; // Petit trilobite ~150g
-      if (price < 200) return 400; // Moyen trilobite ~400g
-      return 800; // Grand trilobite ~800g
-
-    case "AMMONITE":
-      if (price < 100) return 300; // Petite ammonite ~300g
-      if (price < 300) return 600; // Moyenne ammonite ~600g
-      return 1200; // Grande ammonite ~1.2kg
-
-    case "DENT":
-      return 50; // Dent de requin ~50g
-
-    case "VERTEBRE":
-      if (price < 500) return 800; // Petite vertèbre ~800g
-      return 2000; // Grande vertèbre ~2kg
-
-    case "COQUILLAGE":
-      return 200; // Coquillage moyen ~200g
-
-    default:
-      return 500; // Défaut ~500g
-  }
-}
+// ✅ FONCTION SUPPRIMÉE - estimateFossilWeight
+// Le poids est maintenant stocké directement dans la base de données
 
 // ✅ Type helper pour l'autocomplétion
 export type ShippingZoneKey = keyof typeof SHIPPING_ZONES;

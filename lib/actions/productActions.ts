@@ -21,6 +21,7 @@ interface CreateProductData {
   geologicalPeriod: string;
   geologicalStage: string;
   description?: string;
+  weight: number; // ✅ Nouveau champ obligatoire
   images: Array<{
     url: string;
     altText?: string;
@@ -63,6 +64,7 @@ export async function createProductAction(data: CreateProductData) {
         locality: data.locality,
         geologicalPeriod: data.geologicalPeriod,
         geologicalStage: data.geologicalStage,
+        weight: data.weight.toString(), // ✅ Ajouter le poids dans les metadata
         image_urls: validImages.map((img) => img.url).join(","),
         image_alts: validImages.map((img) => img.altText || "").join(","),
       },
@@ -103,6 +105,7 @@ export async function createProductAction(data: CreateProductData) {
           geologicalPeriod: data.geologicalPeriod as GeologicalPeriod,
           geologicalStage: data.geologicalStage,
           description: data.description || null,
+          weight: data.weight, // ✅ Mettre à jour le poids
           stripePriceId: stripePrice.id,
           status: ProductStatus.AVAILABLE,
         },
@@ -126,6 +129,7 @@ export async function createProductAction(data: CreateProductData) {
           geologicalPeriod: data.geologicalPeriod as GeologicalPeriod,
           geologicalStage: data.geologicalStage,
           description: data.description || null,
+          weight: data.weight, // ✅ Ajouter le poids
           stripeProductId: stripeProduct.id,
           stripePriceId: stripePrice.id,
           status: ProductStatus.AVAILABLE,
@@ -134,7 +138,7 @@ export async function createProductAction(data: CreateProductData) {
     }
 
     console.log("✅ Produit sauvegardé dans la BDD:", product.id);
-    console.log("📝 Description sauvegardée:", product.description);
+    console.log("📏 Poids sauvegardé:", product.weight, "grammes");
 
     // ✅ 4. Ajouter les images
     for (let i = 0; i < validImages.length; i++) {
@@ -176,18 +180,12 @@ export async function createProductAction(data: CreateProductData) {
         stripePriceId: stripePrice.id,
         imagesCount: savedImages.length,
         description: product.description,
+        weight: product.weight,
         isUpdate: !!existingProduct,
       },
     };
   } catch (error) {
     console.error("❌ Erreur création produit:", error);
-
-    // ✅ En cas d'erreur, nettoyer Stripe si possible
-    if (error instanceof Error && error.message.includes("Unique constraint")) {
-      console.log("🧹 Nettoyage des données Stripe en cours...");
-      // Optionnel : supprimer le produit Stripe créé
-      // await stripe.products.del(stripeProduct.id);
-    }
 
     return {
       success: false,

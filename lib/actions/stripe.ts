@@ -9,7 +9,6 @@ import Stripe from "stripe";
 import {
   ALL_SHIPPING_COUNTRIES,
   calculateShippingByWeight,
-  estimateFossilWeight,
 } from "../config/shipping-zones";
 
 export async function fetchClientSecret(
@@ -66,21 +65,21 @@ export async function fetchClientSecret(
       0
     );
 
-    // ✅ Calculer le poids total estimé du panier
+    // ✅ Calculer le poids total réel du panier en utilisant le champ weight
     const totalWeight = cart.items.reduce((weight, item) => {
       const product = products.find((p) => p.id === item.productId);
       if (product) {
-        // ✅ Gérer les deux cas : Decimal ou number
-        const productPrice =
-          typeof product.price === "number"
-            ? product.price
-            : product.price.toNumber();
-
-        const itemWeight = estimateFossilWeight(product.category, productPrice);
+        // ✅ Utiliser le poids réel stocké en base de données
+        const itemWeight = product.weight; // Le poids est déjà en grammes
+        console.log(
+          `📏 Poids réel utilisé pour ${product.title}: ${itemWeight}g`
+        );
         return weight + itemWeight * item.quantity;
       }
       return weight;
     }, 0);
+
+    console.log(`📦 Poids total du panier: ${totalWeight}g`);
 
     // ✅ Logique conditionnelle selon si un pays est sélectionné
     let shippingOptions: Stripe.Checkout.SessionCreateParams.ShippingOption[];
