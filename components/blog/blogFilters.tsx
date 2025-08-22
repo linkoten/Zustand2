@@ -166,7 +166,7 @@ export default function BlogFilters() {
 
           {currentSearch && (
             <Badge variant="secondary" className="flex items-center gap-1">
-              "{currentSearch}"
+              &quot;{currentSearch}&quot;
               <button
                 onClick={() => {
                   setSearchTerm("");

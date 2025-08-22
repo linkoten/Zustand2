@@ -276,7 +276,7 @@ export default async function BlogArticlePage({
 
               <Button variant="outline" size="sm">
                 <Share2 className="w-4 h-4 mr-2" />
-                Partager l'article
+                Partager l&apos;article
               </Button>
             </div>
           </footer>

@@ -124,7 +124,7 @@ export default function RichTextEditor({
         <div className="min-h-[400px] p-4 flex items-center justify-center">
           <div className="text-center text-gray-500">
             <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-            <p className="text-sm">Chargement de l'éditeur...</p>
+            <p className="text-sm">Chargement de l&apos;éditeur...</p>
           </div>
         </div>
       </div>
@@ -148,7 +148,7 @@ export default function RichTextEditor({
         <div className="min-h-[400px] p-4 flex items-center justify-center">
           <div className="text-center text-gray-500">
             <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-            <p className="text-sm">Initialisation de l'éditeur...</p>
+            <p className="text-sm">Initialisation de l&apos;éditeur...</p>
           </div>
         </div>
       </div>

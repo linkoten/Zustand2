@@ -52,7 +52,7 @@ export default async function RelatedArticles({
           Articles connexes
         </h2>
         <p className="text-gray-600">
-          Découvrez d'autres articles qui pourraient vous intéresser
+          Découvrez d&apos;autres articles qui pourraient vous intéresser
         </p>
       </div>
 

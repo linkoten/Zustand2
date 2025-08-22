@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { BlogCategory, BlogStatus } from "@/lib/generated/prisma";
+import { BlogCategory, BlogStatus, Prisma } from "@/lib/generated/prisma";
 import { BlogListItem } from "@/types/type";
 
 interface BlogFilters {
@@ -26,7 +26,7 @@ export async function getBlogArticles(
     const { category, tag, search, page = 1, limit = 12 } = filters;
 
     // Construire les conditions WHERE
-    const whereConditions: any = {
+    const whereConditions: Prisma.ArticleBlogWhereInput = {
       status: BlogStatus.PUBLISHED,
       publishedAt: {
         lte: new Date(),

@@ -83,8 +83,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </div>
 
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Découvrez le monde fascinant des fossiles, explorez l'histoire de la
-            Terre et approfondissez vos connaissances en paléontologie
+            Découvrez le monde fascinant des fossiles, explorez l&apos;histoire
+            de la Terre et approfondissez vos connaissances en paléontologie
           </p>
         </div>
 

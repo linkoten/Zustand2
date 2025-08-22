@@ -168,8 +168,14 @@ export default function CreateArticleForm() {
         );
         router.push(`/blog/${result.article.slug}`);
       }
-    } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la création de l'article");
+    } catch (error: unknown) {
+      // ✅ Gestion typée de l'erreur
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de la création de l'article";
+
+      toast.error(errorMessage);
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -190,7 +196,7 @@ export default function CreateArticleForm() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="title">Titre de l'article *</Label>
+                <Label htmlFor="title">Titre de l&apos;article *</Label>
                 <Input
                   id="title"
                   value={formData.title}
@@ -236,7 +242,7 @@ export default function CreateArticleForm() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Contenu de l'article</CardTitle>
+                <CardTitle>Contenu de l&apos;article</CardTitle>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Clock className="w-4 h-4" />
                   <span>{estimatedReadTime} min de lecture</span>
@@ -312,7 +318,7 @@ export default function CreateArticleForm() {
                 className="w-full"
               >
                 <Eye className="w-4 h-4 mr-2" />
-                Publier l'article
+                Publier l&apos;article
               </Button>
             </CardContent>
           </Card>
@@ -348,7 +354,7 @@ export default function CreateArticleForm() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="featuredImage">URL de l'image</Label>
+                <Label htmlFor="featuredImage">URL de l&apos;image</Label>
                 <Input
                   id="featuredImage"
                   value={formData.featuredImage}

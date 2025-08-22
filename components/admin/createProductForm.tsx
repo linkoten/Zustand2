@@ -401,7 +401,7 @@ export default function CreateProductForm() {
                 name="countryOfOrigin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pays d'origine</FormLabel>
+                    <FormLabel>Pays d&apos;origine</FormLabel>
                     <FormControl>
                       <Input placeholder="Ex: France" {...field} />
                     </FormControl>
@@ -454,7 +454,9 @@ export default function CreateProductForm() {
               >
                 <div className="flex-1 space-y-2">
                   <div>
-                    <Label htmlFor={`image-url-${index}`}>URL de l'image</Label>
+                    <Label htmlFor={`image-url-${index}`}>
+                      URL de l&apos;image
+                    </Label>
                     <Input
                       id={`image-url-${index}`}
                       placeholder="https://example.com/image.jpg"

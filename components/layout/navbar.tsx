@@ -78,7 +78,7 @@ export default function Navbar() {
                         </Link>
                       </Button>
                       <Button asChild>
-                        <Link href="/sign-up">S'inscrire</Link>
+                        <Link href="/sign-up">S&apos;inscrire</Link>
                       </Button>
                     </div>
                   )}
@@ -158,7 +158,7 @@ export default function Navbar() {
                               href="/sign-up"
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
-                              S'inscrire
+                              S&apos;inscrire
                             </Link>
                           </Button>
                         </div>
