@@ -70,10 +70,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             <div className="flex-1 flex justify-end">
               {canCreateArticle && (
                 <Button asChild className="shadow-lg">
-                  <Link
-                    href="/admin/blog/create"
-                    className="flex items-center gap-2"
-                  >
+                  <Link href="/blog/create" className="flex items-center gap-2">
                     <PlusCircle className="w-5 h-5" />
                     Nouvel article
                   </Link>
