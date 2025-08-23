@@ -22,7 +22,8 @@ export default function Home() {
             </h1>
             <p className="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
               Découvrez notre collection de fossiles authentiques et explorez
-              l'univers fascinant de la paléontologie à travers nos articles.
+              l&apos;univers fascinant de la paléontologie à travers nos
+              articles.
             </p>
           </div>
         </div>
