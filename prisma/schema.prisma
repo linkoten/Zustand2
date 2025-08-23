@@ -157,6 +157,55 @@ model BlogTag {
   articles ArticleBlog[]
 }
 
+model FossilRequest {
+  id String @id @default(cuid())
+
+  // Informations utilisateur
+  name  String
+  email String
+  phone String?
+
+  // Détails de la demande
+  fossilType       String // Type de fossile recherché
+  description      String            @db.Text
+  maxBudget        Decimal?          @db.Decimal(10, 2)
+  geologicalPeriod GeologicalPeriod?
+  category         Category?
+  countryOfOrigin  String?
+  locality         String?
+
+  // Statut de la demande
+  status   RequestStatus   @default(PENDING)
+  priority RequestPriority @default(NORMAL)
+
+  // Suivi
+  adminNotes      String?   @db.Text
+  responseMessage String?   @db.Text
+  respondedAt     DateTime?
+  respondedBy     String? // ID de l'admin qui a répondu
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("fossil_requests")
+}
+
+enum RequestStatus {
+  PENDING // En attente
+  IN_PROGRESS // En cours de traitement
+  COMPLETED // Terminée
+  REJECTED // Rejetée
+  CANCELLED // Annulée
+}
+
+enum RequestPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
 enum PaymentStatus {
   PENDING
   COMPLETED

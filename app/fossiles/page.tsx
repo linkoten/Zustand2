@@ -3,7 +3,7 @@ import { SerializedProduct } from "@/types/type";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import {
   Category,
   GeologicalPeriod,
@@ -165,14 +165,24 @@ export default async function FossilesPage({
             </p>
           </div>
 
-          {userId && (
-            <Button asChild>
-              <Link href="/fossiles/create">
-                <Plus className="mr-2 h-4 w-4" />
-                Créer un produit
+          <div className="flex gap-2">
+            {/* ✅ Nouveau bouton pour la demande de recherche */}
+            <Button asChild variant="outline">
+              <Link href="/fossiles/request">
+                <Search className="mr-2 h-4 w-4" />
+                Demande de recherche
               </Link>
             </Button>
-          )}
+
+            {userId && (
+              <Button asChild>
+                <Link href="/fossiles/create">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Créer un produit
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
