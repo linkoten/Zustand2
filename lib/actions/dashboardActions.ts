@@ -1,0 +1,207 @@
+import prisma from "@/lib/prisma";
+import { UserRole } from "@/lib/generated/prisma";
+import { DashboardUser } from "@/types/dashboardType";
+
+export async function getUserData(
+  clerkId: string
+): Promise<DashboardUser | null> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) return null;
+
+    // ✅ Convertir en format attendu par les composants
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role, // Sera converti en string automatiquement
+      createdAt: user.createdAt.toISOString(), // ✅ Convertir Date en string
+    };
+  } catch (error) {
+    console.error("Erreur lors de la récupération de l'utilisateur:", error);
+    return null;
+  }
+}
+
+export async function getUserDashboardData(userId: string) {
+  try {
+    // Récupérer les favoris de l'utilisateur
+    const favorites = await prisma.userFavorite.findMany({
+      where: { userId },
+      include: {
+        product: {
+          include: {
+            images: {
+              orderBy: { order: "asc" },
+              take: 1,
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 6, // Limiter à 6 favoris récents
+    });
+
+    // Récupérer les demandes de fossiles de l'utilisateur
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+      select: { email: true },
+    });
+
+    const fossilRequests = await prisma.fossilRequest.findMany({
+      where: {
+        email: user?.email,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5, // Limiter à 5 demandes récentes
+    });
+
+    // Compter les totaux
+    const [totalFavorites, totalRequests] = await Promise.all([
+      prisma.userFavorite.count({ where: { userId } }),
+      prisma.fossilRequest.count({
+        where: {
+          email: user?.email,
+        },
+      }),
+    ]);
+
+    return {
+      favorites: favorites.map((fav) => ({
+        ...fav.product,
+        price: fav.product.price.toNumber(),
+        createdAt: fav.product.createdAt.toISOString(),
+        updatedAt: fav.product.updatedAt.toISOString(),
+      })),
+      fossilRequests: fossilRequests.map((req) => ({
+        ...req,
+        maxBudget: req.maxBudget?.toNumber() || null,
+        createdAt: req.createdAt.toISOString(),
+        updatedAt: req.updatedAt.toISOString(),
+        respondedAt: req.respondedAt?.toISOString() || null,
+      })),
+      totalFavorites,
+      totalRequests,
+    };
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des données utilisateur:",
+      error
+    );
+    return {
+      favorites: [],
+      fossilRequests: [],
+      totalFavorites: 0,
+      totalRequests: 0,
+    };
+  }
+}
+
+export async function getAdminDashboardData() {
+  try {
+    // Récupérer toutes les demandes de fossiles
+    const allFossilRequests = await prisma.fossilRequest.findMany({
+      orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
+    });
+
+    // Compter les statistiques
+    const [
+      totalUsers,
+      totalProducts,
+      totalBlogArticles,
+      totalRequests,
+      pendingRequests,
+      availableProducts,
+      publishedArticles,
+    ] = await Promise.all([
+      prisma.user.count(),
+      prisma.product.count(),
+      prisma.articleBlog.count(),
+      prisma.fossilRequest.count(),
+      prisma.fossilRequest.count({ where: { status: "PENDING" } }),
+      prisma.product.count({ where: { status: "AVAILABLE" } }),
+      prisma.articleBlog.count({ where: { status: "PUBLISHED" } }),
+    ]);
+
+    // Récupérer les derniers utilisateurs inscrits
+    const recentUsers = await prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    // Récupérer les produits récents
+    const recentProducts = await prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      include: {
+        images: {
+          orderBy: { order: "asc" },
+          take: 1,
+        },
+      },
+    });
+
+    return {
+      fossilRequests: allFossilRequests.map((req) => ({
+        ...req,
+        maxBudget: req.maxBudget?.toNumber() || null,
+        createdAt: req.createdAt.toISOString(),
+        updatedAt: req.updatedAt.toISOString(),
+        respondedAt: req.respondedAt?.toISOString() || null,
+      })),
+      stats: {
+        totalUsers,
+        totalProducts,
+        totalBlogArticles,
+        totalRequests,
+        pendingRequests,
+        availableProducts,
+        publishedArticles,
+      },
+      recentUsers: recentUsers.map((user) => ({
+        ...user,
+        role: user.role, // Sera converti en string automatiquement
+        createdAt: user.createdAt.toISOString(), // ✅ Convertir Date en string
+      })),
+      recentProducts: recentProducts.map((product) => ({
+        ...product,
+        price: product.price.toNumber(),
+        createdAt: product.createdAt.toISOString(),
+        updatedAt: product.updatedAt.toISOString(),
+      })),
+    };
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données admin:", error);
+    return {
+      fossilRequests: [],
+      stats: {
+        totalUsers: 0,
+        totalProducts: 0,
+        totalBlogArticles: 0,
+        totalRequests: 0,
+        pendingRequests: 0,
+        availableProducts: 0,
+        publishedArticles: 0,
+      },
+      recentUsers: [],
+      recentProducts: [],
+    };
+  }
+}
