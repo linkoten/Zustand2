@@ -1,157 +1,10 @@
-import prisma from "@/lib/prisma";
-import { SerializedProduct } from "@/types/type";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
-import {
-  Category,
-  GeologicalPeriod,
-  Prisma,
-  ProductStatus,
-} from "@/lib/generated/prisma";
 import FossilesClient from "@/components/fossils/fossilesClient";
-
-interface SearchParams {
-  category?: string;
-  countryOfOrigin?: string;
-  locality?: string;
-  geologicalPeriod?: string;
-  geologicalStage?: string;
-}
-
-async function getFossils(
-  filters: SearchParams = {},
-  userId?: string | null
-): Promise<SerializedProduct[]> {
-  try {
-    const whereConditions: Prisma.ProductWhereInput = {
-      status: ProductStatus.AVAILABLE,
-    };
-
-    if (filters.category) {
-      whereConditions.category = filters.category as Category;
-    }
-    if (filters.countryOfOrigin) {
-      whereConditions.countryOfOrigin = filters.countryOfOrigin;
-    }
-    if (filters.locality) {
-      whereConditions.locality = filters.locality;
-    }
-    if (filters.geologicalPeriod) {
-      whereConditions.geologicalPeriod =
-        filters.geologicalPeriod as GeologicalPeriod;
-    }
-    if (filters.geologicalStage) {
-      whereConditions.geologicalStage = filters.geologicalStage;
-    }
-
-    const fossils = await prisma.product.findMany({
-      where: whereConditions,
-      include: {
-        images: {
-          orderBy: { order: "asc" },
-          take: 1,
-        },
-        // ✅ Inclure les favoris de l'utilisateur connecté
-        userFavorites: userId
-          ? {
-              where: { userId },
-            }
-          : false,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    return fossils.map((fossil) => ({
-      ...fossil,
-      price: fossil.price.toNumber(),
-      description: fossil.description || undefined,
-      weight: fossil.weight,
-      // ✅ Calculer si le produit est en favori pour cet utilisateur
-      isFavorite: userId ? fossil.userFavorites.length > 0 : false,
-      createdAt: fossil.createdAt.toISOString(),
-      updatedAt: fossil.updatedAt.toISOString(),
-      category: fossil.category,
-      geologicalPeriod: fossil.geologicalPeriod,
-      status: fossil.status,
-      images: fossil.images.map((image) => ({
-        id: image.id,
-        imageUrl: image.imageUrl,
-        altText: image.altText || undefined,
-        order: image.order,
-        createdAt: image.createdAt.toISOString(),
-      })),
-    }));
-  } catch (error) {
-    console.error("Erreur lors de la récupération des fossiles:", error);
-    return [];
-  }
-}
-
-async function getFilterOptions() {
-  try {
-    const [
-      categoriesResult,
-      countriesResult,
-      localitiesResult,
-      geologicalPeriodsResult,
-      geologicalStagesResult,
-    ] = await Promise.all([
-      prisma.product.findMany({
-        where: { status: ProductStatus.AVAILABLE },
-        select: { category: true },
-        distinct: ["category"],
-      }),
-      prisma.product.findMany({
-        where: { status: ProductStatus.AVAILABLE },
-        select: { countryOfOrigin: true },
-        distinct: ["countryOfOrigin"],
-      }),
-      prisma.product.findMany({
-        where: { status: ProductStatus.AVAILABLE },
-        select: { locality: true },
-        distinct: ["locality"],
-      }),
-      prisma.product.findMany({
-        where: { status: ProductStatus.AVAILABLE },
-        select: { geologicalPeriod: true },
-        distinct: ["geologicalPeriod"],
-      }),
-      prisma.product.findMany({
-        where: { status: ProductStatus.AVAILABLE },
-        select: { geologicalStage: true },
-        distinct: ["geologicalStage"],
-      }),
-    ]);
-
-    return {
-      categories: categoriesResult.map((item) => item.category),
-      countries: countriesResult.map((item) => item.countryOfOrigin).sort(),
-      localities: localitiesResult.map((item) => item.locality).sort(),
-      geologicalPeriods: geologicalPeriodsResult.map(
-        (item) => item.geologicalPeriod
-      ),
-      geologicalStages: geologicalStagesResult
-        .map((item) => item.geologicalStage)
-        .sort(),
-    };
-  } catch (error) {
-    console.error(
-      "Erreur lors de la récupération des options de filtre:",
-      error
-    );
-    return {
-      categories: [],
-      countries: [],
-      localities: [],
-      geologicalPeriods: [],
-      geologicalStages: [],
-    };
-  }
-}
+import { getFilterOptions, getFossils } from "@/lib/actions/productActions";
+import { SearchParams } from "@/types/productType";
 
 export default async function FossilesPage({
   searchParams,
@@ -159,9 +12,13 @@ export default async function FossilesPage({
   searchParams: Promise<SearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
-  const fossils = await getFossils(resolvedSearchParams);
-  const filterOptions = await getFilterOptions();
+
+  // ✅ Récupérer userId AVANT l'appel à getFossils
   const { userId } = await auth();
+
+  // ✅ Passer userId à getFossils pour inclure les infos favoris
+  const fossils = await getFossils(resolvedSearchParams, userId);
+  const filterOptions = await getFilterOptions();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -175,7 +32,6 @@ export default async function FossilesPage({
           </div>
 
           <div className="flex gap-2">
-            {/* ✅ Nouveau bouton pour la demande de recherche */}
             <Button asChild variant="outline">
               <Link href="/fossiles/request">
                 <Search className="mr-2 h-4 w-4" />

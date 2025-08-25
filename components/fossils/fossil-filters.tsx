@@ -12,30 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Filter, X, RefreshCw } from "lucide-react";
-import { Category, GeologicalPeriod } from "@/lib/generated/prisma";
-
-interface FilterOptions {
-  categories: string[];
-  countries: string[];
-  localities: string[];
-  geologicalPeriods: string[];
-  geologicalStages: string[];
-}
-
-interface ActiveFilters {
-  category?: string;
-  countryOfOrigin?: string;
-  locality?: string;
-  geologicalPeriod?: string;
-  geologicalStage?: string;
-}
-
-interface FossilesFiltersProps {
-  filterOptions: FilterOptions;
-  activeFilters: ActiveFilters;
-  onFiltersChange: (filters: ActiveFilters) => void;
-  resultsCount: number;
-}
+import { ActiveFilters, FossilesFiltersProps } from "@/types/productType";
 
 const categoryLabels: Record<string, string> = {
   TRILOBITE: "Trilobite",

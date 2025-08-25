@@ -1,12 +1,6 @@
+import { getBlogArticles } from "@/lib/actions/blogActions";
 import BlogCard from "./blogCard";
-import { getBlogArticles } from "./getBlogArticles";
-import { BlogCategory } from "@/lib/generated/prisma";
-
-interface RelatedArticlesProps {
-  currentArticleId: string;
-  category: BlogCategory;
-  tags: string[];
-}
+import { RelatedArticlesProps } from "@/types/blogType";
 
 export default async function RelatedArticles({
   currentArticleId,

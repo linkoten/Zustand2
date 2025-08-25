@@ -8,16 +8,11 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ShoppingCart, ArrowLeft, MapPin, Calendar, Info } from "lucide-react";
-import { SerializedProduct } from "@/types/type";
 import { addToCartAction } from "@/lib/actions/cart-actions";
 import { formatPrice } from "@/lib/utils";
 import ProductCard from "./productCard";
 import ProductCarousel from "./productCarousel";
-
-interface ProductPageClientProps {
-  product: SerializedProduct;
-  similarProducts: SerializedProduct[];
-}
+import { ProductPageClientProps } from "@/types/productType";
 
 export default function ProductPageClient({
   product,

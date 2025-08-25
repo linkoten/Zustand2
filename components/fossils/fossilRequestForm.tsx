@@ -16,19 +16,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, Send } from "lucide-react";
-
-interface FossilRequestFormData {
-  name: string;
-  email: string;
-  phone: string;
-  fossilType: string;
-  description: string;
-  maxBudget: string;
-  geologicalPeriod: string;
-  category: string;
-  countryOfOrigin: string;
-  locality: string;
-}
+import { FossilRequestFormData } from "@/types/productType";
 
 const initialFormData: FossilRequestFormData = {
   name: "",

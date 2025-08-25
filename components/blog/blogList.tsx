@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BlogCategory } from "@/lib/generated/prisma";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,47 +35,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { BlogListProps } from "@/types/blogType";
 
-interface BlogFilters {
-  category?: BlogCategory;
-  tag?: string;
-  search?: string;
-  page: number;
-  limit: number;
-}
-
-interface BlogListProps {
-  filters: BlogFilters;
-}
-
-interface BlogPost {
-  id: number;
-  title: string;
-  excerpt: string;
-  slug: string;
-  category: BlogCategory;
-  tags: string[];
-  featuredImage?: string;
-  publishedAt: string;
-  readTime: number;
-  author: {
-    firstName: string | null;
-    lastName: string | null;
-    imageUrl: string | null;
-  };
-}
-
-interface BlogResponse {
-  posts: BlogPost[];
-  totalPages: number;
-  currentPage: number;
-  totalPosts: number;
-}
-
-export default function BlogList({ filters }: BlogListProps) {
-  const [blogData, setBlogData] = useState<BlogResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+export default function BlogList({
+  posts,
+  totalPages,
+  currentPage,
+  totalPosts,
+}: BlogListProps) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [localPosts, setLocalPosts] = useState(posts);
   const { user } = useUser();
   const router = useRouter();
 
@@ -84,39 +53,8 @@ export default function BlogList({ filters }: BlogListProps) {
     user?.publicMetadata?.role === "admin" ||
     user?.publicMetadata?.role === "moderator";
 
-  useEffect(() => {
-    const fetchBlogPosts = async () => {
-      setIsLoading(true);
-      try {
-        const queryParams = new URLSearchParams();
-
-        if (filters.category) queryParams.set("category", filters.category);
-        if (filters.tag) queryParams.set("tag", filters.tag);
-        if (filters.search) queryParams.set("search", filters.search);
-        queryParams.set("page", filters.page.toString());
-        queryParams.set("limit", filters.limit.toString());
-
-        const response = await fetch(`/api/blog?${queryParams.toString()}`);
-
-        if (!response.ok) {
-          throw new Error("Erreur lors du chargement des articles");
-        }
-
-        const data: BlogResponse = await response.json();
-        setBlogData(data);
-      } catch (error) {
-        console.error("Erreur:", error);
-        toast.error("Erreur lors du chargement des articles");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchBlogPosts();
-  }, [filters]);
-
   // ✅ Fonction pour supprimer un article
-  const handleDelete = async (postId: number) => {
+  const handleDelete = async (postId: string) => {
     if (!canEditBlog) return;
 
     setDeletingId(postId);
@@ -132,14 +70,11 @@ export default function BlogList({ filters }: BlogListProps) {
 
       toast.success("Article supprimé avec succès");
 
-      // Recharger la liste
-      if (blogData) {
-        setBlogData({
-          ...blogData,
-          posts: blogData.posts.filter((post) => post.id !== postId),
-          totalPosts: blogData.totalPosts - 1,
-        });
-      }
+      // Mettre à jour la liste locale
+      setLocalPosts((prev) => prev.filter((post) => post.id !== postId));
+
+      // Rafraîchir la page pour mettre à jour les données côté serveur
+      router.refresh();
     } catch (error) {
       console.error("Erreur:", error);
       toast.error("Erreur lors de la suppression de l'article");
@@ -148,25 +83,7 @@ export default function BlogList({ filters }: BlogListProps) {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="bg-white rounded-lg shadow-sm animate-pulse">
-            <div className="h-48 bg-gray-200 rounded-t-lg"></div>
-            <div className="p-6">
-              <div className="h-4 bg-gray-200 rounded mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-              <div className="h-3 bg-gray-200 rounded mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (!blogData || blogData.posts.length === 0) {
+  if (localPosts.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500 text-lg">Aucun article trouvé.</p>
@@ -178,7 +95,7 @@ export default function BlogList({ filters }: BlogListProps) {
     <div className="space-y-8">
       {/* Grille des articles */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {blogData.posts.map((post) => (
+        {localPosts.map((post) => (
           <Card
             key={post.id}
             className="group hover:shadow-lg transition-shadow overflow-hidden"
@@ -232,8 +149,7 @@ export default function BlogList({ filters }: BlogListProps) {
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                               Êtes-vous sûr de vouloir supprimer l&apos;article
-                              &quot;
-                              {post.title}&quot; ? Cette action est
+                              &quot;{post.title}&quot; ? Cette action est
                               irréversible.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
@@ -278,13 +194,11 @@ export default function BlogList({ filters }: BlogListProps) {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1">
                       <User className="w-3 h-3" />
-                      <span>
-                        {post.author.firstName} {post.author.lastName}
-                      </span>
+                      <span>{post.author.name || "Auteur inconnu"}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      <span>{post.readTime} min</span>
+                      <span>{post.readTime || 5} min</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
@@ -301,15 +215,13 @@ export default function BlogList({ filters }: BlogListProps) {
       </div>
 
       {/* Pagination */}
-      {blogData.totalPages > 1 && (
+      {totalPages > 1 && (
         <div className="flex justify-center gap-2">
-          {Array.from({ length: blogData.totalPages }, (_, i) => i + 1).map(
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(
             (pageNum) => (
               <Button
                 key={pageNum}
-                variant={
-                  pageNum === blogData.currentPage ? "default" : "outline"
-                }
+                variant={pageNum === currentPage ? "default" : "outline"}
                 size="sm"
                 asChild
               >

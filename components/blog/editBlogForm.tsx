@@ -16,28 +16,7 @@ import {
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
 import { BlogCategory, BlogStatus } from "@/lib/generated/prisma";
-
-// ✅ Types basés sur le schéma Prisma réel
-interface EditableBlogPost {
-  id: string;
-  title: string;
-  excerpt: string | null;
-  content: string;
-  slug: string;
-  category: BlogCategory;
-  tags: string[]; // ✅ Array de noms de tags
-  featuredImage: string | null;
-  imageAlt: string | null;
-  status: BlogStatus;
-  readTime: number | null;
-  publishedAt: string | null;
-  seoTitle: string | null;
-  seoDescription: string | null;
-}
-
-interface EditBlogFormProps {
-  post: EditableBlogPost;
-}
+import { EditBlogFormProps } from "@/types/blogType";
 
 // ✅ Categories du schéma Prisma
 const categories = [

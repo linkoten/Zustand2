@@ -15,26 +15,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
-import { Product } from "@/lib/generated/prisma";
-
-// ✅ Utiliser un type personnalisé au lieu du type Prisma brut
-interface EditableProduct {
-  id: number;
-  title: string;
-  description: string | null;
-  price: number; // ✅ number au lieu de Decimal
-  category: string;
-  countryOfOrigin: string;
-  locality: string | null;
-  geologicalPeriod: string;
-  geologicalStage: string | null;
-  weight: number | null;
-  status: string;
-}
-
-interface EditProductFormProps {
-  product: EditableProduct;
-}
+import { EditProductFormProps } from "@/types/productType";
 
 const categories = [
   { value: "TRILOBITE", label: "Trilobite" },

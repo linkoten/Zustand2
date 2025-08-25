@@ -7,26 +7,11 @@ import prisma from "@/lib/prisma";
 import {
   Category,
   GeologicalPeriod,
+  Prisma,
   ProductStatus,
 } from "@/lib/generated/prisma";
-
-interface CreateProductData {
-  title: string;
-  category: string;
-  genre: string;
-  species: string;
-  price: number;
-  countryOfOrigin: string;
-  locality: string;
-  geologicalPeriod: string;
-  geologicalStage: string;
-  description?: string;
-  weight: number; // ✅ Nouveau champ obligatoire
-  images: Array<{
-    url: string;
-    altText?: string;
-  }>;
-}
+import { SerializedProduct } from "@/types/type";
+import { CreateProductData, SearchParams } from "@/types/productType";
 
 export async function createProductAction(data: CreateProductData) {
   try {
@@ -193,6 +178,144 @@ export async function createProductAction(data: CreateProductData) {
         error instanceof Error
           ? error.message
           : "Une erreur est survenue lors de la création du produit",
+    };
+  }
+}
+
+export async function getFossils(
+  filters: SearchParams = {},
+  userId?: string | null
+): Promise<SerializedProduct[]> {
+  try {
+    const whereConditions: Prisma.ProductWhereInput = {
+      status: ProductStatus.AVAILABLE,
+    };
+
+    if (filters.category) {
+      whereConditions.category = filters.category as Category;
+    }
+    if (filters.countryOfOrigin) {
+      whereConditions.countryOfOrigin = filters.countryOfOrigin;
+    }
+    if (filters.locality) {
+      whereConditions.locality = filters.locality;
+    }
+    if (filters.geologicalPeriod) {
+      whereConditions.geologicalPeriod =
+        filters.geologicalPeriod as GeologicalPeriod;
+    }
+    if (filters.geologicalStage) {
+      whereConditions.geologicalStage = filters.geologicalStage;
+    }
+
+    // ✅ Récupérer TOUS les produits disponibles
+    const fossils = await prisma.product.findMany({
+      where: whereConditions,
+      include: {
+        images: {
+          orderBy: { order: "asc" },
+          take: 1,
+        },
+        // ✅ Inclure SEULEMENT les favoris de l'utilisateur connecté (pas tous les favoris)
+        userFavorites: userId
+          ? {
+              where: { userId }, // Filtrer par userId pour avoir seulement SES favoris
+            }
+          : false,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return fossils.map((fossil) => ({
+      ...fossil,
+      price: fossil.price.toNumber(),
+      description: fossil.description || undefined,
+      weight: fossil.weight,
+      // ✅ Vérifier si CE produit est dans les favoris de CET utilisateur
+      isFavorite: userId ? fossil.userFavorites.length > 0 : false,
+      createdAt: fossil.createdAt.toISOString(),
+      updatedAt: fossil.updatedAt.toISOString(),
+      category: fossil.category,
+      geologicalPeriod: fossil.geologicalPeriod,
+      status: fossil.status,
+      images: fossil.images.map((image) => ({
+        id: image.id,
+        imageUrl: image.imageUrl,
+        altText: image.altText || undefined,
+        order: image.order,
+        createdAt: image.createdAt.toISOString(),
+      })),
+    }));
+  } catch (error) {
+    console.error("Erreur lors de la récupération des fossiles:", error);
+    return [];
+  }
+}
+
+export async function getFilterOptions() {
+  try {
+    const [
+      categoriesResult,
+      countriesResult,
+      localitiesResult,
+      geologicalPeriodsResult,
+      geologicalStagesResult,
+    ] = await Promise.all([
+      prisma.product.findMany({
+        where: { status: ProductStatus.AVAILABLE },
+        select: { category: true },
+        distinct: ["category"],
+      }),
+      prisma.product.findMany({
+        where: { status: ProductStatus.AVAILABLE },
+        select: { countryOfOrigin: true },
+        distinct: ["countryOfOrigin"],
+      }),
+      prisma.product.findMany({
+        where: { status: ProductStatus.AVAILABLE },
+        select: { locality: true },
+        distinct: ["locality"],
+      }),
+      prisma.product.findMany({
+        where: { status: ProductStatus.AVAILABLE },
+        select: { geologicalPeriod: true },
+        distinct: ["geologicalPeriod"],
+      }),
+      prisma.product.findMany({
+        where: { status: ProductStatus.AVAILABLE },
+        select: { geologicalStage: true },
+        distinct: ["geologicalStage"],
+      }),
+    ]);
+
+    return {
+      categories: categoriesResult.map((item) => item.category),
+      countries: countriesResult.map((item) => item.countryOfOrigin).sort(),
+      localities: localitiesResult
+        .map((item) => item.locality)
+        .filter(Boolean) // ✅ Filtrer les valeurs null
+        .sort(),
+      geologicalPeriods: geologicalPeriodsResult.map(
+        (item) => item.geologicalPeriod
+      ),
+      geologicalStages: geologicalStagesResult
+        .map((item) => item.geologicalStage)
+        .filter(Boolean) // ✅ Filtrer les valeurs null
+        .sort(),
+    };
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des options de filtre:",
+      error
+    );
+    return {
+      categories: [],
+      countries: [],
+      localities: [],
+      geologicalPeriods: [],
+      geologicalStages: [],
     };
   }
 }

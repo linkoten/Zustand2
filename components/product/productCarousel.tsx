@@ -13,14 +13,9 @@ import {
   CarouselApi,
 } from "@/components/ui/carousel";
 import { Layers } from "lucide-react";
-import { SerializedProductImage } from "@/types/type";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
-
-interface ProductCarouselProps {
-  images: SerializedProductImage[];
-  productTitle: string;
-}
+import { ProductCarouselProps } from "@/types/productType";
 
 export default function ProductCarousel({
   images,

@@ -7,13 +7,7 @@ import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-
-interface FavoriteButtonProps {
-  productId: number;
-  isFavorite: boolean;
-  variant?: "default" | "overlay";
-  size?: "sm" | "md" | "lg";
-}
+import { FavoriteButtonProps } from "@/types/productType";
 
 export function FavoriteButton({
   productId,

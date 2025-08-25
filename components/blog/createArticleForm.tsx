@@ -17,25 +17,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { X, Plus, Save, Eye, Clock } from "lucide-react";
-import { BlogCategory, BlogStatus } from "@/lib/generated/prisma";
+import { BlogCategory, BlogStatus, BlogTag } from "@/lib/generated/prisma";
 
 import { toast } from "sonner";
 import RichTextEditor from "./richTextEditor";
-// ✅ Import des Server Actions
+
+import { Switch } from "../ui/switch";
+import { estimateReadTime, generateSlug } from "@/lib/utils";
 import {
   createBlogArticle,
   createBlogTag,
   getAllBlogTags,
-} from "./createBlogArticle";
-import { Switch } from "../ui/switch";
-import { estimateReadTime, generateSlug } from "@/lib/utils";
-
-interface BlogTag {
-  id: string;
-  name: string;
-  slug: string;
-  color?: string | null;
-}
+} from "@/lib/actions/blogActions";
 
 const categories = [
   { value: BlogCategory.PALEONTOLOGIE, label: "Paléontologie" },

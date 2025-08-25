@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { SerializedProduct } from "@/types/type";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,20 +44,8 @@ import {
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
 import { FavoriteButton } from "../product/favoriteButton";
+import { FossilesClientProps } from "@/types/productType";
 // ✅ Import du bouton favori
-
-interface FilterOptions {
-  categories: string[];
-  countries: string[];
-  localities: string[];
-  geologicalPeriods: string[];
-  geologicalStages: string[];
-}
-
-interface FossilesClientProps {
-  fossils: SerializedProduct[];
-  filterOptions: FilterOptions;
-}
 
 export default function FossilesClient({
   fossils,

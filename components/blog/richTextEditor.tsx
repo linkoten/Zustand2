@@ -45,12 +45,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-
-interface RichTextEditorProps {
-  content: string;
-  onChange: (content: string) => void;
-  placeholder?: string;
-}
+import { RichTextEditorProps } from "@/types/blogType";
 
 export default function RichTextEditor({
   content,

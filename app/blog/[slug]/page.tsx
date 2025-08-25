@@ -15,14 +15,14 @@ import {
   Share2,
   BookOpen,
 } from "lucide-react";
-import {
-  getBlogArticleBySlug,
-  getBlogArticles,
-} from "@/components/blog/getBlogArticles";
 import { BlogCategory } from "@/lib/generated/prisma";
 import ShareButtons from "@/components/blog/shareButtons";
 import BlogContent from "@/components/blog/blogContent";
 import RelatedArticles from "@/components/blog/relatedArticles";
+import {
+  getBlogArticleBySlug,
+  getBlogArticles,
+} from "@/lib/actions/blogActions";
 
 interface BlogArticlePageProps {
   params: Promise<{ slug: string }>;

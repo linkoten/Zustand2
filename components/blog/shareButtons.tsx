@@ -1,14 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ShareButtonsProps } from "@/types/blogType";
 import { Facebook, Twitter, Linkedin, Link, Mail } from "lucide-react";
 import { toast } from "sonner";
-
-interface ShareButtonsProps {
-  title: string;
-  url: string;
-  description?: string;
-}
 
 export default function ShareButtons({
   title,
