@@ -83,7 +83,9 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
                 year: "numeric",
               })}
             </div>
-            <p className="text-xs text-muted-foreground">Date d'inscription</p>
+            <p className="text-xs text-muted-foreground">
+              Date d&apos;inscription
+            </p>
           </CardContent>
         </Card>
 
@@ -157,7 +159,7 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
               <div className="text-center py-8">
                 <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">
-                  Vous n'avez pas encore de favoris
+                  Vous n&apos;avez pas encore de favoris
                 </p>
                 <Button asChild>
                   <Link href="/fossiles">Découvrir des fossiles</Link>

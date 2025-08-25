@@ -50,7 +50,7 @@ export default function AdminDashboard({ user, data }: AdminDashboardProps) {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Dashboard Admin 🛠️</h1>
         <p className="text-muted-foreground">
-          Vue d'ensemble de la plateforme FossilShop
+          Vue d&apos;ensemble de la plateforme FossilShop
         </p>
       </div>
 
