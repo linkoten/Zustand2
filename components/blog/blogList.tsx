@@ -231,8 +231,10 @@ export default function BlogList({ filters }: BlogListProps) {
                               Confirmer la suppression
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              Êtes-vous sûr de vouloir supprimer l'article "
-                              {post.title}" ? Cette action est irréversible.
+                              Êtes-vous sûr de vouloir supprimer l&apos;article
+                              &quot;
+                              {post.title}&quot; ? Cette action est
+                              irréversible.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

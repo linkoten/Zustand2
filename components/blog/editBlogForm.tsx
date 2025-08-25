@@ -124,7 +124,7 @@ export default function EditBlogForm({ post }: EditBlogFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">
-          <Label htmlFor="title">Titre de l'article *</Label>
+          <Label htmlFor="title">Titre de l&apos;article *</Label>
           <Input
             id="title"
             value={formData.title}

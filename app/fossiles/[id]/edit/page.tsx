@@ -78,7 +78,7 @@ export default async function EditProductPage({
         <CardHeader>
           <CardTitle className="text-2xl">Modifier le produit</CardTitle>
           <CardDescription>
-            Modifiez les informations du fossile "{product.title}"
+            Modifiez les informations du fossile &quot;{product.title}&quot;
           </CardDescription>
         </CardHeader>
         <CardContent>

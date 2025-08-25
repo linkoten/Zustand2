@@ -187,7 +187,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
         </div>
 
         <div>
-          <Label htmlFor="countryOfOrigin">Pays d'origine *</Label>
+          <Label htmlFor="countryOfOrigin">Pays d&apos;origine *</Label>
           <Input
             id="countryOfOrigin"
             value={formData.countryOfOrigin}

@@ -227,7 +227,7 @@ export default function FossilesClient({
                 </div>
 
                 <div>
-                  <Label htmlFor="country">Pays d'origine</Label>
+                  <Label htmlFor="country">Pays d&apos;origine</Label>
                   <Select
                     value={selectedCountry}
                     onValueChange={setSelectedCountry}
@@ -298,7 +298,9 @@ export default function FossilesClient({
                   />
                 ) : (
                   <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <span className="text-muted-foreground">Pas d'image</span>
+                    <span className="text-muted-foreground">
+                      Pas d&apos;image
+                    </span>
                   </div>
                 )}
 
@@ -345,8 +347,10 @@ export default function FossilesClient({
                               Confirmer la suppression
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              Êtes-vous sûr de vouloir supprimer le fossile "
-                              {fossil.title}" ? Cette action est irréversible.
+                              Êtes-vous sûr de vouloir supprimer le fossile
+                              &quot;
+                              {fossil.title}&quot; ? Cette action est
+                              irréversible.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

@@ -73,16 +73,16 @@ export default async function EditBlogPage({ params }: EditBlogPageProps) {
         <Button asChild variant="ghost" size="sm">
           <Link href={`/blog/${post.slug}`} className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Retour à l'article
+            Retour à l&apos;article
           </Link>
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Modifier l'article</CardTitle>
+          <CardTitle className="text-2xl">Modifier l&apos;article</CardTitle>
           <CardDescription>
-            Modifiez les informations de l'article "{post.title}"
+            Modifiez les informations de l&apos;article &quot;{post.title}&quot;
           </CardDescription>
         </CardHeader>
         <CardContent>
