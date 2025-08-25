@@ -143,7 +143,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // ✅ Vérifier que l'utilisateur est admin ou modérateur
@@ -159,7 +159,7 @@ export async function DELETE(
       );
     }
 
-    const postId = params.id; // ✅ String au lieu d'parseInt
+    const { id: postId } = await params;
 
     if (!postId) {
       return NextResponse.json(
