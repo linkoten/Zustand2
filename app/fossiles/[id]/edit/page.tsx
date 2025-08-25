@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import EditProductForm from "@/components/fossils/editProductForm";
 
 interface EditProductPageProps {
-  params: { id: number };
+  params: Promise<{ id: string }>; // ✅ Promise + string (les params URL sont toujours des strings)
 }
 
 async function getProduct(id: number) {
@@ -51,10 +51,12 @@ async function getProduct(id: number) {
 export default async function EditProductPage({
   params,
 }: EditProductPageProps) {
+  const { id: idString } = await params;
+  const id = parseInt(idString);
   // ✅ Vérifier que l'utilisateur est admin
   await requireAdmin();
 
-  const product = await getProduct(params.id);
+  const product = await getProduct(id);
 
   if (!product) {
     notFound();
