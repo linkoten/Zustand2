@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import EditBlogForm from "@/components/blog/editBlogForm";
 
 interface EditBlogPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 async function getBlogPost(slug: string) {
@@ -51,6 +51,8 @@ async function getBlogPost(slug: string) {
 }
 
 export default async function EditBlogPage({ params }: EditBlogPageProps) {
+  const { slug } = await params;
+
   // ✅ Vérifier que l'utilisateur est admin ou modérateur
   const { user } = await requireAdmin();
   const canEdit =
@@ -61,7 +63,7 @@ export default async function EditBlogPage({ params }: EditBlogPageProps) {
     notFound();
   }
 
-  const post = await getBlogPost(params.slug);
+  const post = await getBlogPost(slug);
 
   if (!post) {
     notFound();
