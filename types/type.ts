@@ -109,6 +109,7 @@ export interface SerializedProduct {
   status: ProductStatus;
   createdAt: string;
   updatedAt: string;
+  isFavorite?: boolean;
   images: SerializedProductImage[]; // ✅ Array d'images au lieu d'une seule
 }
 

@@ -51,6 +51,7 @@ model Product {
   // Stripe
   stripeProductId String? @unique
   stripePriceId   String? @unique
+  favorite        Boolean @default(false)
 
   // Statut du produit
   status ProductStatus @default(AVAILABLE)
@@ -58,9 +59,21 @@ model Product {
   // Pas de relation user car les produits sont indépendants
 
   // Relations futures pour le panier
-  cartItems CartItem[]
-  Payment   Payment[]
-  images    ProductImage[] // ✅ Nouvelle relation pour les images
+  cartItems     CartItem[]
+  Payment       Payment[]
+  images        ProductImage[] // ✅ Nouvelle relation pour les images
+  userFavorites UserFavorite[] // ✅ Relation avec les favoris
+}
+
+model UserFavorite {
+  id        String   @id @default(cuid())
+  userId    String // ID Clerk de l'utilisateur
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId]) // Un utilisateur ne peut favoriser qu'une fois le même produit
+  @@map("user_favorites")
 }
 
 // ✅ Nouveau modèle pour les images

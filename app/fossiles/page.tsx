@@ -21,7 +21,8 @@ interface SearchParams {
 }
 
 async function getFossils(
-  filters: SearchParams = {}
+  filters: SearchParams = {},
+  userId?: string | null
 ): Promise<SerializedProduct[]> {
   try {
     const whereConditions: Prisma.ProductWhereInput = {
@@ -52,6 +53,12 @@ async function getFossils(
           orderBy: { order: "asc" },
           take: 1,
         },
+        // ✅ Inclure les favoris de l'utilisateur connecté
+        userFavorites: userId
+          ? {
+              where: { userId },
+            }
+          : false,
       },
       orderBy: {
         createdAt: "desc",
@@ -62,7 +69,9 @@ async function getFossils(
       ...fossil,
       price: fossil.price.toNumber(),
       description: fossil.description || undefined,
-      weight: fossil.weight, // ✅ Inclure le poids
+      weight: fossil.weight,
+      // ✅ Calculer si le produit est en favori pour cet utilisateur
+      isFavorite: userId ? fossil.userFavorites.length > 0 : false,
       createdAt: fossil.createdAt.toISOString(),
       updatedAt: fossil.updatedAt.toISOString(),
       category: fossil.category,
