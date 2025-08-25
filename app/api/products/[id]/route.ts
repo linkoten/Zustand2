@@ -4,13 +4,13 @@ import { requireAdmin } from "@/lib/auth";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: number } }
+  { params }: { params: Promise<{ id: number }> }
 ) {
   try {
     // ✅ Vérifier que l'utilisateur est admin
     await requireAdmin();
 
-    const productId = params.id;
+    const { id: productId } = await params;
     const body = await request.json();
 
     const {
@@ -97,13 +97,13 @@ export async function PUT(
 // Reprendre la fonction DELETE de l'étape 3
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: number } }
+  { params }: { params: Promise<{ id: number }> }
 ) {
   try {
     // ✅ Vérifier que l'utilisateur est admin
     await requireAdmin();
 
-    const productId = params.id;
+    const { id: productId } = await params;
 
     if (!productId) {
       return NextResponse.json(
