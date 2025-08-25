@@ -5,7 +5,7 @@ import { BlogCategory, BlogStatus } from "@/lib/generated/prisma";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // ✅ Vérifier que l'utilisateur est admin ou modérateur
@@ -21,7 +21,7 @@ export async function PUT(
       );
     }
 
-    const postId = params.id; // ✅ String au lieu d'parseInt
+    const { id: postId } = await params;
     const body = await request.json();
 
     const {
