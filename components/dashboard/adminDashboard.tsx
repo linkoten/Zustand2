@@ -24,7 +24,6 @@ const statusColors = {
   PENDING: "bg-yellow-100 text-yellow-800",
   IN_PROGRESS: "bg-blue-100 text-blue-800",
   COMPLETED: "bg-green-100 text-green-800",
-  REJECTED: "bg-red-100 text-red-800",
   CANCELLED: "bg-gray-100 text-gray-800",
 };
 
@@ -39,7 +38,6 @@ const statusIcons = {
   PENDING: AlertCircle,
   IN_PROGRESS: Clock,
   COMPLETED: CheckCircle,
-  REJECTED: XCircle,
   CANCELLED: XCircle,
 };
 
@@ -159,6 +157,12 @@ export default function AdminDashboard({ user, data }: AdminDashboardProps) {
                 <Search className="h-5 w-5 text-orange-500" />
                 Demandes de fossiles récentes
               </CardTitle>
+              <Button asChild>
+                <Link href="/admin/fossil-requests">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Demandes de fossiles
+                </Link>
+              </Button>
               <Button asChild variant="outline" size="sm">
                 <Link href="/dashboard/requests">Voir toutes</Link>
               </Button>
