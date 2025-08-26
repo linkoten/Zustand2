@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { BlogCategory } from "@/lib/generated/prisma";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -12,8 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { Search, X } from "lucide-react";
-import { BlogCategory } from "@/lib/generated/prisma";
+import { useBlogStore } from "@/stores/blogStore";
 
 const categories = [
   { value: BlogCategory.PALEONTOLOGIE, label: "Paléontologie" },
@@ -29,6 +31,8 @@ const categories = [
 export default function BlogFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { resetFilters } = useBlogStore();
+
   const [searchTerm, setSearchTerm] = useState(
     searchParams.get("search") || ""
   );
@@ -51,16 +55,24 @@ export default function BlogFilters() {
     // Remettre à la page 1 lors d'un nouveau filtre
     params.delete("page");
 
-    router.push(`/blog?${params.toString()}`);
+    console.log("🔄 Nouveaux filtres appliqués:", newParams);
+
+    const newUrl = params.toString() ? `/blog?${params.toString()}` : "/blog";
+    console.log("🔗 URL générée:", newUrl);
+
+    router.push(newUrl);
   };
 
   const clearFilters = () => {
     setSearchTerm("");
+    // Utiliser le store ET l'URL
+    resetFilters();
     router.push("/blog");
   };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🔍 Recherche:", searchTerm);
     updateFilters({ search: searchTerm || null });
   };
 
@@ -69,50 +81,46 @@ export default function BlogFilters() {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
       <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-end">
-        {/* Recherche */}
+        {/* Barre de recherche */}
         <form onSubmit={handleSearch} className="flex-1 min-w-0">
-          <label
-            htmlFor="search"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
+          <Label htmlFor="search" className="text-sm font-medium mb-2 block">
             Rechercher
-          </label>
+          </Label>
           <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               id="search"
               type="text"
-              placeholder="Rechercher un article..."
+              placeholder="Rechercher dans les articles..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pr-10"
+              className="pl-10"
             />
             <Button
               type="submit"
-              size="icon"
-              variant="ghost"
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+              size="sm"
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8"
             >
               <Search className="h-4 w-4" />
             </Button>
           </div>
         </form>
 
-        {/* Catégorie */}
+        {/* Sélecteur de catégorie */}
         <div className="w-full lg:w-auto min-w-[200px]">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Catégorie
-          </label>
+          <Label className="text-sm font-medium mb-2 block">Catégorie</Label>
           <Select
-            value={currentCategory || undefined} // ✅ Utiliser undefined au lieu de ""
-            onValueChange={(value) =>
-              updateFilters({ category: value || null })
-            }
+            value={currentCategory || undefined}
+            onValueChange={(value) => {
+              console.log("📂 Catégorie sélectionnée:", value);
+              updateFilters({ category: value === "all" ? null : value });
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="Toutes les catégories" />
             </SelectTrigger>
             <SelectContent>
-              {/* ✅ Supprimer le SelectItem avec valeur vide */}
+              <SelectItem value="all">Toutes les catégories</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category.value} value={category.value}>
                   {category.label}
@@ -122,13 +130,9 @@ export default function BlogFilters() {
           </Select>
         </div>
 
-        {/* Bouton reset */}
+        {/* Bouton pour effacer les filtres */}
         {hasActiveFilters && (
-          <Button
-            variant="outline"
-            onClick={clearFilters}
-            className="flex items-center gap-2"
-          >
+          <Button onClick={clearFilters} variant="outline" className="gap-2">
             <X className="h-4 w-4" />
             Effacer
           </Button>
@@ -141,8 +145,9 @@ export default function BlogFilters() {
           <span className="text-sm text-gray-600">Filtres actifs :</span>
 
           {currentCategory && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              {categories.find((c) => c.value === currentCategory)?.label}
+            <Badge variant="secondary" className="gap-1">
+              {categories.find((c) => c.value === currentCategory)?.label ||
+                currentCategory}
               <button
                 onClick={() => updateFilters({ category: null })}
                 className="ml-1 hover:bg-gray-200 rounded-full p-0.5"
@@ -153,7 +158,7 @@ export default function BlogFilters() {
           )}
 
           {currentTag && (
-            <Badge variant="secondary" className="flex items-center gap-1">
+            <Badge variant="secondary" className="gap-1">
               #{currentTag}
               <button
                 onClick={() => updateFilters({ tag: null })}
@@ -165,7 +170,7 @@ export default function BlogFilters() {
           )}
 
           {currentSearch && (
-            <Badge variant="secondary" className="flex items-center gap-1">
+            <Badge variant="secondary" className="gap-1">
               &quot;{currentSearch}&quot;
               <button
                 onClick={() => {

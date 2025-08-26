@@ -12,15 +12,67 @@ import { BlogListItem } from "@/types/type";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
-export async function getBlogPosts(page: number = 1, limit: number = 12) {
+export async function getBlogPosts(
+  page: number = 1,
+  filters?: {
+    search?: string;
+    category?: string;
+    tag?: string;
+  }
+) {
   try {
+    const limit = 12;
     const skip = (page - 1) * limit;
+
+    // Construire les conditions WHERE
+    const whereConditions: Prisma.ArticleBlogWhereInput = {
+      status: BlogStatus.PUBLISHED,
+      publishedAt: {
+        lte: new Date(),
+      },
+    };
+
+    // ✅ Filtre par catégorie
+    if (filters?.category) {
+      whereConditions.category = filters.category as BlogCategory;
+    }
+
+    // ✅ Filtre par tag
+    if (filters?.tag) {
+      whereConditions.tags = {
+        some: {
+          OR: [
+            { slug: filters.tag },
+            { name: { equals: filters.tag, mode: "insensitive" } },
+          ],
+        },
+      };
+    }
+
+    // ✅ Filtre par recherche (titre, excerpt, contenu)
+    if (filters?.search) {
+      whereConditions.OR = [
+        { title: { contains: filters.search, mode: "insensitive" } },
+        { excerpt: { contains: filters.search, mode: "insensitive" } },
+        { content: { contains: filters.search, mode: "insensitive" } },
+        {
+          tags: {
+            some: {
+              name: { contains: filters.search, mode: "insensitive" },
+            },
+          },
+        },
+      ];
+    }
+
+    console.log(
+      "Conditions de filtrage appliquées:",
+      JSON.stringify(whereConditions, null, 2)
+    );
 
     const [posts, totalPosts] = await Promise.all([
       prisma.articleBlog.findMany({
-        where: {
-          status: BlogStatus.PUBLISHED,
-        },
+        where: whereConditions,
         include: {
           author: {
             select: {
@@ -30,7 +82,10 @@ export async function getBlogPosts(page: number = 1, limit: number = 12) {
           },
           tags: {
             select: {
+              id: true,
               name: true,
+              slug: true,
+              color: true,
             },
           },
         },
@@ -41,13 +96,14 @@ export async function getBlogPosts(page: number = 1, limit: number = 12) {
         take: limit,
       }),
       prisma.articleBlog.count({
-        where: {
-          status: BlogStatus.PUBLISHED,
-        },
+        where: whereConditions,
       }),
     ]);
 
     const totalPages = Math.ceil(totalPosts / limit);
+
+    console.log(`Filtres appliqués: ${JSON.stringify(filters)}`);
+    console.log(`Articles trouvés: ${posts.length}/${totalPosts}`);
 
     return {
       posts: posts.map((post) => ({
@@ -56,13 +112,15 @@ export async function getBlogPosts(page: number = 1, limit: number = 12) {
         excerpt: post.excerpt,
         slug: post.slug,
         category: post.category,
-        tags: post.tags.map((tag) => tag.name),
+        tags: post.tags,
         featuredImage: post.featuredImage,
         publishedAt:
           post.publishedAt?.toISOString() || post.createdAt.toISOString(),
         readTime: post.readTime,
+        views: post.views,
         author: {
           name: post.author.name,
+          id: post.author.id,
         },
       })),
       totalPages,

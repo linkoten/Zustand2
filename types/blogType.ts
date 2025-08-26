@@ -50,7 +50,27 @@ export interface BlogPost {
 
 // ✅ Nouvelle interface qui correspond aux props de la page
 export interface BlogListProps {
-  posts: BlogPost[];
+  posts: Array<{
+    id: string;
+    title: string;
+    excerpt: string | null;
+    slug: string;
+    category: BlogCategory;
+    tags: Array<{
+      id: string;
+      name: string;
+      slug: string;
+      color: string | null;
+    }>;
+    featuredImage: string | null;
+    publishedAt: string;
+    readTime: number | null;
+    views: number;
+    author: {
+      name: string | null;
+      id: number;
+    };
+  }>;
   totalPages: number;
   currentPage: number;
   totalPosts: number;
@@ -108,4 +128,17 @@ export interface ShareButtonsProps {
   title: string;
   url: string;
   description?: string;
+}
+
+export interface BlogSectionProps {
+  initialData: BlogListProps;
+}
+
+export interface BlogStatsProps {
+  initialStats: {
+    totalPosts: number;
+    currentPagePosts: number;
+    totalPages: number;
+    currentPage: number;
+  };
 }

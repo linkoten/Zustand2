@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BlogCategory } from "@/lib/generated/prisma";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,11 +18,13 @@ import {
   Edit,
   Trash2,
   AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -47,11 +49,54 @@ export default function BlogList({
   const [localPosts, setLocalPosts] = useState(posts);
   const { user } = useUser();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // ✅ Mettre à jour localPosts quand les props changent
+  useEffect(() => {
+    setLocalPosts(posts);
+  }, [posts]);
 
   // ✅ Vérifier si l'utilisateur est admin ou modérateur
   const canEditBlog =
     user?.publicMetadata?.role === "admin" ||
     user?.publicMetadata?.role === "moderator";
+
+  // ✅ Fonction pour créer une URL avec les paramètres de recherche existants
+  const createPageUrl = (pageNumber: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", pageNumber.toString());
+    return `/blog?${params.toString()}`;
+  };
+
+  // ✅ Fonction pour obtenir la couleur de la catégorie
+  const getCategoryColor = (category: BlogCategory) => {
+    const colors = {
+      [BlogCategory.PALEONTOLOGIE]: "bg-blue-100 text-blue-800",
+      [BlogCategory.DECOUVERTE]: "bg-green-100 text-green-800",
+      [BlogCategory.GUIDE_COLLECTION]: "bg-purple-100 text-purple-800",
+      [BlogCategory.HISTOIRE_GEOLOGIQUE]: "bg-amber-100 text-amber-800",
+      [BlogCategory.ACTUALITE]: "bg-red-100 text-red-800",
+      [BlogCategory.TECHNIQUE]: "bg-gray-100 text-gray-800",
+      [BlogCategory.EXPOSITION]: "bg-pink-100 text-pink-800",
+      [BlogCategory.PORTRAIT]: "bg-indigo-100 text-indigo-800",
+    };
+    return colors[category] || "bg-gray-100 text-gray-800";
+  };
+
+  // ✅ Fonction pour obtenir le label de la catégorie
+  const getCategoryLabel = (category: BlogCategory) => {
+    const labels = {
+      [BlogCategory.PALEONTOLOGIE]: "Paléontologie",
+      [BlogCategory.DECOUVERTE]: "Découverte",
+      [BlogCategory.GUIDE_COLLECTION]: "Guide Collection",
+      [BlogCategory.HISTOIRE_GEOLOGIQUE]: "Histoire Géologique",
+      [BlogCategory.ACTUALITE]: "Actualité",
+      [BlogCategory.TECHNIQUE]: "Technique",
+      [BlogCategory.EXPOSITION]: "Exposition",
+      [BlogCategory.PORTRAIT]: "Portrait",
+    };
+    return labels[category] || category;
+  };
 
   // ✅ Fonction pour supprimer un article
   const handleDelete = async (postId: string) => {
@@ -83,10 +128,26 @@ export default function BlogList({
     }
   };
 
+  // ✅ Si aucun article
   if (localPosts.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">Aucun article trouvé.</p>
+        <div className="max-w-md mx-auto">
+          <div className="text-6xl mb-4">📝</div>
+          <h3 className="text-xl font-semibold mb-2">Aucun article trouvé</h3>
+          <p className="text-gray-500 mb-6">
+            {searchParams.get("search") ||
+            searchParams.get("category") ||
+            searchParams.get("tag")
+              ? "Essayez de modifier vos critères de recherche."
+              : "Aucun article n'a encore été publié."}
+          </p>
+          {canEditBlog && (
+            <Button asChild>
+              <Link href="/blog/create">Créer le premier article</Link>
+            </Button>
+          )}
+        </div>
       </div>
     );
   }
@@ -98,10 +159,11 @@ export default function BlogList({
         {localPosts.map((post) => (
           <Card
             key={post.id}
-            className="group hover:shadow-lg transition-shadow overflow-hidden"
+            className="group hover:shadow-lg transition-all duration-300 overflow-hidden border-0 shadow-sm"
           >
+            {/* En-tête avec image */}
             <CardHeader className="p-0">
-              <div className="relative aspect-video overflow-hidden">
+              <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-stone-100 to-stone-200">
                 {post.featuredImage ? (
                   <Image
                     src={post.featuredImage}
@@ -111,19 +173,19 @@ export default function BlogList({
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-                    <span className="text-amber-600 font-semibold">📖</span>
+                    <span className="text-4xl">📖</span>
                   </div>
                 )}
 
                 {/* ✅ Boutons admin en overlay */}
                 {canEditBlog && (
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <div className="flex gap-1">
                       <Button
                         asChild
                         size="sm"
                         variant="secondary"
-                        className="h-8 w-8 p-0 bg-white/90 hover:bg-white"
+                        className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
                       >
                         <Link href={`/blog/${post.slug}/edit`}>
                           <Edit className="h-4 w-4" />
@@ -135,7 +197,7 @@ export default function BlogList({
                           <Button
                             size="sm"
                             variant="destructive"
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 shadow-sm"
                             disabled={deletingId === post.id}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -167,31 +229,65 @@ export default function BlogList({
                     </div>
                   </div>
                 )}
+
+                {/* Badge de catégorie */}
+                <div className="absolute bottom-3 left-3">
+                  <Badge
+                    variant="secondary"
+                    className={`${getCategoryColor(post.category)} border-0 font-medium`}
+                  >
+                    {getCategoryLabel(post.category)}
+                  </Badge>
+                </div>
               </div>
             </CardHeader>
 
+            {/* Contenu de la carte */}
             <CardContent className="p-6">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">{post.category}</Badge>
-                  {post.tags.length > 0 && (
-                    <span className="text-xs text-gray-500">
-                      {post.tags.slice(0, 2).join(", ")}
-                    </span>
+              <div className="space-y-4">
+                {/* Titre et description */}
+                <div>
+                  <CardTitle className="text-lg leading-tight mb-2 group-hover:text-primary transition-colors">
+                    <Link href={`/blog/${post.slug}`} className="line-clamp-2">
+                      {post.title}
+                    </Link>
+                  </CardTitle>
+
+                  {post.excerpt && (
+                    <CardDescription className="text-sm line-clamp-3 text-muted-foreground">
+                      {post.excerpt}
+                    </CardDescription>
                   )}
                 </div>
 
-                <div>
-                  <CardTitle className="text-lg leading-tight hover:text-primary transition-colors">
-                    <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                  </CardTitle>
-                  <CardDescription className="mt-2 text-sm line-clamp-3">
-                    {post.excerpt}
-                  </CardDescription>
-                </div>
+                {/* Tags */}
+                {post.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {post.tags.slice(0, 3).map((tag) => (
+                      <Link
+                        key={tag.id}
+                        href={`/blog?tag=${tag.slug}`}
+                        className="inline-block"
+                      >
+                        <Badge
+                          variant="outline"
+                          className="text-xs hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
+                        >
+                          #{tag.name}
+                        </Badge>
+                      </Link>
+                    ))}
+                    {post.tags.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{post.tags.length - 3}
+                      </Badge>
+                    )}
+                  </div>
+                )}
 
-                <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t">
-                  <div className="flex items-center gap-4">
+                {/* Métadonnées */}
+                <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
+                  <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1">
                       <User className="w-3 h-3" />
                       <span>{post.author.name || "Auteur inconnu"}</span>
@@ -204,7 +300,11 @@ export default function BlogList({
                   <div className="flex items-center gap-1">
                     <CalendarDays className="w-3 h-3" />
                     <span>
-                      {new Date(post.publishedAt).toLocaleDateString("fr-FR")}
+                      {new Date(post.publishedAt).toLocaleDateString("fr-FR", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
                     </span>
                   </div>
                 </div>
@@ -214,21 +314,96 @@ export default function BlogList({
         ))}
       </div>
 
-      {/* Pagination */}
+      {/* ✅ Pagination améliorée */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-            (pageNum) => (
-              <Button
-                key={pageNum}
-                variant={pageNum === currentPage ? "default" : "outline"}
-                size="sm"
-                asChild
-              >
-                <Link href={`/blog?page=${pageNum}`}>{pageNum}</Link>
-              </Button>
-            )
-          )}
+        <div className="flex flex-col items-center gap-4">
+          {/* Informations de pagination */}
+          <div className="text-sm text-muted-foreground">
+            Page {currentPage} sur {totalPages} • {totalPosts} article
+            {totalPosts > 1 ? "s" : ""} au total
+          </div>
+
+          {/* Boutons de pagination */}
+          <div className="flex items-center gap-2">
+            {/* Bouton Précédent */}
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              disabled={currentPage === 1}
+              className="gap-1"
+            >
+              <Link href={createPageUrl(currentPage - 1)}>
+                <ChevronLeft className="h-4 w-4" />
+                Précédent
+              </Link>
+            </Button>
+
+            {/* Pages numérotées */}
+            <div className="flex gap-1">
+              {/* Première page */}
+              {currentPage > 3 && (
+                <>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={createPageUrl(1)}>1</Link>
+                  </Button>
+                  {currentPage > 4 && (
+                    <span className="px-2 text-muted-foreground">...</span>
+                  )}
+                </>
+              )}
+
+              {/* Pages autour de la page actuelle */}
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const pageNum = Math.max(
+                  1,
+                  Math.min(totalPages, currentPage - 2 + i)
+                );
+                if (
+                  pageNum < Math.max(1, currentPage - 2) ||
+                  pageNum > Math.min(totalPages, currentPage + 2)
+                ) {
+                  return null;
+                }
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={pageNum === currentPage ? "default" : "outline"}
+                    size="sm"
+                    asChild
+                  >
+                    <Link href={createPageUrl(pageNum)}>{pageNum}</Link>
+                  </Button>
+                );
+              })}
+
+              {/* Dernière page */}
+              {currentPage < totalPages - 2 && (
+                <>
+                  {currentPage < totalPages - 3 && (
+                    <span className="px-2 text-muted-foreground">...</span>
+                  )}
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={createPageUrl(totalPages)}>{totalPages}</Link>
+                  </Button>
+                </>
+              )}
+            </div>
+
+            {/* Bouton Suivant */}
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              disabled={currentPage === totalPages}
+              className="gap-1"
+            >
+              <Link href={createPageUrl(currentPage + 1)}>
+                Suivant
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
         </div>
       )}
     </div>
