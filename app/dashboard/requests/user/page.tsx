@@ -68,7 +68,7 @@ export default async function UserFossilRequestsPage({
               Mes demandes de fossiles
             </h1>
             <p className="text-muted-foreground">
-              Suivez l'état de vos demandes de recherche de fossiles
+              Suivez l&apos;état de vos demandes de recherche de fossiles
             </p>
           </div>
 
@@ -128,12 +128,12 @@ export default async function UserFossilRequestsPage({
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                  Vous n'avez pas encore de demandes
+                  Vous n&apos;avez pas encore de demandes
                 </h3>
                 <p className="text-blue-700 mb-4">
-                  Vous cherchez un fossile spécifique ? Notre équipe d'experts
-                  peut vous aider à le trouver ! Décrivez ce que vous recherchez
-                  et nous ferons de notre mieux pour vous aider.
+                  Vous cherchez un fossile spécifique ? Notre équipe
+                  d&apos;experts peut vous aider à le trouver ! Décrivez ce que
+                  vous recherchez et nous ferons de notre mieux pour vous aider.
                 </p>
                 <Button asChild>
                   <Link href="/fossiles/request">
