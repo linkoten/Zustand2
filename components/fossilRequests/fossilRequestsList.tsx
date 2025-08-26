@@ -411,8 +411,8 @@ export default function FossilRequestsList({
                                     </AlertDialogTitle>
                                     <AlertDialogDescription>
                                       Êtes-vous sûr de vouloir supprimer cette
-                                      demande pour "{request.fossilType}" ?
-                                      Cette action est irréversible.
+                                      demande pour &quot;{request.fossilType}
+                                      &quot; ? Cette action est irréversible.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
