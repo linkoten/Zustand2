@@ -33,9 +33,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Eye, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  Search,
+  Eye,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  Trash2,
+  MessageSquare,
+  FileText,
+  StickyNote,
+} from "lucide-react";
 import Link from "next/link";
 import { FossilRequestListProps } from "@/types/fossilRequestType";
+import { deleteFossilRequest } from "@/lib/actions/fossilRequestsActions";
+import { toast } from "sonner";
 
 const statusLabels: Record<RequestStatus, string> = {
   PENDING: "En attente",
@@ -79,9 +102,30 @@ export default function FossilRequestsList({
   const [searchTerm, setSearchTerm] = useState(
     searchParams.get("search") || ""
   );
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const currentStatus = searchParams.get("status");
   const currentPriority = searchParams.get("priority");
+
+  // ✅ Fonction pour supprimer une demande (utilisateur uniquement)
+  const handleDelete = async (requestId: string) => {
+    setDeletingId(requestId);
+    try {
+      const result = await deleteFossilRequest(requestId);
+      if (result.success) {
+        toast.success("Demande supprimée avec succès");
+        router.refresh();
+      } else {
+        toast.error(
+          "error" in result ? result.error : "Erreur lors de la suppression"
+        );
+      }
+    } catch (error) {
+      toast.error("Erreur lors de la suppression");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   // ✅ Fonction pour générer l'URL de détail selon le rôle
   const getDetailUrl = (requestId: string) => {
@@ -109,13 +153,11 @@ export default function FossilRequestsList({
     });
 
     params.delete("page");
-    // ✅ Utiliser l'URL de base correcte
     router.push(`${getBaseUrl()}?${params.toString()}`);
   };
 
   const clearFilters = () => {
     setSearchTerm("");
-    // ✅ Utiliser l'URL de base correcte
     router.push(getBaseUrl());
   };
 
@@ -127,7 +169,6 @@ export default function FossilRequestsList({
   const createPageUrl = (pageNumber: number) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", pageNumber.toString());
-    // ✅ Utiliser l'URL de base correcte
     return `${getBaseUrl()}?${params.toString()}`;
   };
 
@@ -276,6 +317,16 @@ export default function FossilRequestsList({
                       <TableHead>Priorité</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Actions</TableHead>
+                      {/* ✅ Nouvelles colonnes selon le rôle */}
+                      {userRole === UserRole.USER && (
+                        <TableHead>Message admin</TableHead>
+                      )}
+                      {userRole === UserRole.ADMIN && (
+                        <TableHead>Notes admin</TableHead>
+                      )}
+                      {userRole === UserRole.ADMIN && (
+                        <TableHead>Message client</TableHead>
+                      )}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -331,14 +382,124 @@ export default function FossilRequestsList({
                           </div>
                         </TableCell>
                         <TableCell>
-                          {/* ✅ URL dynamique selon le rôle */}
-                          <Button asChild size="sm" variant="outline">
-                            <Link href={getDetailUrl(request.id)}>
-                              <Eye className="h-4 w-4 mr-1" />
-                              Voir
-                            </Link>
-                          </Button>
+                          <div className="flex gap-2">
+                            {/* ✅ URL dynamique selon le rôle */}
+                            <Button asChild size="sm" variant="outline">
+                              <Link href={getDetailUrl(request.id)}>
+                                <Eye className="h-4 w-4 mr-1" />
+                                Voir
+                              </Link>
+                            </Button>
+
+                            {/* ✅ Bouton delete pour les utilisateurs */}
+                            {userRole === UserRole.USER && (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-red-600 hover:text-red-700"
+                                    disabled={deletingId === request.id}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Confirmer la suppression
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Êtes-vous sûr de vouloir supprimer cette
+                                      demande pour "{request.fossilType}" ?
+                                      Cette action est irréversible.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      Annuler
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDelete(request.id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      Supprimer
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            )}
+                          </div>
                         </TableCell>
+
+                        {/* ✅ Message admin pour les utilisateurs */}
+                        {userRole === UserRole.USER && (
+                          <TableCell>
+                            {request.responseMessage ? (
+                              <div className="max-w-xs">
+                                <div className="flex items-center gap-1 mb-1">
+                                  <MessageSquare className="h-3 w-3 text-blue-500" />
+                                  <span className="text-xs font-medium text-blue-600">
+                                    Message reçu
+                                  </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground line-clamp-3">
+                                  {request.responseMessage}
+                                </p>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">
+                                Aucun message
+                              </span>
+                            )}
+                          </TableCell>
+                        )}
+
+                        {/* ✅ Notes admin pour les admins */}
+                        {userRole === UserRole.ADMIN && (
+                          <TableCell>
+                            {request.adminNotes ? (
+                              <div className="max-w-xs">
+                                <div className="flex items-center gap-1 mb-1">
+                                  <StickyNote className="h-3 w-3 text-orange-500" />
+                                  <span className="text-xs font-medium text-orange-600">
+                                    Notes privées
+                                  </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground line-clamp-2">
+                                  {request.adminNotes}
+                                </p>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">
+                                Aucune note
+                              </span>
+                            )}
+                          </TableCell>
+                        )}
+
+                        {/* ✅ Message client pour les admins */}
+                        {userRole === UserRole.ADMIN && (
+                          <TableCell>
+                            {request.responseMessage ? (
+                              <div className="max-w-xs">
+                                <div className="flex items-center gap-1 mb-1">
+                                  <FileText className="h-3 w-3 text-green-500" />
+                                  <span className="text-xs font-medium text-green-600">
+                                    Envoyé au client
+                                  </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground line-clamp-2">
+                                  {request.responseMessage}
+                                </p>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">
+                                Pas de réponse
+                              </span>
+                            )}
+                          </TableCell>
+                        )}
                       </TableRow>
                     ))}
                   </TableBody>

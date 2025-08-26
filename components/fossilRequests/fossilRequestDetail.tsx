@@ -1,9 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-
+import {
+  UserRole,
+  RequestStatus,
+  RequestPriority,
+} from "@/lib/generated/prisma";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -21,49 +25,64 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
 import {
   Save,
-  Trash2,
-  AlertTriangle,
+  FileText,
+  Calendar,
+  User,
   Mail,
   Phone,
   MapPin,
-  Calendar,
-  DollarSign,
-  FileText,
+  Euro,
+  MessageSquare,
+  StickyNote,
+  AlertCircle,
 } from "lucide-react";
-import { FossilRequest } from "@/types/fossilRequestType";
-import {
-  deleteFossilRequest,
-  updateFossilRequest,
-} from "@/lib/actions/fossilRequestsActions";
-import { RequestPriority, RequestStatus } from "@/lib/generated/prisma";
+import { updateFossilRequest } from "@/lib/actions/fossilRequestsActions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-const statusLabels = {
+interface FossilRequestDetailProps {
+  request: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    fossilType: string;
+    description: string;
+    maxBudget: number | null;
+    geologicalPeriod: string | null;
+    category: string | null;
+    countryOfOrigin: string | null;
+    locality: string | null;
+    status: RequestStatus;
+    priority: RequestPriority;
+    adminNotes: string | null;
+    responseMessage: string | null;
+    respondedBy: string | null;
+    respondedAt: string | null;
+    createdAt: string;
+    updatedAt: string;
+    clerkUserId?: string | null;
+    userRole?: UserRole;
+  };
+}
+
+const statusLabels: Record<RequestStatus, string> = {
   PENDING: "En attente",
   IN_PROGRESS: "En cours",
   COMPLETED: "Terminé",
   CANCELLED: "Annulé",
   REJECTED: "Rejeté",
 };
-const statusColors = {
+
+const statusColors: Record<RequestStatus, string> = {
   PENDING: "bg-yellow-100 text-yellow-800",
   IN_PROGRESS: "bg-blue-100 text-blue-800",
   COMPLETED: "bg-green-100 text-green-800",
   CANCELLED: "bg-red-100 text-red-800",
-  REJECTED: "bg-red-100 text-red-800",
+  REJECTED: "bg-gray-100 text-gray-800",
 };
 
 const priorityLabels = {
@@ -80,30 +99,36 @@ const priorityColors = {
   URGENT: "bg-red-100 text-red-800",
 };
 
-interface FossilRequestDetailProps {
-  request: FossilRequest;
-}
-
 export default function FossilRequestDetail({
   request,
 }: FossilRequestDetailProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
-    status: request.status,
-    priority: request.priority,
-    adminNotes: request.adminNotes || "",
-    responseMessage: request.responseMessage || "",
-  });
+  // ✅ Déterminer si l'utilisateur est admin
+  const isAdmin = request.userRole === UserRole.ADMIN;
+
+  // États pour les champs modifiables (admin seulement)
+  const [status, setStatus] = useState(request.status);
+  const [priority, setPriority] = useState(request.priority);
+  const [adminNotes, setAdminNotes] = useState(request.adminNotes || "");
+  const [responseMessage, setResponseMessage] = useState(
+    request.responseMessage || ""
+  );
 
   const handleSave = async () => {
-    setIsSaving(true);
+    if (!isAdmin) return;
 
+    setLoading(true);
     try {
-      const result = await updateFossilRequest(request.id, formData);
+      const result = await updateFossilRequest(request.id, {
+        status,
+        priority,
+        adminNotes: adminNotes.trim() || null,
+        responseMessage: responseMessage.trim() || null,
+        respondedBy: "Admin", // Ou récupérer le nom de l'admin connecté
+      });
 
       if (result.success) {
         toast.success("Demande mise à jour avec succès");
@@ -115,48 +140,23 @@ export default function FossilRequestDetail({
     } catch (error) {
       toast.error("Erreur lors de la mise à jour");
     } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-
-    try {
-      const result = await deleteFossilRequest(request.id);
-
-      if (result.success) {
-        toast.success("Demande supprimée avec succès");
-        router.push("/admin/fossil-requests");
-      } else {
-        toast.error(result.error || "Erreur lors de la suppression");
-      }
-    } catch (error) {
-      toast.error("Erreur lors de la suppression");
-    } finally {
-      setIsDeleting(false);
+      setLoading(false);
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* En-tête avec actions */}
+      {/* En-tête */}
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
-              <CardTitle className="text-2xl">
-                Demande de {request.name}
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Demande #{request.id.slice(-8)}
               </CardTitle>
               <CardDescription>
-                Créée le{" "}
-                {new Date(request.createdAt).toLocaleDateString("fr-FR", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                Type de fossile recherché : {request.fossilType}
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -166,163 +166,120 @@ export default function FossilRequestDetail({
               <Badge className={priorityColors[request.priority]}>
                 {priorityLabels[request.priority]}
               </Badge>
+              {/* ✅ Bouton d'édition seulement pour les admins */}
+              {isAdmin &&
+                (isEditing ? (
+                  <div className="flex gap-2">
+                    <Button onClick={handleSave} disabled={loading} size="sm">
+                      <Save className="h-4 w-4 mr-2" />
+                      Sauvegarder
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditing(false)}
+                      disabled={loading}
+                      size="sm"
+                    >
+                      Annuler
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => setIsEditing(true)}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Modifier
+                  </Button>
+                ))}
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setIsEditing(!isEditing)}
-              variant={isEditing ? "outline" : "default"}
-            >
-              {isEditing ? "Annuler" : "Modifier"}
-            </Button>
-
-            {isEditing && (
-              <Button onClick={handleSave} disabled={isSaving}>
-                <Save className="h-4 w-4 mr-2" />
-                {isSaving ? "Sauvegarde..." : "Sauvegarder"}
-              </Button>
-            )}
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" disabled={isDeleting}>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Supprimer
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-destructive" />
-                    Confirmer la suppression
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Êtes-vous sûr de vouloir supprimer cette demande ? Cette
-                    action est irréversible.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Annuler</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDelete}
-                    className="bg-destructive hover:bg-destructive/90"
-                  >
-                    Supprimer
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Informations client */}
+        {/* Informations du client */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
-              Informations client
+              <User className="h-5 w-5" />
+              Informations du client
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Nom
-                </Label>
-                <p className="font-medium">{request.name}</p>
+                <Label className="text-sm font-medium">Nom</Label>
+                <p className="text-sm text-muted-foreground">{request.name}</p>
               </div>
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Email
-                </Label>
-                <p className="font-medium">{request.email}</p>
+                <Label className="text-sm font-medium">Email</Label>
+                <p className="text-sm text-muted-foreground">{request.email}</p>
               </div>
             </div>
-
             {request.phone && (
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Téléphone
-                </Label>
-                <p className="font-medium flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  {request.phone}
-                </p>
+                <Label className="text-sm font-medium">Téléphone</Label>
+                <p className="text-sm text-muted-foreground">{request.phone}</p>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Gestion admin */}
+        {/* Statut et priorité - Modifiable pour admin seulement */}
         <Card>
           <CardHeader>
-            <CardTitle>Gestion administrative</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              Statut de la demande
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isEditing ? (
+            {isAdmin && isEditing ? (
               <>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="status">Statut</Label>
-                    <Select
-                      value={formData.status}
-                      onValueChange={(value) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          status: value as RequestStatus,
-                        }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(statusLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="priority">Priorité</Label>
-                    <Select
-                      value={formData.priority}
-                      onValueChange={(value) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          priority: value as RequestPriority,
-                        }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(priorityLabels).map(
-                          ([value, label]) => (
-                            <SelectItem key={value} value={value}>
-                              {label}
-                            </SelectItem>
-                          )
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div>
+                  <Label htmlFor="status">Statut</Label>
+                  <Select
+                    value={status}
+                    onValueChange={(value: RequestStatus) => setStatus(value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(statusLabels).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="priority">Priorité</Label>
+                  <Select
+                    value={priority}
+                    onValueChange={(value: RequestPriority) =>
+                      setPriority(value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(priorityLabels).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </>
             ) : (
-              <div className="grid grid-cols-2 gap-4">
+              <>
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">
-                    Statut
-                  </Label>
+                  <Label className="text-sm font-medium">Statut actuel</Label>
                   <div className="mt-1">
                     <Badge className={statusColors[request.status]}>
                       {statusLabels[request.status]}
@@ -330,15 +287,25 @@ export default function FossilRequestDetail({
                   </div>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">
-                    Priorité
-                  </Label>
+                  <Label className="text-sm font-medium">Priorité</Label>
                   <div className="mt-1">
                     <Badge className={priorityColors[request.priority]}>
                       {priorityLabels[request.priority]}
                     </Badge>
                   </div>
                 </div>
+              </>
+            )}
+
+            {request.respondedBy && request.respondedAt && (
+              <div>
+                <Label className="text-sm font-medium">
+                  Dernière mise à jour
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Par {request.respondedBy} le{" "}
+                  {new Date(request.respondedAt).toLocaleDateString("fr-FR")}
+                </p>
               </div>
             )}
           </CardContent>
@@ -353,188 +320,191 @@ export default function FossilRequestDetail({
             Détails de la demande
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground">
-                Type de fossile
-              </Label>
-              <p className="font-medium">{request.fossilType}</p>
-            </div>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="text-sm font-medium">
+              Type de fossile recherché
+            </Label>
+            <p className="text-sm text-muted-foreground mt-1">
+              {request.fossilType}
+            </p>
+          </div>
 
-            {request.category && (
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Catégorie
-                </Label>
-                <p className="font-medium">{request.category}</p>
-              </div>
-            )}
+          <div>
+            <Label className="text-sm font-medium">Description détaillée</Label>
+            <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
+              {request.description}
+            </p>
+          </div>
 
-            {request.geologicalPeriod && (
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Période géologique
-                </Label>
-                <p className="font-medium">{request.geologicalPeriod}</p>
-              </div>
-            )}
-
-            {request.countryOfOrigin && (
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Pays d&apos;origine
-                </Label>
-                <p className="font-medium flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  {request.countryOfOrigin}
-                </p>
-              </div>
-            )}
-
-            {request.locality && (
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Localité
-                </Label>
-                <p className="font-medium">{request.locality}</p>
-              </div>
-            )}
-
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {request.maxBudget && (
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Budget maximum
-                </Label>
-                <p className="font-medium flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
+                <Label className="text-sm font-medium">Budget maximum</Label>
+                <p className="text-sm text-muted-foreground">
                   {request.maxBudget.toLocaleString("fr-FR")} €
                 </p>
               </div>
             )}
-          </div>
-
-          <div>
-            <Label className="text-sm font-medium text-muted-foreground">
-              Description
-            </Label>
-            <div className="mt-2 p-4 bg-muted rounded-lg">
-              <p className="whitespace-pre-wrap">{request.description}</p>
-            </div>
+            {request.geologicalPeriod && (
+              <div>
+                <Label className="text-sm font-medium">
+                  Période géologique
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  {request.geologicalPeriod}
+                </p>
+              </div>
+            )}
+            {request.category && (
+              <div>
+                <Label className="text-sm font-medium">Catégorie</Label>
+                <p className="text-sm text-muted-foreground">
+                  {request.category}
+                </p>
+              </div>
+            )}
+            {request.countryOfOrigin && (
+              <div>
+                <Label className="text-sm font-medium">
+                  Pays d'origine souhaité
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  {request.countryOfOrigin}
+                </p>
+              </div>
+            )}
+            {request.locality && (
+              <div>
+                <Label className="text-sm font-medium">
+                  Localité spécifique
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  {request.locality}
+                </p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Notes et messages admin */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* ✅ Notes administratives - Seulement pour les admins */}
+      {isAdmin && (
         <Card>
           <CardHeader>
-            <CardTitle>Notes administratives</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <StickyNote className="h-5 w-5" />
+              Notes administratives
+            </CardTitle>
             <CardDescription>
-              Notes internes (non visibles par le client)
+              Notes privées, visibles uniquement par les administrateurs
             </CardDescription>
           </CardHeader>
           <CardContent>
             {isEditing ? (
               <Textarea
-                placeholder="Ajoutez vos notes internes..."
-                value={formData.adminNotes}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    adminNotes: e.target.value,
-                  }))
-                }
-                rows={6}
+                value={adminNotes}
+                onChange={(e) => setAdminNotes(e.target.value)}
+                placeholder="Ajouter des notes privées..."
+                rows={4}
               />
             ) : (
-              <div className="min-h-[100px] p-4 bg-muted rounded-lg">
-                {request.adminNotes ? (
-                  <p className="whitespace-pre-wrap">{request.adminNotes}</p>
-                ) : (
-                  <p className="text-muted-foreground italic">
-                    Aucune note administrative
-                  </p>
-                )}
-              </div>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                {request.adminNotes || "Aucune note administrative"}
+              </p>
             )}
           </CardContent>
         </Card>
+      )}
 
+      {/* ✅ Message au client - Seulement pour les admins */}
+      {isAdmin && (
         <Card>
           <CardHeader>
-            <CardTitle>Message au client</CardTitle>
-            <CardDescription>Message qui sera envoyé au client</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Message au client
+            </CardTitle>
+            <CardDescription>
+              Message qui sera envoyé au client concernant cette demande
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {isEditing ? (
               <Textarea
-                placeholder="Rédigez un message pour le client..."
-                value={formData.responseMessage}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    responseMessage: e.target.value,
-                  }))
-                }
-                rows={6}
+                value={responseMessage}
+                onChange={(e) => setResponseMessage(e.target.value)}
+                placeholder="Rédigez votre message au client..."
+                rows={4}
               />
             ) : (
-              <div className="min-h-[100px] p-4 bg-muted rounded-lg">
-                {request.responseMessage ? (
-                  <p className="whitespace-pre-wrap">
-                    {request.responseMessage}
-                  </p>
-                ) : (
-                  <p className="text-muted-foreground italic">
-                    Aucun message client
-                  </p>
-                )}
-              </div>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                {request.responseMessage || "Aucun message envoyé au client"}
+              </p>
             )}
           </CardContent>
         </Card>
-      </div>
+      )}
 
-      {/* Historique */}
+      {/* ✅ Message de l'administrateur - Seulement pour les utilisateurs */}
+      {!isAdmin && request.responseMessage && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-blue-700">
+              <MessageSquare className="h-5 w-5" />
+              Message de l'équipe FossilShop
+            </CardTitle>
+            {request.respondedAt && (
+              <CardDescription>
+                Reçu le{" "}
+                {new Date(request.respondedAt).toLocaleDateString("fr-FR")} à{" "}
+                {new Date(request.respondedAt).toLocaleTimeString("fr-FR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </CardDescription>
+            )}
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-blue-800 whitespace-pre-wrap">
+              {request.responseMessage}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Informations sur la demande */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Historique
+            Informations sur la demande
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="font-medium">Demande créée</span>
-              <span className="text-muted-foreground">
-                {new Date(request.createdAt).toLocaleDateString("fr-FR", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm font-medium">Date de création</Label>
+              <p className="text-sm text-muted-foreground">
+                {new Date(request.createdAt).toLocaleDateString("fr-FR")} à{" "}
+                {new Date(request.createdAt).toLocaleTimeString("fr-FR", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}
-              </span>
+              </p>
             </div>
-
-            {request.updatedAt !== request.createdAt && (
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="font-medium">Dernière modification</span>
-                <span className="text-muted-foreground">
-                  {new Date(request.updatedAt).toLocaleDateString("fr-FR", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              </div>
-            )}
+            <div>
+              <Label className="text-sm font-medium">
+                Dernière modification
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                {new Date(request.updatedAt).toLocaleDateString("fr-FR")} à{" "}
+                {new Date(request.updatedAt).toLocaleTimeString("fr-FR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

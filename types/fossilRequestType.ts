@@ -45,7 +45,7 @@ export interface FossilRequestListProps {
 export interface FossilRequestUpdateData {
   status?: RequestStatus;
   priority?: RequestPriority;
-  adminNotes?: string;
-  responseMessage?: string;
+  adminNotes?: string | null;
+  responseMessage?: string | null;
   respondedBy?: string;
 }

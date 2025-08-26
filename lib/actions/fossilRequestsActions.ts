@@ -263,15 +263,60 @@ export async function updateFossilRequest(
   }
 }
 
-export async function deleteFossilRequest(id: string) {
+export async function deleteFossilRequestAsUser(id: string) {
   try {
-    await requireAdmin();
+    const { user, clerkUserId } = await requireAuth();
+
+    // Vérifier que la demande appartient à l'utilisateur
+    const request = await prisma.fossilRequest.findUnique({
+      where: { id },
+      select: { clerkUserId: true },
+    });
+
+    if (!request) {
+      return {
+        success: false,
+        error: "Demande non trouvée",
+      };
+    }
+
+    if (request.clerkUserId !== clerkUserId) {
+      return {
+        success: false,
+        error: "Vous n'avez pas l'autorisation de supprimer cette demande",
+      };
+    }
 
     await prisma.fossilRequest.delete({
       where: { id },
     });
 
     return { success: true };
+  } catch (error) {
+    console.error("Erreur lors de la suppression de la demande:", error);
+    return {
+      success: false,
+      error: "Erreur lors de la suppression de la demande",
+    };
+  }
+}
+
+// Mise à jour de la fonction existante pour supporter les deux cas
+export async function deleteFossilRequest(id: string) {
+  try {
+    const { user, clerkUserId } = await requireAuth();
+    const userRole = normalizeUserRole(user.role);
+
+    // Si admin, peut supprimer n'importe quelle demande
+    if (userRole === UserRole.ADMIN) {
+      await prisma.fossilRequest.delete({
+        where: { id },
+      });
+      return { success: true };
+    }
+
+    // Si utilisateur normal, peut seulement supprimer ses propres demandes
+    return await deleteFossilRequestAsUser(id);
   } catch (error) {
     console.error("Erreur lors de la suppression de la demande:", error);
     return {
