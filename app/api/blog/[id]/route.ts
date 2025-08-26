@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
-import { BlogCategory, BlogStatus } from "@/lib/generated/prisma";
+import { BlogCategory, BlogStatus, UserRole } from "@/lib/generated/prisma";
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // ✅ Vérifier que l'utilisateur est admin ou modérateur
-    const { user } = await requireAdmin();
+    // ✅ requireAdmin() retourne l'utilisateur de la DB et vérifie déjà qu'il est admin
+    const user = await requireAdmin();
+
+    // ✅ Optionnel : vérifier aussi les modérateurs si vous en avez
     const canEdit =
-      user?.publicMetadata?.role === "admin" ||
-      user?.publicMetadata?.role === "moderator";
+      user.role === UserRole.ADMIN || user.role === UserRole.MODERATOR;
 
     if (!canEdit) {
       return NextResponse.json(
@@ -74,10 +75,9 @@ export async function PUT(
       );
     }
 
-    // ✅ Gérer les tags
+    // Gérer les tags
     const tagObjects = await Promise.all(
       tags.map(async (tagName: string) => {
-        // Créer le tag s'il n'existe pas
         const tag = await prisma.blogTag.upsert({
           where: { name: tagName },
           update: {},
@@ -105,11 +105,9 @@ export async function PUT(
         readTime: readTime ? parseInt(readTime) : null,
         seoTitle: seoTitle || null,
         seoDescription: seoDescription || null,
-        // ✅ Reconnexion des tags
         tags: {
-          set: tagObjects, // Remplace tous les tags existants
+          set: tagObjects,
         },
-        // Mettre à jour publishedAt si on passe de brouillon à publié
         publishedAt:
           status === "PUBLISHED" && existingPost.status === "DRAFT"
             ? new Date()
@@ -146,13 +144,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // ✅ Vérifier que l'utilisateur est admin ou modérateur
-    const { user } = await requireAdmin();
-    const canEdit =
-      user?.publicMetadata?.role === "admin" ||
-      user?.publicMetadata?.role === "moderator";
+    // ✅ requireAdmin() fait déjà la vérification du rôle admin
+    const user = await requireAdmin();
 
-    if (!canEdit) {
+    // ✅ Optionnel : vérifier aussi les modérateurs
+    const canDelete =
+      user.role === UserRole.ADMIN || user.role === UserRole.MODERATOR;
+
+    if (!canDelete) {
       return NextResponse.json(
         { error: "Accès non autorisé" },
         { status: 403 }
@@ -180,7 +179,7 @@ export async function DELETE(
       );
     }
 
-    // ✅ Supprimer l'article (les tags seront déconnectés automatiquement)
+    // Supprimer l'article
     await prisma.articleBlog.delete({
       where: { id: postId },
     });
