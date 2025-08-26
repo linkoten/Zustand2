@@ -26,10 +26,7 @@ export default async function FossilRequestDetailPage({
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-6">
         <Button asChild variant="ghost" size="sm">
-          <Link
-            href="/admin/fossil-requests"
-            className="flex items-center gap-2"
-          >
+          <Link href="/dashboard" className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             Retour aux demandes
           </Link>

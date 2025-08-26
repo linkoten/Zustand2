@@ -26,6 +26,7 @@ export interface FossilRequestFilters {
   priority?: RequestPriority;
   search?: string;
   page?: number;
+  userOnly?: boolean; // ✅ Ajouter cette propriété
 }
 
 export interface FossilRequestListProps {

@@ -225,7 +225,7 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
               </CardTitle>
               {data.totalRequests > 0 && (
                 <Button asChild variant="outline" size="sm">
-                  <Link href="/dashboard/requests">Voir tout</Link>
+                  <Link href="/dashboard/user/requests">Voir tout</Link>
                 </Button>
               )}
             </div>
@@ -299,7 +299,7 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
                       </div>
 
                       <Button asChild size="sm" variant="outline">
-                        <Link href={`/dashboard/requests/${request.id}`}>
+                        <Link href={`/dashboard/user/requests/${request.id}`}>
                           <Eye className="h-3 w-3 mr-1" />
                           Voir
                         </Link>

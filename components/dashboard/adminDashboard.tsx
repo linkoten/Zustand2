@@ -133,15 +133,6 @@ export default function AdminDashboard({ user, data }: AdminDashboardProps) {
             </Button>
             <Button asChild variant="outline" className="h-12">
               <Link
-                href="/admin/fossil-requests"
-                className="flex items-center gap-2"
-              >
-                <Search className="h-4 w-4" />
-                Demandes de fossiles
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-12">
-              <Link
                 href="/dashboard/analytics"
                 className="flex items-center gap-2"
               >
@@ -163,7 +154,7 @@ export default function AdminDashboard({ user, data }: AdminDashboardProps) {
                 Demandes de fossiles récentes
               </CardTitle>
               <Button asChild variant="outline" size="sm">
-                <Link href="/admin/fossil-requests">Voir toutes</Link>
+                <Link href="/dashboard/admin/requests">Voir toutes</Link>
               </Button>
             </div>
           </CardHeader>
@@ -229,7 +220,9 @@ export default function AdminDashboard({ user, data }: AdminDashboardProps) {
                         </div>
                         <div className="flex gap-2">
                           <Button asChild size="sm" variant="outline">
-                            <Link href={`/dashboard/requests/${request.id}`}>
+                            <Link
+                              href={`/dashboard/admin/requests/${request.id}`}
+                            >
                               <Eye className="h-3 w-3 mr-1" />
                               Voir
                             </Link>
