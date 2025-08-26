@@ -8,8 +8,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Plus, Settings, Package } from "lucide-react";
+import {
+  Plus,
+  Settings,
+  Package,
+  LayoutDashboard,
+  FileText,
+  Users,
+} from "lucide-react";
 
 export function AdminMenu() {
   return (
@@ -20,7 +28,18 @@ export function AdminMenu() {
           <span className="hidden sm:inline">Admin</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-56">
+        {/* ✅ Lien Dashboard */}
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard">
+            <LayoutDashboard className="w-4 h-4 mr-2" />
+            Dashboard
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        {/* Gestion des produits */}
         <DropdownMenuItem asChild>
           <Link href="/fossiles/create">
             <Plus className="w-4 h-4 mr-2" />
@@ -28,9 +47,59 @@ export function AdminMenu() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/fossiles/create">
+          <Link href="/admin/products">
             <Package className="w-4 h-4 mr-2" />
             Gérer les produits
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        {/* ✅ Nouvelles sections admin */}
+        <DropdownMenuItem asChild>
+          <Link href="/admin/fossil-requests">
+            <FileText className="w-4 h-4 mr-2" />
+            Demandes de fossiles
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/admin/users">
+            <Users className="w-4 h-4 mr-2" />
+            Gestion utilisateurs
+          </Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+// ✅ Nouveau composant pour le menu utilisateur normal
+export function UserMenu() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm">
+          <LayoutDashboard className="w-4 h-4 mr-2" />
+          <span className="hidden sm:inline">Mon compte</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard">
+            <LayoutDashboard className="w-4 h-4 mr-2" />
+            Tableau de bord
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/profile">
+            <Users className="w-4 h-4 mr-2" />
+            Mon profil
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/orders">
+            <Package className="w-4 h-4 mr-2" />
+            Mes commandes
           </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>

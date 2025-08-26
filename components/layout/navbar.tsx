@@ -4,7 +4,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
-import { ShoppingCart, Menu, X, User, BookOpen } from "lucide-react";
+import {
+  ShoppingCart,
+  Menu,
+  X,
+  User,
+  BookOpen,
+  LayoutDashboard,
+} from "lucide-react";
 import { useState } from "react";
 import { CartSidebar } from "@/components/cart/cart-sidebar";
 
@@ -16,7 +23,12 @@ export default function Navbar() {
   const navigationLinks = [
     { href: "/", label: "Accueil" },
     { href: "/fossiles", label: "Fossiles" },
-    { href: "/blog", label: "Blog", icon: BookOpen }, // ✅ Nouveau lien blog
+    { href: "/blog", label: "Blog", icon: BookOpen },
+  ];
+
+  // ✅ Liens qui nécessitent une authentification
+  const userLinks = [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   ];
 
   const toggleMobileMenu = () => {
@@ -40,6 +52,7 @@ export default function Navbar() {
 
             {/* Navigation desktop */}
             <div className="hidden md:flex items-center space-x-8">
+              {/* Liens publics */}
               {navigationLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -50,6 +63,22 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
+
+              {/* ✅ Liens pour utilisateurs connectés */}
+              {isLoaded && user && (
+                <>
+                  {userLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="text-gray-700 hover:text-gray-900 transition-colors font-medium flex items-center gap-2"
+                    >
+                      {link.icon && <link.icon className="w-4 h-4" />}
+                      {link.label}
+                    </Link>
+                  ))}
+                </>
+              )}
             </div>
 
             {/* Actions desktop */}
@@ -116,6 +145,7 @@ export default function Navbar() {
           {isMobileMenuOpen && (
             <div className="md:hidden py-4 border-t">
               <div className="flex flex-col space-y-4">
+                {/* Liens publics */}
                 {navigationLinks.map((link) => (
                   <Link
                     key={link.href}
@@ -127,6 +157,25 @@ export default function Navbar() {
                     {link.label}
                   </Link>
                 ))}
+
+                {/* ✅ Liens pour utilisateurs connectés en mobile */}
+                {isLoaded && user && (
+                  <>
+                    <div className="border-t pt-2 mt-2">
+                      {userLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className="text-gray-700 hover:text-gray-900 transition-colors font-medium flex items-center gap-2 px-2 py-1"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {link.icon && <link.icon className="w-4 h-4" />}
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </>
+                )}
 
                 <div className="border-t pt-4 mt-4">
                   {isLoaded && (

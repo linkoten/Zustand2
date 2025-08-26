@@ -97,7 +97,7 @@ export default function FossilRequestDetail({
     status: request.status,
     priority: request.priority,
     adminNotes: request.adminNotes || "",
-    adminMessage: request.adminMessage || "",
+    responseMessage: request.responseMessage || "",
   });
 
   const handleSave = async () => {
@@ -471,19 +471,21 @@ export default function FossilRequestDetail({
             {isEditing ? (
               <Textarea
                 placeholder="Rédigez un message pour le client..."
-                value={formData.adminMessage}
+                value={formData.responseMessage}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    adminMessage: e.target.value,
+                    responseMessage: e.target.value,
                   }))
                 }
                 rows={6}
               />
             ) : (
               <div className="min-h-[100px] p-4 bg-muted rounded-lg">
-                {request.adminMessage ? (
-                  <p className="whitespace-pre-wrap">{request.adminMessage}</p>
+                {request.responseMessage ? (
+                  <p className="whitespace-pre-wrap">
+                    {request.responseMessage}
+                  </p>
                 ) : (
                   <p className="text-muted-foreground italic">
                     Aucun message client

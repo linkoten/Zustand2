@@ -48,7 +48,7 @@ export default async function FossilRequestsPage({
 
           <div className="flex gap-2">
             <Button asChild variant="outline">
-              <Link href="/admin/dashboard">Retour au dashboard</Link>
+              <Link href="/dashboard">Retour au dashboard</Link>
             </Button>
           </div>
         </div>

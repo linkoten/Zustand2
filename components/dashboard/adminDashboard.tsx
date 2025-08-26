@@ -25,6 +25,7 @@ const statusColors = {
   IN_PROGRESS: "bg-blue-100 text-blue-800",
   COMPLETED: "bg-green-100 text-green-800",
   CANCELLED: "bg-gray-100 text-gray-800",
+  REJECTED: "bg-red-100 text-red-800",
 };
 
 const priorityColors = {
@@ -39,6 +40,7 @@ const statusIcons = {
   IN_PROGRESS: Clock,
   COMPLETED: CheckCircle,
   CANCELLED: XCircle,
+  REJECTED: XCircle,
 };
 
 export default function AdminDashboard({ user, data }: AdminDashboardProps) {
@@ -130,9 +132,12 @@ export default function AdminDashboard({ user, data }: AdminDashboardProps) {
               </Link>
             </Button>
             <Button asChild variant="outline" className="h-12">
-              <Link href="/dashboard/users" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Gérer utilisateurs
+              <Link
+                href="/admin/fossil-requests"
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4" />
+                Demandes de fossiles
               </Link>
             </Button>
             <Button asChild variant="outline" className="h-12">
@@ -157,14 +162,8 @@ export default function AdminDashboard({ user, data }: AdminDashboardProps) {
                 <Search className="h-5 w-5 text-orange-500" />
                 Demandes de fossiles récentes
               </CardTitle>
-              <Button asChild>
-                <Link href="/admin/fossil-requests">
-                  <FileText className="mr-2 h-4 w-4" />
-                  Demandes de fossiles
-                </Link>
-              </Button>
               <Button asChild variant="outline" size="sm">
-                <Link href="/dashboard/requests">Voir toutes</Link>
+                <Link href="/admin/fossil-requests">Voir toutes</Link>
               </Button>
             </div>
           </CardHeader>
@@ -229,9 +228,11 @@ export default function AdminDashboard({ user, data }: AdminDashboardProps) {
                           )}
                         </div>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="h-3 w-3 mr-1" />
-                            Voir
+                          <Button asChild size="sm" variant="outline">
+                            <Link href={`/dashboard/requests/${request.id}`}>
+                              <Eye className="h-3 w-3 mr-1" />
+                              Voir
+                            </Link>
                           </Button>
                         </div>
                       </div>

@@ -15,7 +15,7 @@ export interface FossilRequest {
   status: RequestStatus;
   priority: RequestPriority;
   adminNotes: string | null;
-  adminMessage: string | null;
+  responseMessage: string | null;
   respondedBy: string | null;
   createdAt: string;
   updatedAt: string;
@@ -39,6 +39,6 @@ export interface FossilRequestUpdateData {
   status?: RequestStatus;
   priority?: RequestPriority;
   adminNotes?: string;
-  adminMessage?: string;
+  responseMessage?: string;
   respondedBy?: string;
 }

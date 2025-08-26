@@ -287,7 +287,7 @@ export default function FossilRequestsList({
                         </TableCell>
                         <TableCell>
                           <Button asChild size="sm" variant="outline">
-                            <Link href={`/fossilRequests/${request.id}`}>
+                            <Link href={`/dashboard/requests/${request.id}`}>
                               <Eye className="h-4 w-4 mr-1" />
                               Voir
                             </Link>

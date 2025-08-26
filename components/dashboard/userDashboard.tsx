@@ -10,6 +10,7 @@ import {
   Euro,
   MapPin,
   AlertCircle,
+  Eye,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -112,7 +113,7 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Button asChild className="h-12">
               <Link href="/fossiles" className="flex items-center gap-2">
                 <Search className="h-4 w-4" />
@@ -126,6 +127,15 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
               >
                 <AlertCircle className="h-4 w-4" />
                 Nouvelle demande
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="h-12">
+              <Link
+                href="/dashboard/requests"
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4" />
+                Mes demandes
               </Link>
             </Button>
             <Button asChild variant="outline" className="h-12">
@@ -261,11 +271,13 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
                         </Badge>
                       </div>
                     </div>
+
                     <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                       {request.description}
                     </p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <div className="flex items-center gap-4">
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           {new Date(request.createdAt).toLocaleDateString(
@@ -285,6 +297,13 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
                           </span>
                         )}
                       </div>
+
+                      <Button asChild size="sm" variant="outline">
+                        <Link href={`/dashboard/requests/${request.id}`}>
+                          <Eye className="h-3 w-3 mr-1" />
+                          Voir
+                        </Link>
+                      </Button>
                     </div>
                   </div>
                 ))}
