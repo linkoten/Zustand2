@@ -367,7 +367,7 @@ export default function FossilRequestDetail({
             {request.countryOfOrigin && (
               <div>
                 <Label className="text-sm font-medium">
-                  Pays d'origine souhaité
+                  Pays d`&apos;origine souhaité
                 </Label>
                 <p className="text-sm text-muted-foreground">
                   {request.countryOfOrigin}
@@ -452,7 +452,7 @@ export default function FossilRequestDetail({
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-blue-700">
               <MessageSquare className="h-5 w-5" />
-              Message de l'équipe FossilShop
+              Message de l`&apos;équipe FossilShop
             </CardTitle>
             {request.respondedAt && (
               <CardDescription>
