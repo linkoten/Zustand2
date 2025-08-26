@@ -167,7 +167,7 @@ export async function getFossilRequestById(id: string) {
       status: request.status,
       priority: request.priority,
       adminNotes: request.adminNotes,
-      adminMessage: request.responseMessage,
+      responseMessage: request.responseMessage,
       respondedBy: request.respondedBy,
       respondedAt: request.respondedAt?.toISOString() || null,
       createdAt: request.createdAt.toISOString(),
