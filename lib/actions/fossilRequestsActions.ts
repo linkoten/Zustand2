@@ -6,6 +6,7 @@ import {
   FossilRequestFilters,
   FossilRequestUpdateData,
 } from "@/types/fossilRequestType";
+import { Prisma } from "../generated/prisma";
 
 export async function getFossilRequests(
   page: number = 1,
@@ -19,7 +20,7 @@ export async function getFossilRequests(
     const skip = (page - 1) * limit;
 
     // Construire les conditions WHERE
-    const whereConditions: any = {};
+    const whereConditions: Prisma.FossilRequestWhereInput = {};
 
     if (filters?.status) {
       whereConditions.status = filters.status;

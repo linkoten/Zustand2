@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { getFossilRequestById } from "@/lib/actions/fossilRequests";
+import { getFossilRequestById } from "@/lib/actions/fossilRequestsActions";
 import FossilRequestDetail from "@/components/fossilRequests/fossilRequestDetail";
 
 interface FossilRequestDetailPageProps {

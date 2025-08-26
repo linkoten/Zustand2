@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { FileText, Plus } from "lucide-react";
 import Link from "next/link";
 import { RequestPriority, RequestStatus } from "@/lib/generated/prisma";
-import { getFossilRequests } from "@/lib/actions/fossilRequests";
+import { getFossilRequests } from "@/lib/actions/fossilRequestsActions";
 import FossilRequestsList from "@/components/fossilRequests/fossilRequestsList";
 
 export default async function FossilRequestsPage({

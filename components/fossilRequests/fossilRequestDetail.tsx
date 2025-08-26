@@ -49,7 +49,7 @@ import { FossilRequest } from "@/types/fossilRequestType";
 import {
   deleteFossilRequest,
   updateFossilRequest,
-} from "@/lib/actions/fossilRequests";
+} from "@/lib/actions/fossilRequestsActions";
 import { RequestPriority, RequestStatus } from "@/lib/generated/prisma";
 
 const statusLabels = {
@@ -384,7 +384,7 @@ export default function FossilRequestDetail({
             {request.countryOfOrigin && (
               <div>
                 <Label className="text-sm font-medium text-muted-foreground">
-                  Pays d'origine
+                  Pays d&apos;origine
                 </Label>
                 <p className="font-medium flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
