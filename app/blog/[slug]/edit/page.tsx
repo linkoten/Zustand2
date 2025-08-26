@@ -12,52 +12,20 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import EditBlogForm from "@/components/blog/editBlogForm";
+import { getBlogPost } from "@/lib/actions/blogActions";
+import { UserRole } from "@/lib/generated/prisma";
 
 interface EditBlogPageProps {
   params: Promise<{ slug: string }>;
-}
-
-async function getBlogPost(slug: string) {
-  try {
-    // ✅ Utiliser articleBlog au lieu de blogPost
-    const post = await prisma.articleBlog.findFirst({
-      where: { slug },
-      include: {
-        author: {
-          select: {
-            name: true, // ✅ Utiliser name au lieu de firstName/lastName
-            id: true,
-          },
-        },
-        tags: true, // ✅ Inclure les tags
-      },
-    });
-
-    if (!post) {
-      return null;
-    }
-
-    return {
-      ...post,
-      publishedAt: post.publishedAt?.toISOString() || null,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
-      tags: post.tags.map((tag) => tag.name), // ✅ Extraire les noms des tags
-    };
-  } catch (error) {
-    console.error("Erreur lors de la récupération de l'article:", error);
-    return null;
-  }
 }
 
 export default async function EditBlogPage({ params }: EditBlogPageProps) {
   const { slug } = await params;
 
   // ✅ Vérifier que l'utilisateur est admin ou modérateur
-  const { user } = await requireAdmin();
+  const user = await requireAdmin();
   const canEdit =
-    user?.publicMetadata?.role === "admin" ||
-    user?.publicMetadata?.role === "moderator";
+    user.role === UserRole.ADMIN || user.role === UserRole.MODERATOR;
 
   if (!canEdit) {
     notFound();

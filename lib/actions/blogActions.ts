@@ -138,6 +138,39 @@ export async function getBlogPosts(
   }
 }
 
+export async function getBlogPost(slug: string) {
+  try {
+    // ✅ Utiliser articleBlog au lieu de blogPost
+    const post = await prisma.articleBlog.findFirst({
+      where: { slug },
+      include: {
+        author: {
+          select: {
+            name: true, // ✅ Utiliser name au lieu de firstName/lastName
+            id: true,
+          },
+        },
+        tags: true, // ✅ Inclure les tags
+      },
+    });
+
+    if (!post) {
+      return null;
+    }
+
+    return {
+      ...post,
+      publishedAt: post.publishedAt?.toISOString() || null,
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+      tags: post.tags.map((tag) => tag.name), // ✅ Extraire les noms des tags
+    };
+  } catch (error) {
+    console.error("Erreur lors de la récupération de l'article:", error);
+    return null;
+  }
+}
+
 // ✅ Fonction pour obtenir un article par son slug
 export async function getBlogArticleBySlug(slug: string) {
   try {
