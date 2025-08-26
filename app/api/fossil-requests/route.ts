@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 
 export async function POST(request: NextRequest) {
   try {
+    // ✅ Récupérer l'ID de l'utilisateur connecté
+    const { userId } = await auth();
+
     const body = await request.json();
 
     const {
@@ -44,6 +48,7 @@ export async function POST(request: NextRequest) {
         locality: locality || null,
         status: "PENDING",
         priority: "NORMAL",
+        clerkUserId: userId, // ✅ Associer à l'utilisateur connecté
       },
     });
 

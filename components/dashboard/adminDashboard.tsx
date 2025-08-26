@@ -154,7 +154,7 @@ export default function AdminDashboard({ user, data }: AdminDashboardProps) {
                 Demandes de fossiles récentes
               </CardTitle>
               <Button asChild variant="outline" size="sm">
-                <Link href="/dashboard/admin/requests">Voir toutes</Link>
+                <Link href="/dashboard/requests/admin">Voir toutes</Link>
               </Button>
             </div>
           </CardHeader>
@@ -221,7 +221,7 @@ export default function AdminDashboard({ user, data }: AdminDashboardProps) {
                         <div className="flex gap-2">
                           <Button asChild size="sm" variant="outline">
                             <Link
-                              href={`/dashboard/admin/requests/${request.id}`}
+                              href={`/dashboard/requests/admin/${request.id}`}
                             >
                               <Eye className="h-3 w-3 mr-1" />
                               Voir

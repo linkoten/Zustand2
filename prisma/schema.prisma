@@ -198,8 +198,9 @@ model FossilRequest {
   respondedBy     String? // ID de l'admin qui a répondu
 
   // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  clerkUserId String? // ✅ Ce champ doit exister
 
   @@map("fossil_requests")
 }

@@ -131,7 +131,7 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
             </Button>
             <Button asChild variant="outline" className="h-12">
               <Link
-                href="/dashboard/requests"
+                href="/dashboard/requests/user"
                 className="flex items-center gap-2"
               >
                 <Search className="h-4 w-4" />
@@ -225,7 +225,7 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
               </CardTitle>
               {data.totalRequests > 0 && (
                 <Button asChild variant="outline" size="sm">
-                  <Link href="/dashboard/user/requests">Voir tout</Link>
+                  <Link href="/dashboard/requests/user">Voir tout</Link>
                 </Button>
               )}
             </div>
@@ -299,7 +299,7 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
                       </div>
 
                       <Button asChild size="sm" variant="outline">
-                        <Link href={`/dashboard/user/requests/${request.id}`}>
+                        <Link href={`/dashboard/requests/user/${request.id}`}>
                           <Eye className="h-3 w-3 mr-1" />
                           Voir
                         </Link>
