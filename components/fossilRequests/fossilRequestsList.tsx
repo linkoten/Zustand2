@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { RequestStatus, RequestPriority } from "@/lib/generated/prisma";
+import {
+  RequestStatus,
+  RequestPriority,
+  UserRole,
+} from "@/lib/generated/prisma";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +44,7 @@ const statusLabels: Record<RequestStatus, string> = {
   CANCELLED: "Annulé",
   REJECTED: "Rejeté",
 };
+
 const statusColors: Record<RequestStatus, string> = {
   PENDING: "bg-yellow-100 text-yellow-800",
   IN_PROGRESS: "bg-blue-100 text-blue-800",
@@ -67,6 +72,7 @@ export default function FossilRequestsList({
   totalPages,
   currentPage,
   totalRequests,
+  userRole, // ✅ Récupérer le rôle utilisateur
 }: FossilRequestListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -76,6 +82,20 @@ export default function FossilRequestsList({
 
   const currentStatus = searchParams.get("status");
   const currentPriority = searchParams.get("priority");
+
+  // ✅ Fonction pour générer l'URL de détail selon le rôle
+  const getDetailUrl = (requestId: string) => {
+    return userRole === UserRole.ADMIN
+      ? `/dashboard/requests/admin/${requestId}`
+      : `/dashboard/requests/user/${requestId}`;
+  };
+
+  // ✅ Fonction pour générer l'URL de base selon le rôle
+  const getBaseUrl = () => {
+    return userRole === UserRole.ADMIN
+      ? "/dashboard/requests/admin"
+      : "/dashboard/requests/user";
+  };
 
   const updateFilters = (newParams: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams);
@@ -89,12 +109,14 @@ export default function FossilRequestsList({
     });
 
     params.delete("page");
-    router.push(`/fossilRequests?${params.toString()}`);
+    // ✅ Utiliser l'URL de base correcte
+    router.push(`${getBaseUrl()}?${params.toString()}`);
   };
 
   const clearFilters = () => {
     setSearchTerm("");
-    router.push("/fossilRequests");
+    // ✅ Utiliser l'URL de base correcte
+    router.push(getBaseUrl());
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -105,7 +127,8 @@ export default function FossilRequestsList({
   const createPageUrl = (pageNumber: number) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", pageNumber.toString());
-    return `/fossilRequests?${params.toString()}`;
+    // ✅ Utiliser l'URL de base correcte
+    return `${getBaseUrl()}?${params.toString()}`;
   };
 
   const hasActiveFilters =
@@ -205,9 +228,14 @@ export default function FossilRequestsList({
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Demandes de fossiles</CardTitle>
+              <CardTitle>
+                {userRole === UserRole.ADMIN
+                  ? "Demandes de fossiles"
+                  : "Mes demandes"}
+              </CardTitle>
               <CardDescription>
                 {totalRequests} demande{totalRequests > 1 ? "s" : ""} au total
+                {userRole === UserRole.USER && " pour vous"}
               </CardDescription>
             </div>
             <div className="text-sm text-muted-foreground">
@@ -218,7 +246,18 @@ export default function FossilRequestsList({
         <CardContent>
           {requests.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">Aucune demande trouvée</p>
+              <p className="text-muted-foreground">
+                {userRole === UserRole.ADMIN
+                  ? "Aucune demande trouvée"
+                  : "Vous n'avez pas encore de demandes"}
+              </p>
+              {userRole === UserRole.USER && (
+                <Button asChild className="mt-4">
+                  <Link href="/fossiles/request">
+                    Créer ma première demande
+                  </Link>
+                </Button>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
@@ -227,7 +266,10 @@ export default function FossilRequestsList({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Client</TableHead>
+                      {/* ✅ Afficher la colonne Client seulement pour les admins */}
+                      {userRole === UserRole.ADMIN && (
+                        <TableHead>Client</TableHead>
+                      )}
                       <TableHead>Fossile recherché</TableHead>
                       <TableHead>Budget</TableHead>
                       <TableHead>Statut</TableHead>
@@ -239,14 +281,17 @@ export default function FossilRequestsList({
                   <TableBody>
                     {requests.map((request) => (
                       <TableRow key={request.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{request.name}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {request.email}
+                        {/* ✅ Afficher les infos client seulement pour les admins */}
+                        {userRole === UserRole.ADMIN && (
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{request.name}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {request.email}
+                              </div>
                             </div>
-                          </div>
-                        </TableCell>
+                          </TableCell>
+                        )}
                         <TableCell>
                           <div>
                             <div className="font-medium">
@@ -286,8 +331,9 @@ export default function FossilRequestsList({
                           </div>
                         </TableCell>
                         <TableCell>
+                          {/* ✅ URL dynamique selon le rôle */}
                           <Button asChild size="sm" variant="outline">
-                            <Link href={`/dashboard/requests/${request.id}`}>
+                            <Link href={getDetailUrl(request.id)}>
                               <Eye className="h-4 w-4 mr-1" />
                               Voir
                             </Link>

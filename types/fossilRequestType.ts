@@ -1,4 +1,8 @@
-import { RequestStatus, RequestPriority } from "@/lib/generated/prisma";
+import {
+  RequestStatus,
+  RequestPriority,
+  UserRole,
+} from "@/lib/generated/prisma";
 
 export interface FossilRequest {
   id: string;
@@ -16,6 +20,7 @@ export interface FossilRequest {
   priority: RequestPriority;
   adminNotes: string | null;
   responseMessage: string | null;
+  userRole?: UserRole;
   respondedBy: string | null;
   createdAt: string;
   updatedAt: string;
@@ -34,6 +39,7 @@ export interface FossilRequestListProps {
   totalPages: number;
   currentPage: number;
   totalRequests: number;
+  userRole: UserRole;
 }
 
 export interface FossilRequestUpdateData {

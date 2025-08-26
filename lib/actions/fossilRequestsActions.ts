@@ -36,6 +36,18 @@ async function requireAdmin() {
   return user;
 }
 
+// ✅ Fonction helper pour convertir le rôle string vers UserRole enum
+function normalizeUserRole(role: string): UserRole {
+  switch (role.toUpperCase()) {
+    case "ADMIN":
+      return UserRole.ADMIN;
+    case "USER":
+      return UserRole.USER;
+    default:
+      return UserRole.USER; // Valeur par défaut
+  }
+}
+
 // ✅ Fonction corrigée pour supporter tous les utilisateurs
 export async function getFossilRequests(
   page: number = 1,
@@ -52,8 +64,9 @@ export async function getFossilRequests(
     const whereConditions: Prisma.FossilRequestWhereInput = {};
 
     // ✅ Logique de filtrage par utilisateur
+    const userRole = normalizeUserRole(user.role);
     const shouldFilterByUser =
-      filters?.userOnly === true || user.role !== UserRole.ADMIN;
+      filters?.userOnly === true || userRole !== UserRole.ADMIN;
 
     if (shouldFilterByUser) {
       whereConditions.clerkUserId = clerkUserId;
@@ -107,17 +120,18 @@ export async function getFossilRequests(
         status: request.status,
         priority: request.priority,
         adminNotes: request.adminNotes,
-        responseMessage: request.responseMessage, // ✅ Mapping corrigé
+        responseMessage: request.responseMessage, // ✅ Correction du nom de propriété
         respondedBy: request.respondedBy,
         respondedAt: request.respondedAt?.toISOString() || null,
         createdAt: request.createdAt.toISOString(),
         updatedAt: request.updatedAt.toISOString(),
         clerkUserId: request.clerkUserId,
+        userRole: userRole, // ✅ Utiliser le rôle normalisé
       })),
       totalPages,
       currentPage: page,
       totalRequests,
-      userRole: user.role,
+      userRole: userRole, // ✅ Utiliser le rôle normalisé
     };
   } catch (error) {
     console.error("Erreur lors de la récupération des demandes:", error);
@@ -144,9 +158,12 @@ export async function getFossilRequestById(id: string) {
       return null;
     }
 
+    // ✅ Normaliser le rôle utilisateur
+    const userRole = normalizeUserRole(user.role);
+
     // ✅ Vérifier les permissions : admin peut tout voir, utilisateur seulement ses demandes
     const canView =
-      user.role === UserRole.ADMIN || request.clerkUserId === clerkUserId;
+      userRole === UserRole.ADMIN || request.clerkUserId === clerkUserId;
 
     if (!canView) {
       return null;
@@ -167,13 +184,13 @@ export async function getFossilRequestById(id: string) {
       status: request.status,
       priority: request.priority,
       adminNotes: request.adminNotes,
-      responseMessage: request.responseMessage,
+      responseMessage: request.responseMessage, // ✅ Correction du nom de propriété
       respondedBy: request.respondedBy,
       respondedAt: request.respondedAt?.toISOString() || null,
       createdAt: request.createdAt.toISOString(),
       updatedAt: request.updatedAt.toISOString(),
       clerkUserId: request.clerkUserId,
-      userRole: user.role,
+      userRole: userRole, // ✅ Utiliser le rôle normalisé
     };
   } catch (error) {
     console.error("Erreur lors de la récupération de la demande:", error);
@@ -200,6 +217,7 @@ export async function updateFossilRequest(
       updateData.priority = data.priority;
     }
     if (data.responseMessage !== undefined) {
+      // ✅ Correction du nom de propriété
       updateData.responseMessage = data.responseMessage;
       updateData.respondedAt = new Date();
     }
@@ -229,7 +247,7 @@ export async function updateFossilRequest(
         status: updatedRequest.status,
         priority: updatedRequest.priority,
         adminNotes: updatedRequest.adminNotes,
-        adminMessage: updatedRequest.responseMessage,
+        responseMessage: updatedRequest.responseMessage, // ✅ Correction du nom de propriété
         respondedBy: updatedRequest.respondedBy,
         respondedAt: updatedRequest.respondedAt?.toISOString() || null,
         createdAt: updatedRequest.createdAt.toISOString(),
