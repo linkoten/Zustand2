@@ -47,6 +47,7 @@ model Product {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   weight           Int // ✅ Nouveau champ obligatoire en grammes
+  ratings          Rating[]
 
   // Stripe
   stripeProductId String? @unique
@@ -147,6 +148,7 @@ model ArticleBlog {
   tags           BlogTag[] // Tags associés
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  ratings        Rating[]
 
   // ✅ Relation avec l'auteur
   authorId Int
@@ -203,6 +205,33 @@ model FossilRequest {
   clerkUserId String? // ✅ Ce champ doit exister
 
   @@map("fossil_requests")
+}
+
+// ✅ MODÈLE Rating avec contraintes optionnelles plus flexibles
+model Rating {
+  id        String   @id @default(cuid())
+  userId    String // ID Clerk de l'utilisateur
+  rating    Int // Note de 1 à 5
+  comment   String? // Commentaire optionnel
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ✅ Relations optionnelles - un rating peut être pour un produit OU un article OU rien
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  articleId String?
+  article   ArticleBlog? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  // ✅ Contraintes optionnelles : un utilisateur ne peut noter qu'une fois par produit/article
+  @@unique([userId, productId])
+  @@unique([userId, articleId])
+  // ✅ Index pour optimiser les requêtes
+  @@index([productId])
+  @@index([articleId])
+  @@index([userId])
+  @@index([rating]) // ✅ Index pour filtrer par note
+  @@map("ratings")
 }
 
 enum RequestStatus {

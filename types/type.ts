@@ -110,6 +110,8 @@ export interface SerializedProduct {
   createdAt: string;
   updatedAt: string;
   isFavorite?: boolean;
+  averageRating?: number;
+  totalRatings?: number;
   images: SerializedProductImage[]; // ✅ Array d'images au lieu d'une seule
 }
 

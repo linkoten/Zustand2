@@ -13,6 +13,9 @@ import { formatPrice } from "@/lib/utils";
 import ProductCard from "./productCard";
 import ProductCarousel from "./productCarousel";
 import { ProductPageClientProps } from "@/types/productType";
+// ✅ Import des composants de notation
+import RatingDisplay from "@/components/rating/ratingDisplay";
+import RatingForm from "@/components/rating/ratingForm";
 
 export default function ProductPageClient({
   product,
@@ -70,6 +73,23 @@ export default function ProductPageClient({
               <p className="text-2xl font-semibold text-primary">
                 {formatPrice(product.price)}
               </p>
+              {/* ✅ Affichage de la notation moyenne */}
+              <div className="mt-2">
+                <RatingDisplay
+                  productId={product.id}
+                  stats={{
+                    averageRating: 0,
+                    totalRatings: 0,
+                    ratingDistribution: {
+                      1: 0,
+                      2: 0,
+                      3: 0,
+                      4: 0,
+                      5: 0,
+                    },
+                  }}
+                />{" "}
+              </div>
             </div>
 
             {/* Badges */}
@@ -158,6 +178,26 @@ export default function ProductPageClient({
                 Ajouté le{" "}
                 {new Date(product.createdAt).toLocaleDateString("fr-FR")}
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ✅ Section des avis et notations */}
+        <div className="mb-12">
+          <Separator className="mb-8" />
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold mb-6">Avis clients</h2>
+
+            {/* Formulaire de notation */}
+            <div className="mb-8">
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Donnez votre avis
+                  </h3>
+                  <RatingForm productId={product.id} />
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
