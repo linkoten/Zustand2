@@ -100,7 +100,7 @@ export default function RatingDisplay({
                     <StarRating rating={userRating.rating} readonly />
                     {userRating.comment && (
                       <p className="text-sm text-muted-foreground italic">
-                        "{userRating.comment}"
+                        &quot;{userRating.comment}&quot;
                       </p>
                     )}
                   </div>
