@@ -7,6 +7,7 @@ import {
   BlogCategory,
   BlogStatus, // ✅ Renommer pour éviter le conflit
 } from "@/lib/generated/prisma";
+import { RatingStats } from "./ratingType";
 
 // Types pour les retours d'actions
 export type ActionResult<T = void> = {
@@ -112,6 +113,8 @@ export interface SerializedProduct {
   isFavorite?: boolean;
   averageRating?: number;
   totalRatings?: number;
+  ratingStats: RatingStats;
+
   images: SerializedProductImage[]; // ✅ Array d'images au lieu d'une seule
 }
 

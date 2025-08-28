@@ -58,17 +58,6 @@ export default function FossilesClient({
 
   const isAdmin = user?.publicMetadata?.role === "admin";
 
-  // ✅ Console.log pour déboguer les données reçues
-  console.log(
-    "🦕 FossilesClient - Fossils data:",
-    fossils.map((f) => ({
-      id: f.id,
-      title: f.title,
-      averageRating: f.averageRating,
-      totalRatings: f.totalRatings,
-    }))
-  );
-
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("category") || ""
@@ -282,13 +271,6 @@ export default function FossilesClient({
       {/* Grille des fossiles */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredFossils.map((fossil) => {
-          // ✅ Console.log pour chaque fossile
-          console.log(`⭐ Fossil ${fossil.id} ratings:`, {
-            averageRating: fossil.averageRating,
-            totalRatings: fossil.totalRatings,
-            hasRatings: fossil.totalRatings && fossil.totalRatings > 0,
-          });
-
           return (
             <Card
               key={fossil.id}
@@ -394,16 +376,17 @@ export default function FossilesClient({
 
                   {/* ✅ NOUVELLE section pour les ratings */}
                   <div className="flex items-center gap-2 py-2">
-                    {fossil.totalRatings && fossil.totalRatings > 0 ? (
+                    {fossil.ratingStats?.totalRatings &&
+                    fossil.ratingStats.totalRatings > 0 ? (
                       <>
                         <StarRating
-                          rating={fossil.averageRating || 0}
+                          rating={fossil.ratingStats.averageRating || 0}
                           readonly
                           size="sm"
                         />
                         <span className="text-sm text-muted-foreground">
-                          {fossil.averageRating?.toFixed(1)} (
-                          {fossil.totalRatings} avis)
+                          {fossil.ratingStats.averageRating?.toFixed(1)} (
+                          {fossil.ratingStats.totalRatings} avis)
                         </span>
                       </>
                     ) : (

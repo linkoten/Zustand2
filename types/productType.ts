@@ -1,3 +1,4 @@
+import { RatingStats, UserRating } from "./ratingType";
 import { SerializedProduct, SerializedProductImage } from "./type";
 
 export interface CreateProductData {
@@ -109,4 +110,6 @@ export interface ProductCarouselProps {
 export interface ProductPageClientProps {
   product: SerializedProduct;
   similarProducts: SerializedProduct[];
+  ratingStats: RatingStats;
+  userRating: UserRating | null;
 }

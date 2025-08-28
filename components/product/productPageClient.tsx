@@ -20,6 +20,8 @@ import RatingForm from "@/components/rating/ratingForm";
 export default function ProductPageClient({
   product,
   similarProducts,
+  ratingStats,
+  userRating,
 }: ProductPageClientProps) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
@@ -77,18 +79,10 @@ export default function ProductPageClient({
               <div className="mt-2">
                 <RatingDisplay
                   productId={product.id}
-                  stats={{
-                    averageRating: 0,
-                    totalRatings: 0,
-                    ratingDistribution: {
-                      1: 0,
-                      2: 0,
-                      3: 0,
-                      4: 0,
-                      5: 0,
-                    },
-                  }}
-                />{" "}
+                  stats={ratingStats}
+                  userRating={userRating || undefined}
+                  showForm={true}
+                />
               </div>
             </div>
 

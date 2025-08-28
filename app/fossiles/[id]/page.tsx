@@ -1,95 +1,10 @@
 import { notFound } from "next/navigation";
-import prisma from "@/lib/prisma";
-import { Category, ProductStatus } from "@/lib/generated/prisma";
-import { SerializedProduct } from "@/types/type";
 import ProductPageClient from "@/components/product/productPageClient";
-
-async function getProduct(id: string): Promise<SerializedProduct | null> {
-  try {
-    const productId = parseInt(id);
-
-    if (isNaN(productId)) {
-      return null;
-    }
-
-    const product = await prisma.product.findUnique({
-      where: {
-        id: productId,
-        status: ProductStatus.AVAILABLE,
-      },
-      include: {
-        images: {
-          orderBy: { order: "asc" },
-        },
-      },
-    });
-
-    if (!product) {
-      return null;
-    }
-
-    // ✅ Sérialiser les données avec conversion null -> undefined
-    return {
-      ...product,
-      price: product.price.toNumber(),
-      description: product.description || undefined, // ✅ Convertir null en undefined
-      createdAt: product.createdAt.toISOString(),
-      updatedAt: product.updatedAt.toISOString(),
-      images: product.images.map((image) => ({
-        id: image.id,
-        imageUrl: image.imageUrl,
-        altText: image.altText || undefined, // ✅ Convertir null en undefined
-        order: image.order,
-        createdAt: image.createdAt.toISOString(),
-      })),
-    };
-  } catch (error) {
-    console.error("Erreur récupération produit:", error);
-    return null;
-  }
-}
-
-async function getSimilarProducts(
-  currentProductId: number,
-  category: string,
-  limit: number = 4
-): Promise<SerializedProduct[]> {
-  try {
-    const products = await prisma.product.findMany({
-      where: {
-        id: { not: currentProductId },
-        category: category as Category,
-        status: ProductStatus.AVAILABLE,
-      },
-      include: {
-        images: {
-          orderBy: { order: "asc" },
-          take: 1,
-        },
-      },
-      take: limit,
-      orderBy: { createdAt: "desc" },
-    });
-
-    return products.map((product) => ({
-      ...product,
-      price: product.price.toNumber(),
-      description: product.description || undefined, // ✅ Convertir null en undefined
-      createdAt: product.createdAt.toISOString(),
-      updatedAt: product.updatedAt.toISOString(),
-      images: product.images.map((image) => ({
-        id: image.id,
-        imageUrl: image.imageUrl,
-        altText: image.altText || undefined, // ✅ Convertir null en undefined
-        order: image.order,
-        createdAt: image.createdAt.toISOString(),
-      })),
-    }));
-  } catch (error) {
-    console.error("Erreur récupération produits similaires:", error);
-    return [];
-  }
-}
+import {
+  getProductRatingStats,
+  getUserProductRating,
+} from "@/lib/actions/ratingActions";
+import { getProduct, getSimilarProducts } from "@/lib/actions/productActions";
 
 // ✅ Générer les métadonnées SEO
 export async function generateMetadata({
@@ -130,12 +45,19 @@ export default async function ProductPage({
     notFound();
   }
 
-  const similarProducts = await getSimilarProducts(
-    product.id,
-    product.category
-  );
+  // ✅ Récupérer les vraies statistiques de notation
+  const [ratingStats, userRating, similarProducts] = await Promise.all([
+    getProductRatingStats(product.id),
+    getUserProductRating(product.id),
+    getSimilarProducts(product.id, product.category),
+  ]);
 
   return (
-    <ProductPageClient product={product} similarProducts={similarProducts} />
+    <ProductPageClient
+      product={product}
+      similarProducts={similarProducts}
+      ratingStats={ratingStats}
+      userRating={userRating}
+    />
   );
 }
