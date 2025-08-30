@@ -134,7 +134,8 @@ export function FossilCard({ fossil }: FossilCardProps) {
         <div className="text-xs text-muted-foreground space-y-1">
           {fossil.locality && (
             <p>
-              <span className="font-medium">Localité:</span> {fossil.locality}
+              <span className="font-medium">Localité:</span>{" "}
+              {fossil.locality.name}
             </p>
           )}
           {fossil.geologicalStage && (
