@@ -18,8 +18,11 @@ export default async function FossilesPage({
 
   // ✅ Passer userId à getFossils pour inclure les infos favoris
   const fossils = await getFossils(resolvedSearchParams, userId);
-  const filterOptions = await getFilterOptions();
-
+  const filterOptionsRaw = await getFilterOptions();
+  const filterOptions = {
+    ...filterOptionsRaw,
+    localities: filterOptionsRaw.localities.map((loc) => loc.name), // ou `.map(loc => String(loc.id))` si tu veux filtrer par id
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">

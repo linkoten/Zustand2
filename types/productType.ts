@@ -1,3 +1,4 @@
+import { Locality } from "@/lib/generated/prisma";
 import { RatingStats, UserRating } from "./ratingType";
 import { SerializedProduct, SerializedProductImage } from "./type";
 
@@ -8,7 +9,7 @@ export interface CreateProductData {
   species: string;
   price: number;
   countryOfOrigin: string;
-  locality: string;
+  locality: Locality;
   geologicalPeriod: string;
   geologicalStage: string;
   description?: string;
@@ -40,7 +41,7 @@ export interface EditableProduct {
   price: number; // ✅ number au lieu de Decimal
   category: string;
   countryOfOrigin: string;
-  locality: string | null;
+  locality: Locality;
   geologicalPeriod: string;
   geologicalStage: string | null;
   weight: number | null;

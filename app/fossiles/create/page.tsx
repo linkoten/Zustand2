@@ -1,9 +1,15 @@
 import CreateProductForm from "@/components/admin/createProductForm";
+import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 export default async function CreateProductPage() {
   const { userId } = await auth();
+
+  // Récupérer toutes les localités
+  const localities = await prisma.locality.findMany({
+    orderBy: { name: "asc" },
+  });
 
   if (!userId) {
     redirect("/sign-in");
@@ -25,7 +31,7 @@ export default async function CreateProductPage() {
           </p>
         </div>
 
-        <CreateProductForm />
+        <CreateProductForm localities={localities} />
       </div>
     </div>
   );

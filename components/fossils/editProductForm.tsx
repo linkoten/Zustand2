@@ -183,7 +183,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
           <Label htmlFor="locality">Localité</Label>
           <Input
             id="locality"
-            value={formData.locality}
+            value={formData.locality.name}
             onChange={(e) => handleInputChange("locality", e.target.value)}
           />
         </div>

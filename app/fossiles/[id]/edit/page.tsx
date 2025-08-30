@@ -25,6 +25,7 @@ async function getProduct(id: number) {
         images: {
           orderBy: { order: "asc" },
         },
+        locality: true,
       },
     });
 

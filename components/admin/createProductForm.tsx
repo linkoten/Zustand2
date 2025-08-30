@@ -29,6 +29,15 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Loader2, Upload, X, Plus } from "lucide-react";
 import { createProductAction } from "@/lib/actions/productActions";
+import { Locality } from "@/lib/generated/prisma";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 // ✅ Schema de validation avec weight
 const productSchema = z.object({
@@ -94,9 +103,14 @@ const geologicalPeriods = [
   { value: "QUATERNAIRE", label: "Quaternaire" },
 ];
 
-export default function CreateProductForm() {
+export default function CreateProductForm({
+  localities,
+}: {
+  localities: Locality[];
+}) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [showAddLocalitySheet, setShowAddLocalitySheet] = useState(false);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -151,6 +165,15 @@ export default function CreateProductForm() {
       console.log("📝 Données du formulaire:", data);
 
       // ✅ Nettoyer les données avant envoi
+      const selectedLocality =
+        localities.find((loc) => loc.id.toString() === data.locality) || null;
+
+      if (!selectedLocality) {
+        toast.error("Localité sélectionnée invalide.");
+        setIsLoading(false);
+        return;
+      }
+
       const cleanData = {
         ...data,
         description:
@@ -163,6 +186,7 @@ export default function CreateProductForm() {
             url: img.url.trim(),
             altText: img.altText?.trim() || undefined,
           })),
+        locality: selectedLocality,
       };
 
       console.log("📝 Données nettoyées:", cleanData);
@@ -416,12 +440,35 @@ export default function CreateProductForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Localité</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Ex: Dudley, Worcestershire"
-                        {...field}
-                      />
-                    </FormControl>
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        if (value === "__add__") {
+                          setShowAddLocalitySheet(true);
+                        } else {
+                          field.onChange(value);
+                        }
+                      }}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner une localité" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {localities.map((loc) => (
+                          <SelectItem key={loc.id} value={loc.id.toString()}>
+                            {loc.name}
+                          </SelectItem>
+                        ))}
+                        <SelectItem
+                          value="__add__"
+                          className="text-primary font-bold"
+                        >
+                          ➕ Ajouter une localité
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -429,6 +476,38 @@ export default function CreateProductForm() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Sheet pour ajouter une localité */}
+        <Sheet
+          open={showAddLocalitySheet}
+          onOpenChange={setShowAddLocalitySheet}
+        >
+          <SheetContent side="right" className="w-[400px]">
+            <SheetHeader>
+              <SheetTitle>Ajouter une localité</SheetTitle>
+            </SheetHeader>
+            {/* Placez ici le formulaire d'ajout de localité */}
+            <div className="py-4">
+              {/* Exemple de champ, adaptez selon vos besoins */}
+              <Label htmlFor="new-locality">Nom de la localité</Label>
+              <Input id="new-locality" placeholder="Nouvelle localité..." />
+              {/* Ajoutez ici la logique de création */}
+            </div>
+            <SheetFooter>
+              <SheetClose asChild>
+                <Button type="button" variant="outline">
+                  Annuler
+                </Button>
+              </SheetClose>
+              <Button
+                type="button"
+                onClick={() => setShowAddLocalitySheet(false)}
+              >
+                Ajouter
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
 
         {/* Images */}
         <Card>

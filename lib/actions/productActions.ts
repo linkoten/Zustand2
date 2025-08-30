@@ -36,7 +36,7 @@ export async function createProductAction(data: CreateProductData) {
       };
     }
 
-    // ✅ 1. Créer le produit dans Stripe
+    // ✅ 1. Créer le produit dans Stripe (on envoie le nom de la localité)
     const stripeProduct = await stripe.products.create({
       name: data.title,
       description: data.description || undefined,
@@ -46,10 +46,10 @@ export async function createProductAction(data: CreateProductData) {
         genre: data.genre,
         species: data.species,
         countryOfOrigin: data.countryOfOrigin,
-        locality: data.locality,
+        locality: data.locality.name, // 👈 nom pour Stripe
         geologicalPeriod: data.geologicalPeriod,
         geologicalStage: data.geologicalStage,
-        weight: data.weight.toString(), // ✅ Ajouter le poids dans les metadata
+        weight: data.weight.toString(),
         image_urls: validImages.map((img) => img.url).join(","),
         image_alts: validImages.map((img) => img.altText || "").join(","),
       },
@@ -73,27 +73,33 @@ export async function createProductAction(data: CreateProductData) {
 
     let product;
 
+    // Prépare les données pour Prisma
+    const productData = {
+      title: data.title,
+      category: data.category as Category,
+      genre: data.genre,
+      species: data.species,
+      price: data.price,
+      countryOfOrigin: data.countryOfOrigin,
+      locality: {
+        connect: { id: data.locality.id }, // 👈 connexion par id
+      },
+      geologicalPeriod: data.geologicalPeriod as GeologicalPeriod,
+      geologicalStage: data.geologicalStage,
+      description: data.description || null,
+      weight: data.weight,
+      stripeProductId: stripeProduct.id,
+      stripePriceId: stripePrice.id,
+      status: ProductStatus.AVAILABLE,
+    };
+
     if (existingProduct) {
       console.log("⚠️ Produit existant trouvé, mise à jour...");
 
       // Mettre à jour le produit existant
       product = await prisma.product.update({
         where: { stripeProductId: stripeProduct.id },
-        data: {
-          title: data.title,
-          category: data.category as Category,
-          genre: data.genre,
-          species: data.species,
-          price: data.price,
-          countryOfOrigin: data.countryOfOrigin,
-          locality: data.locality,
-          geologicalPeriod: data.geologicalPeriod as GeologicalPeriod,
-          geologicalStage: data.geologicalStage,
-          description: data.description || null,
-          weight: data.weight, // ✅ Mettre à jour le poids
-          stripePriceId: stripePrice.id,
-          status: ProductStatus.AVAILABLE,
-        },
+        data: productData,
       });
 
       // Supprimer les anciennes images
@@ -103,22 +109,7 @@ export async function createProductAction(data: CreateProductData) {
     } else {
       // Créer un nouveau produit
       product = await prisma.product.create({
-        data: {
-          title: data.title,
-          category: data.category as Category,
-          genre: data.genre,
-          species: data.species,
-          price: data.price,
-          countryOfOrigin: data.countryOfOrigin,
-          locality: data.locality,
-          geologicalPeriod: data.geologicalPeriod as GeologicalPeriod,
-          geologicalStage: data.geologicalStage,
-          description: data.description || null,
-          weight: data.weight, // ✅ Ajouter le poids
-          stripeProductId: stripeProduct.id,
-          stripePriceId: stripePrice.id,
-          status: ProductStatus.AVAILABLE,
-        },
+        data: productData,
       });
     }
 
@@ -198,7 +189,9 @@ export async function getFossils(
       whereConditions.countryOfOrigin = filters.countryOfOrigin;
     }
     if (filters.locality) {
-      whereConditions.locality = filters.locality;
+      whereConditions.locality = {
+        name: filters.locality, // ou id: Number(filters.locality) si tu filtres par id
+      };
     }
     if (filters.geologicalPeriod) {
       whereConditions.geologicalPeriod =
@@ -226,7 +219,9 @@ export async function getFossils(
         ratings: {
           select: { rating: true },
         },
+        locality: true,
       },
+
       orderBy: {
         createdAt: "desc",
       },
@@ -252,6 +247,7 @@ export async function getFossils(
         category: fossil.category,
         geologicalPeriod: fossil.geologicalPeriod,
         status: fossil.status,
+        locality: fossil.locality,
         images: fossil.images.map((image) => ({
           id: image.id,
           imageUrl: image.imageUrl,
@@ -302,6 +298,7 @@ export async function getProduct(
         ratings: {
           select: { rating: true },
         },
+        locality: true,
       },
     });
 
@@ -323,6 +320,7 @@ export async function getProduct(
       description: product.description || undefined,
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
+      locality: product.locality,
       images: product.images.map((image) => ({
         id: image.id,
         imageUrl: image.imageUrl,
@@ -370,6 +368,7 @@ export async function getSimilarProducts(
         ratings: {
           select: { rating: true },
         },
+        locality: true,
       },
       take: limit,
       orderBy: { createdAt: "desc" },
@@ -435,10 +434,14 @@ export async function getFilterOptions() {
         select: { countryOfOrigin: true },
         distinct: ["countryOfOrigin"],
       }),
-      prisma.product.findMany({
-        where: { status: ProductStatus.AVAILABLE },
-        select: { locality: true },
-        distinct: ["locality"],
+      prisma.locality.findMany({
+        where: {
+          products: {
+            some: { status: ProductStatus.AVAILABLE },
+          },
+        },
+        select: { id: true, name: true },
+        orderBy: { name: "asc" },
       }),
       prisma.product.findMany({
         where: { status: ProductStatus.AVAILABLE },
@@ -455,10 +458,7 @@ export async function getFilterOptions() {
     return {
       categories: categoriesResult.map((item) => item.category),
       countries: countriesResult.map((item) => item.countryOfOrigin).sort(),
-      localities: localitiesResult
-        .map((item) => item.locality)
-        .filter(Boolean) // ✅ Filtrer les valeurs null
-        .sort(),
+      localities: localitiesResult,
       geologicalPeriods: geologicalPeriodsResult.map(
         (item) => item.geologicalPeriod
       ),

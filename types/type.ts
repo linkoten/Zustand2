@@ -5,7 +5,8 @@ import {
   ProductStatus,
   CartItem as PrismaCartItem,
   BlogCategory,
-  BlogStatus, // ✅ Renommer pour éviter le conflit
+  BlogStatus,
+  Locality, // ✅ Renommer pour éviter le conflit
 } from "@/lib/generated/prisma";
 import { RatingStats } from "./ratingType";
 
@@ -91,15 +92,6 @@ export interface SerializedProductImage {
   createdAt: string;
 }
 
-export interface SerializedLocality {
-  id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-  geologicalPeriods: string[]; // ou GeologicalPeriod[] si tu utilises l'enum
-  geologicalStages: string[];
-}
-
 // ✅ Type avec price converti en number
 export interface SerializedProduct {
   id: number;
@@ -109,7 +101,7 @@ export interface SerializedProduct {
   genre: string;
   species: string;
   countryOfOrigin: string;
-  locality: SerializedLocality;
+  locality: Locality;
   geologicalPeriod: string;
   geologicalStage: string;
   description?: string;
