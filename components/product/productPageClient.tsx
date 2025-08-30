@@ -69,7 +69,7 @@ export default function ProductPageClient({
             {/* Carte de provenance */}
             <ProductMap
               country={product.countryOfOrigin}
-              locality={product.locality}
+              locality={product.locality.name}
             />
           </div>
 
@@ -142,7 +142,7 @@ export default function ProductPageClient({
                   </div>
                   <div className="flex justify-between">
                     <span className="font-medium">Localité :</span>
-                    <span>{product.locality}</span>
+                    <span>{product.locality.name}</span>
                   </div>
                 </div>
               </CardContent>

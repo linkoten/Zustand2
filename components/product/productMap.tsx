@@ -6,7 +6,7 @@ import L from "leaflet";
 import type { FeatureCollection } from "geojson";
 
 // Correction du marker par défaut (sinon il ne s'affiche pas)
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",

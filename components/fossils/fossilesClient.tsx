@@ -112,7 +112,8 @@ export default function FossilesClient({
       const matchesCountry =
         selectedCountry === "all" || fossil.countryOfOrigin === selectedCountry;
       const matchesLocality =
-        selectedLocality === "all" || fossil.locality === selectedLocality;
+        selectedLocality === "all" ||
+        fossil.locality?.name === selectedLocality;
       const matchesPeriod =
         selectedPeriod === "all" || fossil.geologicalPeriod === selectedPeriod;
       const matchesStage =
@@ -448,7 +449,7 @@ export default function FossilesClient({
                     </p>
                     {fossil.locality && (
                       <p>
-                        <strong>Localité :</strong> {fossil.locality}
+                        <strong>Localité :</strong> {fossil.locality.name}
                       </p>
                     )}
                     <p>
