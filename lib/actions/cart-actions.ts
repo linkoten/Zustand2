@@ -233,7 +233,11 @@ export async function getCartAction(): Promise<CartData | null> {
       include: {
         items: {
           include: {
-            product: true, // ✅ Sans les images pour optimiser
+            product: {
+              include: {
+                locality: true, // 👈 Ajoute ceci pour inclure la localité complète
+              },
+            },
           },
           orderBy: {
             addedAt: "desc",
@@ -265,7 +269,7 @@ export async function getCartAction(): Promise<CartData | null> {
           genre: item.product.genre,
           species: item.product.species,
           countryOfOrigin: item.product.countryOfOrigin,
-          locality: item.product.locality,
+          locality: item.product.locality.name,
           geologicalPeriod: item.product.geologicalPeriod,
           geologicalStage: item.product.geologicalStage,
           description: item.product.description || undefined,
