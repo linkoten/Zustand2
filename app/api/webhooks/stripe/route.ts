@@ -80,6 +80,24 @@ async function handleProductCreated(product: StripeProduct) {
     const { validCategory, validGeologicalPeriod, validStatus, validWeight } =
       validateProductMetadata(product.metadata, product.active);
 
+    // Chercher la localité par son nom (stocké dans metadata.locality)
+    const localityName = product.metadata.locality;
+    if (!localityName) {
+      throw new Error(
+        "Aucune localité renseignée dans les métadonnées Stripe."
+      );
+    }
+
+    const locality = await prisma.locality.findUnique({
+      where: { name: localityName },
+    });
+
+    if (!locality) {
+      throw new Error(
+        `Localité "${localityName}" introuvable en BDD. Crée-la d'abord dans l'admin.`
+      );
+    }
+
     const newProduct = await prisma.product.create({
       data: {
         title: product.name,
@@ -88,11 +106,13 @@ async function handleProductCreated(product: StripeProduct) {
         species: product.metadata.species || "",
         price: 0, // Sera mis à jour quand le prix sera créé
         countryOfOrigin: product.metadata.countryOfOrigin || "",
-        locality: product.metadata.locality || "",
+        locality: {
+          connect: { id: locality.id },
+        },
         geologicalPeriod: validGeologicalPeriod,
         geologicalStage: product.metadata.geologicalStage || "",
-        description: product.description || undefined, // ✅ Ajouter la description
-        weight: validWeight, // ✅ Ajouter le poids obligatoire
+        description: product.description || undefined,
+        weight: validWeight,
         stripeProductId: product.id,
         status: validStatus,
       },
@@ -129,18 +149,17 @@ async function handleProductUpdated(product: StripeProduct) {
         genre?: string;
         species?: string;
         countryOfOrigin?: string;
-        locality?: string;
+        locality?: { connect: { id: number } }; // 👈 Correction ici
         geologicalPeriod?: GeologicalPeriod;
         geologicalStage?: string;
         description?: string;
-        weight?: number; // ✅ Ajouter le poids
+        weight?: number;
         status: ProductStatus;
       } = {
         title: product.name,
         status: validStatus,
       };
 
-      // Ajouter les champs optionnels seulement s'ils existent
       if (product.metadata.category) {
         updateData.category = validCategory;
       }
@@ -154,7 +173,17 @@ async function handleProductUpdated(product: StripeProduct) {
         updateData.countryOfOrigin = product.metadata.countryOfOrigin;
       }
       if (product.metadata.locality) {
-        updateData.locality = product.metadata.locality;
+        const locality = await prisma.locality.findUnique({
+          where: { name: product.metadata.locality },
+        });
+        if (!locality) {
+          throw new Error(
+            `Localité "${product.metadata.locality}" introuvable en BDD. Crée-la d'abord dans l'admin.`
+          );
+        }
+        updateData.locality = {
+          connect: { id: locality.id },
+        };
       }
       if (product.metadata.geologicalPeriod) {
         updateData.geologicalPeriod = validGeologicalPeriod;
@@ -166,7 +195,7 @@ async function handleProductUpdated(product: StripeProduct) {
         updateData.description = product.description;
       }
       if (product.metadata.weight) {
-        updateData.weight = validWeight; // ✅ Mettre à jour le poids
+        updateData.weight = validWeight;
       }
 
       await prisma.product.update({
@@ -177,7 +206,6 @@ async function handleProductUpdated(product: StripeProduct) {
       console.log("✅ Produit mis à jour dans la BDD");
       console.log("📏 Poids mis à jour:", validWeight, "grammes");
 
-      // ✅ FORCER LA REVALIDATION DU CACHE
       revalidatePath("/fossiles");
       revalidatePath("/");
       console.log("🔄 Cache invalidé après mise à jour");
