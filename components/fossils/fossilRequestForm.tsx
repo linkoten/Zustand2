@@ -34,26 +34,23 @@ const initialFormData: FossilRequestFormData = {
 const categories = [
   { value: "TRILOBITE", label: "Trilobite" },
   { value: "AMMONITE", label: "Ammonite" },
-  { value: "BRACHIOPOD", label: "Brachiopode" },
-  { value: "CRINOID", label: "Crinoïde" },
-  { value: "CORAL", label: "Corail" },
-  { value: "PLANT", label: "Plante" },
-  { value: "SHARK_TOOTH", label: "Dent de requin" },
-  { value: "OTHER", label: "Autre" },
+  { value: "DENT", label: "Dent" },
+  { value: "COQUILLAGE", label: "COQUILLAGE" },
 ];
 
 const geologicalPeriods = [
-  { value: "CAMBRIAN", label: "Cambrien" },
-  { value: "ORDOVICIAN", label: "Ordovicien" },
-  { value: "SILURIAN", label: "Silurien" },
-  { value: "DEVONIAN", label: "Dévonien" },
-  { value: "CARBONIFEROUS", label: "Carbonifère" },
-  { value: "PERMIAN", label: "Permien" },
-  { value: "TRIASSIC", label: "Trias" },
-  { value: "JURASSIC", label: "Jurassique" },
-  { value: "CRETACEOUS", label: "Crétacé" },
+  { value: "CAMBRIEN", label: "Cambrien" },
+  { value: "ORDOVICIEN", label: "Ordovicien" },
+  { value: "SILURIEN", label: "Silurien" },
+  { value: "DEVONIEN", label: "Dévonien" },
+  { value: "CARBONIFERE", label: "Carbonifère" },
+  { value: "PERMIEN", label: "Permien" },
+  { value: "TRIAS", label: "Trias" },
+  { value: "JURASSIQUE", label: "Jurassique" },
+  { value: "CRETACE", label: "Crétacé" },
   { value: "PALEOGENE", label: "Paléogène" },
   { value: "NEOGENE", label: "Néogène" },
+  { value: "QUATERNAIRE", label: "QUATERNAIRE" },
 ];
 
 export default function FossilRequestForm() {

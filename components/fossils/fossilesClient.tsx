@@ -29,7 +29,7 @@ import {
   Edit,
   Trash2,
   AlertTriangle,
-  Star, // ✅ Ajout de l'icône Star
+  Star,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -45,7 +45,7 @@ import {
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
 import { FavoriteButton } from "../product/favoriteButton";
-import StarRating from "@/components/rating/starRating"; // ✅ Import du composant StarRating
+import StarRating from "@/components/rating/starRating";
 import { FossilesClientProps } from "@/types/productType";
 
 export default function FossilesClient({
@@ -60,19 +60,19 @@ export default function FossilesClient({
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(
-    searchParams.get("category") || ""
+    searchParams.get("category") || "all"
   );
   const [selectedCountry, setSelectedCountry] = useState(
-    searchParams.get("countryOfOrigin") || ""
+    searchParams.get("countryOfOrigin") || "all"
   );
   const [selectedLocality, setSelectedLocality] = useState(
-    searchParams.get("locality") || ""
+    searchParams.get("locality") || "all"
   );
   const [selectedPeriod, setSelectedPeriod] = useState(
-    searchParams.get("geologicalPeriod") || ""
+    searchParams.get("geologicalPeriod") || "all"
   );
   const [selectedStage, setSelectedStage] = useState(
-    searchParams.get("geologicalStage") || ""
+    searchParams.get("geologicalStage") || "all"
   );
   const [showFilters, setShowFilters] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -108,15 +108,15 @@ export default function FossilesClient({
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
       const matchesCategory =
-        !selectedCategory || fossil.category === selectedCategory;
+        selectedCategory === "all" || fossil.category === selectedCategory;
       const matchesCountry =
-        !selectedCountry || fossil.countryOfOrigin === selectedCountry;
+        selectedCountry === "all" || fossil.countryOfOrigin === selectedCountry;
       const matchesLocality =
-        !selectedLocality || fossil.locality === selectedLocality;
+        selectedLocality === "all" || fossil.locality === selectedLocality;
       const matchesPeriod =
-        !selectedPeriod || fossil.geologicalPeriod === selectedPeriod;
+        selectedPeriod === "all" || fossil.geologicalPeriod === selectedPeriod;
       const matchesStage =
-        !selectedStage || fossil.geologicalStage === selectedStage;
+        selectedStage === "all" || fossil.geologicalStage === selectedStage;
 
       return (
         matchesSearch &&
@@ -139,21 +139,26 @@ export default function FossilesClient({
 
   const applyFilters = () => {
     const params = new URLSearchParams();
-    if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedCountry) params.set("countryOfOrigin", selectedCountry);
-    if (selectedLocality) params.set("locality", selectedLocality);
-    if (selectedPeriod) params.set("geologicalPeriod", selectedPeriod);
-    if (selectedStage) params.set("geologicalStage", selectedStage);
+    if (selectedCategory && selectedCategory !== "all")
+      params.set("category", selectedCategory);
+    if (selectedCountry && selectedCountry !== "all")
+      params.set("countryOfOrigin", selectedCountry);
+    if (selectedLocality && selectedLocality !== "all")
+      params.set("locality", selectedLocality);
+    if (selectedPeriod && selectedPeriod !== "all")
+      params.set("geologicalPeriod", selectedPeriod);
+    if (selectedStage && selectedStage !== "all")
+      params.set("geologicalStage", selectedStage);
 
     router.push(`/fossiles?${params.toString()}`);
   };
 
   const clearFilters = () => {
-    setSelectedCategory("");
-    setSelectedCountry("");
-    setSelectedLocality("");
-    setSelectedPeriod("");
-    setSelectedStage("");
+    setSelectedCategory("all");
+    setSelectedCountry("all");
+    setSelectedLocality("all");
+    setSelectedPeriod("all");
+    setSelectedStage("all");
     setSearchTerm("");
     router.push("/fossiles");
   };
@@ -204,7 +209,7 @@ export default function FossilesClient({
                       <SelectValue placeholder="Toutes les catégories" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Toutes les catégories</SelectItem>
+                      <SelectItem value="all">Toutes les catégories</SelectItem>
                       {filterOptions.categories.map((category) => (
                         <SelectItem key={category} value={category}>
                           {category}
@@ -224,10 +229,30 @@ export default function FossilesClient({
                       <SelectValue placeholder="Tous les pays" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Tous les pays</SelectItem>
+                      <SelectItem value="all">Tous les pays</SelectItem>
                       {filterOptions.countries.map((country) => (
                         <SelectItem key={country} value={country}>
                           {country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="locality">Localité</Label>
+                  <Select
+                    value={selectedLocality}
+                    onValueChange={setSelectedLocality}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Toutes les localités" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Toutes les localités</SelectItem>
+                      {filterOptions.localities.map((locality) => (
+                        <SelectItem key={locality} value={locality}>
+                          {locality}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -244,10 +269,30 @@ export default function FossilesClient({
                       <SelectValue placeholder="Toutes les périodes" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Toutes les périodes</SelectItem>
+                      <SelectItem value="all">Toutes les périodes</SelectItem>
                       {filterOptions.geologicalPeriods.map((period) => (
                         <SelectItem key={period} value={period}>
                           {period}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="stage">Étage géologique</Label>
+                  <Select
+                    value={selectedStage}
+                    onValueChange={setSelectedStage}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Tous les étages" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tous les étages</SelectItem>
+                      {filterOptions.geologicalStages.map((stage) => (
+                        <SelectItem key={stage} value={stage}>
+                          {stage}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -374,7 +419,7 @@ export default function FossilesClient({
                     {fossil.price.toLocaleString("fr-FR")} €
                   </p>
 
-                  {/* ✅ NOUVELLE section pour les ratings */}
+                  {/* ✅ Section pour les ratings */}
                   <div className="flex items-center gap-2 py-2">
                     {fossil.ratingStats?.totalRatings &&
                     fossil.ratingStats.totalRatings > 0 ? (

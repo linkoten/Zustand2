@@ -91,6 +91,15 @@ export interface SerializedProductImage {
   createdAt: string;
 }
 
+export interface SerializedLocality {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  geologicalPeriods: string[]; // ou GeologicalPeriod[] si tu utilises l'enum
+  geologicalStages: string[];
+}
+
 // ✅ Type avec price converti en number
 export interface SerializedProduct {
   id: number;
@@ -100,7 +109,7 @@ export interface SerializedProduct {
   genre: string;
   species: string;
   countryOfOrigin: string;
-  locality: string;
+  locality: SerializedLocality;
   geologicalPeriod: string;
   geologicalStage: string;
   description?: string;

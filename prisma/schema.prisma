@@ -40,7 +40,8 @@ model Product {
   species          String
   price            Decimal          @db.Decimal(10, 2)
   countryOfOrigin  String
-  locality         String
+  localityId       Int
+  locality         Locality         @relation(fields: [localityId], references: [id])
   geologicalPeriod GeologicalPeriod
   geologicalStage  String
   description      String?
@@ -48,11 +49,10 @@ model Product {
   updatedAt        DateTime         @updatedAt
   weight           Int // ✅ Nouveau champ obligatoire en grammes
   ratings          Rating[]
-
   // Stripe
-  stripeProductId String? @unique
-  stripePriceId   String? @unique
-  favorite        Boolean @default(false)
+  stripeProductId  String?          @unique
+  stripePriceId    String?          @unique
+  favorite         Boolean          @default(false)
 
   // Statut du produit
   status ProductStatus @default(AVAILABLE)
@@ -111,6 +111,18 @@ model CartItem {
   product Product @relation(fields: [productId], references: [id])
 
   @@unique([cartId, productId]) // Un produit une seule fois par panier
+}
+
+model Locality {
+  id                Int                @id @default(autoincrement())
+  name              String             @unique
+  latitude          Float
+  longitude         Float
+  geologicalPeriods GeologicalPeriod[] // Plusieurs périodes possibles
+  geologicalStages  String[] // Plusieurs étages possibles (en string, ou crée un enum si tu veux)
+  products          Product[] // Relation inverse
+
+  // Ajoute d'autres champs si besoin (description, pays, etc)
 }
 
 // Nouveau modèle pour les transactions

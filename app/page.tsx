@@ -51,7 +51,7 @@ export default function Home() {
                   className="bg-amber-600 hover:bg-amber-700 w-full"
                 >
                   <Link
-                    href="/fossils"
+                    href="/fossiles"
                     className="flex items-center justify-center gap-2"
                   >
                     Voir les fossiles

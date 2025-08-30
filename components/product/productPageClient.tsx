@@ -16,6 +16,7 @@ import { ProductPageClientProps } from "@/types/productType";
 // ✅ Import des composants de notation
 import RatingDisplay from "@/components/rating/ratingDisplay";
 import RatingForm from "@/components/rating/ratingForm";
+import ProductMap from "./productMap";
 
 export default function ProductPageClient({
   product,
@@ -64,6 +65,11 @@ export default function ProductPageClient({
             <ProductCarousel
               images={product.images}
               productTitle={product.title}
+            />
+            {/* Carte de provenance */}
+            <ProductMap
+              country={product.countryOfOrigin}
+              locality={product.locality}
             />
           </div>
 
