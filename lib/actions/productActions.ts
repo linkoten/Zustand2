@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 import {
   Category,
   GeologicalPeriod,
+  Locality,
   Prisma,
   ProductStatus,
 } from "@/lib/generated/prisma";
@@ -478,6 +479,32 @@ export async function getFilterOptions() {
       localities: [],
       geologicalPeriods: [],
       geologicalStages: [],
+    };
+  }
+}
+
+export async function createLocalityAction({
+  name,
+  latitude,
+  longitude,
+  geologicalPeriods,
+  geologicalStages,
+}: Omit<Locality, "id">) {
+  try {
+    const locality = await prisma.locality.create({
+      data: {
+        name,
+        latitude,
+        longitude,
+        geologicalPeriods,
+        geologicalStages,
+      },
+    });
+    return { success: true, data: locality };
+  } catch (error) {
+    return {
+      success: false,
+      error: "Erreur lors de la création de la localité",
     };
   }
 }

@@ -5,6 +5,7 @@ import { Plus, Search } from "lucide-react";
 import FossilesClient from "@/components/fossils/fossilesClient";
 import { getFilterOptions, getFossils } from "@/lib/actions/productActions";
 import { SearchParams } from "@/types/productType";
+import { requireAdmin } from "@/lib/auth";
 
 export default async function FossilesPage({
   searchParams,
@@ -15,6 +16,8 @@ export default async function FossilesPage({
 
   // ✅ Récupérer userId AVANT l'appel à getFossils
   const { userId } = await auth();
+
+  const user = await requireAdmin();
 
   // ✅ Passer userId à getFossils pour inclure les infos favoris
   const fossils = await getFossils(resolvedSearchParams, userId);
@@ -42,7 +45,7 @@ export default async function FossilesPage({
               </Link>
             </Button>
 
-            {userId && (
+            {user.role === "ADMIN" && (
               <Button asChild>
                 <Link href="/fossiles/create">
                   <Plus className="mr-2 h-4 w-4" />

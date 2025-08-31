@@ -28,7 +28,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Loader2, Upload, X, Plus } from "lucide-react";
-import { createProductAction } from "@/lib/actions/productActions";
+import {
+  createLocalityAction,
+  createProductAction,
+} from "@/lib/actions/productActions";
 import { Locality } from "@/lib/generated/prisma";
 import {
   Sheet,
@@ -111,6 +114,14 @@ export default function CreateProductForm({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showAddLocalitySheet, setShowAddLocalitySheet] = useState(false);
+  const [newLocality, setNewLocality] = useState({
+    name: "",
+    latitude: "",
+    longitude: "",
+    geologicalPeriods: [],
+    geologicalStages: [],
+  });
+  const [isCreatingLocality, setIsCreatingLocality] = useState(false);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -486,12 +497,31 @@ export default function CreateProductForm({
             <SheetHeader>
               <SheetTitle>Ajouter une localité</SheetTitle>
             </SheetHeader>
-            {/* Placez ici le formulaire d'ajout de localité */}
-            <div className="py-4">
-              {/* Exemple de champ, adaptez selon vos besoins */}
-              <Label htmlFor="new-locality">Nom de la localité</Label>
-              <Input id="new-locality" placeholder="Nouvelle localité..." />
-              {/* Ajoutez ici la logique de création */}
+            <div className="py-4 space-y-2">
+              <Label>Nom</Label>
+              <Input
+                value={newLocality.name}
+                onChange={(e) =>
+                  setNewLocality((l) => ({ ...l, name: e.target.value }))
+                }
+              />
+              <Label>Latitude</Label>
+              <Input
+                type="number"
+                value={newLocality.latitude}
+                onChange={(e) =>
+                  setNewLocality((l) => ({ ...l, latitude: e.target.value }))
+                }
+              />
+              <Label>Longitude</Label>
+              <Input
+                type="number"
+                value={newLocality.longitude}
+                onChange={(e) =>
+                  setNewLocality((l) => ({ ...l, longitude: e.target.value }))
+                }
+              />
+              {/* Ajoute ici les champs pour geologicalPeriods et geologicalStages */}
             </div>
             <SheetFooter>
               <SheetClose asChild>
@@ -501,7 +531,25 @@ export default function CreateProductForm({
               </SheetClose>
               <Button
                 type="button"
-                onClick={() => setShowAddLocalitySheet(false)}
+                disabled={isCreatingLocality}
+                onClick={async () => {
+                  setIsCreatingLocality(true);
+                  const res = await createLocalityAction({
+                    name: newLocality.name,
+                    latitude: parseFloat(newLocality.latitude),
+                    longitude: parseFloat(newLocality.longitude),
+                    geologicalPeriods: newLocality.geologicalPeriods,
+                    geologicalStages: newLocality.geologicalStages,
+                  });
+                  setIsCreatingLocality(false);
+                  if (res.success) {
+                    toast.success("Localité créée !");
+                    setShowAddLocalitySheet(false);
+                    // Optionnel : ajoute la nouvelle localité à ton state localities ici
+                  } else {
+                    toast.error(res.error);
+                  }
+                }}
               >
                 Ajouter
               </Button>
