@@ -5,7 +5,8 @@ import { Plus, Search } from "lucide-react";
 import FossilesClient from "@/components/fossils/fossilesClient";
 import { getFilterOptions, getFossils } from "@/lib/actions/productActions";
 import { SearchParams } from "@/types/productType";
-import { requireAdmin } from "@/lib/auth";
+import { getUserData } from "@/lib/actions/dashboardActions";
+import { redirect } from "next/navigation";
 
 export default async function FossilesPage({
   searchParams,
@@ -17,7 +18,14 @@ export default async function FossilesPage({
   // ✅ Récupérer userId AVANT l'appel à getFossils
   const { userId } = await auth();
 
-  const user = await requireAdmin();
+  if (!userId) {
+    redirect("/sign-in");
+  }
+  const user = await getUserData(userId);
+
+  if (!user) {
+    redirect("/sign-in");
+  }
 
   // ✅ Passer userId à getFossils pour inclure les infos favoris
   const fossils = await getFossils(resolvedSearchParams, userId);
