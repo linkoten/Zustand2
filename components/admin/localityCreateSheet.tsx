@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Locality } from "@/lib/generated/prisma";
 
 const geologicalPeriodEnumValues = [
   "CAMBRIEN",
@@ -41,7 +42,7 @@ type GeologicalPeriod = (typeof geologicalPeriodEnumValues)[number];
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreated: (locality: any) => void;
+  onCreated: (locality: Locality) => void;
 };
 
 export default function LocalityCreate({
@@ -251,7 +252,7 @@ export default function LocalityCreate({
                 geologicalStages: newLocality.geologicalStages,
               });
               setIsCreating(false);
-              if (res.success) {
+              if (res.success && res.data) {
                 toast.success("Localité créée !");
                 onCreated(res.data); // callback vers le parent
                 onOpenChange(false);
