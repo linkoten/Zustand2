@@ -1,4 +1,5 @@
 import CreateProductForm from "@/components/admin/createProductForm";
+import { getUserData } from "@/lib/actions/dashboardActions";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -6,20 +7,19 @@ import { redirect } from "next/navigation";
 export default async function CreateProductPage() {
   const { userId } = await auth();
 
+  if (!userId) {
+    redirect("/sign-in");
+  }
+  const user = await getUserData(userId);
+
+  if (user?.role !== "ADMIN") {
+    redirect("/fossiles");
+  }
+
   // Récupérer toutes les localités
   const localities = await prisma.locality.findMany({
     orderBy: { name: "asc" },
   });
-
-  if (!userId) {
-    redirect("/sign-in");
-  }
-
-  // TODO: Ajouter une vérification du rôle admin
-  // const user = await getUserFromClerkId(userId);
-  // if (user?.role !== "ADMIN") {
-  //   redirect("/");
-  // }
 
   return (
     <div className="container mx-auto px-4 py-8">

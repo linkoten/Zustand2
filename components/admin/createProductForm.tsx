@@ -25,22 +25,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, Upload, X, Plus } from "lucide-react";
-import {
-  createLocalityAction,
-  createProductAction,
-} from "@/lib/actions/productActions";
+import { Loader2, X, Plus } from "lucide-react";
+import { createProductAction } from "@/lib/actions/productActions";
 import { Locality } from "@/lib/generated/prisma";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-  SheetClose,
-} from "@/components/ui/sheet";
+import LocalityCreate from "./localityCreateSheet";
 
 // ✅ Schema de validation avec weight
 const productSchema = z.object({
@@ -107,21 +96,14 @@ const geologicalPeriods = [
 ];
 
 export default function CreateProductForm({
-  localities,
+  localities: initialLocalities,
 }: {
   localities: Locality[];
 }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showAddLocalitySheet, setShowAddLocalitySheet] = useState(false);
-  const [newLocality, setNewLocality] = useState({
-    name: "",
-    latitude: "",
-    longitude: "",
-    geologicalPeriods: [],
-    geologicalStages: [],
-  });
-  const [isCreatingLocality, setIsCreatingLocality] = useState(false);
+  const [localities, setLocalities] = useState<Locality[]>(initialLocalities);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -488,74 +470,14 @@ export default function CreateProductForm({
           </CardContent>
         </Card>
 
-        {/* Sheet pour ajouter une localité */}
-        <Sheet
+        <LocalityCreate
           open={showAddLocalitySheet}
           onOpenChange={setShowAddLocalitySheet}
-        >
-          <SheetContent side="right" className="w-[400px]">
-            <SheetHeader>
-              <SheetTitle>Ajouter une localité</SheetTitle>
-            </SheetHeader>
-            <div className="py-4 space-y-2">
-              <Label>Nom</Label>
-              <Input
-                value={newLocality.name}
-                onChange={(e) =>
-                  setNewLocality((l) => ({ ...l, name: e.target.value }))
-                }
-              />
-              <Label>Latitude</Label>
-              <Input
-                type="number"
-                value={newLocality.latitude}
-                onChange={(e) =>
-                  setNewLocality((l) => ({ ...l, latitude: e.target.value }))
-                }
-              />
-              <Label>Longitude</Label>
-              <Input
-                type="number"
-                value={newLocality.longitude}
-                onChange={(e) =>
-                  setNewLocality((l) => ({ ...l, longitude: e.target.value }))
-                }
-              />
-              {/* Ajoute ici les champs pour geologicalPeriods et geologicalStages */}
-            </div>
-            <SheetFooter>
-              <SheetClose asChild>
-                <Button type="button" variant="outline">
-                  Annuler
-                </Button>
-              </SheetClose>
-              <Button
-                type="button"
-                disabled={isCreatingLocality}
-                onClick={async () => {
-                  setIsCreatingLocality(true);
-                  const res = await createLocalityAction({
-                    name: newLocality.name,
-                    latitude: parseFloat(newLocality.latitude),
-                    longitude: parseFloat(newLocality.longitude),
-                    geologicalPeriods: newLocality.geologicalPeriods,
-                    geologicalStages: newLocality.geologicalStages,
-                  });
-                  setIsCreatingLocality(false);
-                  if (res.success) {
-                    toast.success("Localité créée !");
-                    setShowAddLocalitySheet(false);
-                    // Optionnel : ajoute la nouvelle localité à ton state localities ici
-                  } else {
-                    toast.error(res.error);
-                  }
-                }}
-              >
-                Ajouter
-              </Button>
-            </SheetFooter>
-          </SheetContent>
-        </Sheet>
+          onCreated={(locality) => {
+            setLocalities((prev) => [...prev, locality]);
+            form.setValue("locality", locality.id.toString());
+          }}
+        />
 
         {/* Images */}
         <Card>
