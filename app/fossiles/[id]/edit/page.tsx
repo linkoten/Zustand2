@@ -15,17 +15,17 @@ import EditProductForm from "@/components/fossils/editProductForm";
 import { getProduct } from "@/lib/actions/productActions";
 
 interface EditProductPageProps {
-  params: Promise<{ id: number }>; // ✅ Promise + string (les params URL sont toujours des strings)
+  params: Promise<{ id: string }>; // ✅ Promise + string (les params URL sont toujours des strings)
 }
 
 export default async function EditProductPage({
   params,
 }: EditProductPageProps) {
-  const { id } = await params;
+  const resolvedParams = await params;
   // ✅ Vérifier que l'utilisateur est admin
   await requireAdmin();
 
-  const product = await getProduct(id);
+  const product = await getProduct(resolvedParams.id);
 
   if (!product) {
     notFound();
