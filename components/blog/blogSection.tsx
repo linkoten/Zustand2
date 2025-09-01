@@ -4,18 +4,12 @@ import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import BlogList from "./blogList";
 import BlogFilters from "./blogFilters";
-import { BlogListProps, BlogSectionProps } from "@/types/blogType";
+import { BlogSectionProps } from "@/types/blogType";
 import { useBlogStore } from "@/stores/blogStore";
 
 export default function BlogSection({ initialData }: BlogSectionProps) {
-  const {
-    blogData,
-    isLoading,
-    filters,
-    setBlogData,
-    updateFilters,
-    loadBlogData,
-  } = useBlogStore();
+  const { blogData, isLoading, filters, setBlogData, loadBlogData } =
+    useBlogStore();
 
   const searchParams = useSearchParams();
 

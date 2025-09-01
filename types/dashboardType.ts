@@ -1,6 +1,6 @@
 // Types pour les interfaces dashboard
 export interface DashboardUser {
-  id: number;
+  id: string;
   name: string | null;
   email: string;
   role: string;

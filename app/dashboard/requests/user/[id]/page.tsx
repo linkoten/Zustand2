@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { getUserData } from "@/lib/actions/dashboardActions";
 import { getFossilRequestById } from "@/lib/actions/fossilRequestsActions";
 import { notFound } from "next/navigation";
-import { UserRole } from "@/lib/generated/prisma";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";

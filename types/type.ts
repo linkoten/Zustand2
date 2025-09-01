@@ -274,7 +274,7 @@ export interface CartItemData {
 // ✅ Type pour le panier complet
 export interface CartData {
   id: string;
-  userId: number;
+  userId: string;
   createdAt: string;
   updatedAt: string;
   items: CartItemData[];

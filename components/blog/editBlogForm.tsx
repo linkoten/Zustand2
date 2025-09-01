@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
-import { BlogCategory, BlogStatus } from "@/lib/generated/prisma";
 import { EditBlogFormProps } from "@/types/blogType";
 
 // ✅ Categories du schéma Prisma

@@ -3,12 +3,7 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import {
-  CreateRatingData,
-  UpdateRatingData,
-  RatingStats,
-  UserRating,
-} from "@/types/ratingType";
+import { CreateRatingData, RatingStats, UserRating } from "@/types/ratingType";
 
 async function requireAuth() {
   const { userId } = await auth();

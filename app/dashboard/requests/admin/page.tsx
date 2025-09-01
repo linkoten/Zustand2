@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { FileText, Plus } from "lucide-react";
+import { FileText } from "lucide-react";
 import Link from "next/link";
 import { RequestPriority, RequestStatus } from "@/lib/generated/prisma";
 import { getFossilRequests } from "@/lib/actions/fossilRequestsActions";

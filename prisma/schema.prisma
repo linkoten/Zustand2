@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   clerkId   String   @unique
   email     String   @unique
   name      String?
@@ -92,7 +92,7 @@ model ProductImage {
 // Modèle pour le panier (à venir)
 model Cart {
   id        String   @id @default(cuid())
-  userId    Int      @unique // Un panier par utilisateur
+  userId    String   @unique // Un panier par utilisateur
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -163,8 +163,8 @@ model ArticleBlog {
   ratings        Rating[]
 
   // ✅ Relation avec l'auteur
-  authorId Int
-  author   User @relation(fields: [authorId], references: [id])
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
 
   @@index([status, publishedAt])
   @@index([category])

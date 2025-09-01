@@ -1,6 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma";
 import { UserRole } from "@/lib/generated/prisma";
 import UserDashboard from "@/components/dashboard/userDashboard";
 import AdminDashboard from "@/components/dashboard/adminDashboard";

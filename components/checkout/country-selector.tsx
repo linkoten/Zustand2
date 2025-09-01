@@ -2,10 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  getShippingZone,
-  calculateShippingByWeight,
-} from "@/lib/config/shipping-zones";
+import { calculateShippingByWeight } from "@/lib/config/shipping-zones";
 
 interface CountrySelectorProps {
   subtotal: number;

@@ -68,7 +68,7 @@ export interface BlogListProps {
     views: number;
     author: {
       name: string | null;
-      id: number;
+      id: string;
     };
   }>;
   totalPages: number;

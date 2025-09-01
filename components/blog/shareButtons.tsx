@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { ShareButtonsProps } from "@/types/blogType";
-import { Facebook, Twitter, Linkedin, Link, Mail } from "lucide-react";
+import { Link, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { FaFacebookF, FaLinkedin, FaTwitter } from "react-icons/fa";
 
 export default function ShareButtons({
   title,
@@ -42,7 +43,7 @@ export default function ShareButtons({
         onClick={() => handleShare("twitter")}
         className="text-blue-500 hover:text-blue-600"
       >
-        <Twitter className="w-4 h-4" />
+        <FaTwitter className="w-4 h-4" />
       </Button>
 
       <Button
@@ -51,7 +52,7 @@ export default function ShareButtons({
         onClick={() => handleShare("facebook")}
         className="text-blue-600 hover:text-blue-700"
       >
-        <Facebook className="w-4 h-4" />
+        <FaFacebookF className="w-4 h-4" />
       </Button>
 
       <Button
@@ -60,7 +61,7 @@ export default function ShareButtons({
         onClick={() => handleShare("linkedin")}
         className="text-blue-700 hover:text-blue-800"
       >
-        <Linkedin className="w-4 h-4" />
+        <FaLinkedin className="w-4 h-4" />
       </Button>
 
       <Button

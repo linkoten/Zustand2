@@ -4,11 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import {
-  RatingDisplayProps,
-  RatingStats,
-  UserRating,
-} from "@/types/ratingType";
+import { RatingDisplayProps } from "@/types/ratingType";
 import { MessageSquare, Star } from "lucide-react";
 import RatingForm from "./ratingForm";
 import StarRating from "./starRating";

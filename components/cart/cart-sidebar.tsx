@@ -88,7 +88,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       if (result.success) {
         setCart({
           id: cart?.id || "",
-          userId: cart?.userId || 0,
+          userId: cart?.userId || "",
           createdAt: cart?.createdAt || "",
           updatedAt: cart?.updatedAt || "",
           items: [],

@@ -25,16 +25,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
   Save,
   FileText,
   Calendar,
   User,
-  Mail,
-  Phone,
-  MapPin,
-  Euro,
   MessageSquare,
   StickyNote,
   AlertCircle,

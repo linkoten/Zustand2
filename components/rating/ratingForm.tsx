@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
 import { toast } from "sonner";
-import { RatingFormProps, UserRating } from "@/types/ratingType";
+import { RatingFormProps } from "@/types/ratingType";
 import { Trash2 } from "lucide-react";
 import StarRating from "./starRating";
 import { createOrUpdateRating } from "@/lib/actions/ratingActions";
