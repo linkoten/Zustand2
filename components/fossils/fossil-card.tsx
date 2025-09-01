@@ -10,16 +10,42 @@ import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { ProductStatus } from "@/lib/generated/prisma";
-import { ShoppingCart, Eye, CheckCircle, Loader2, Pencil } from "lucide-react";
+import {
+  ShoppingCart,
+  Eye,
+  CheckCircle,
+  Loader2,
+  Pencil,
+  Edit,
+  Trash2,
+  AlertTriangle,
+} from "lucide-react";
 import { toast } from "sonner";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { addToCartAction } from "@/lib/actions/cart-actions"; // ✅ Import Server Action
 import { FossilCardProps } from "@/types/type";
 import { useUserStore } from "@/stores/userStore";
+import { FavoriteButton } from "../product/favoriteButton";
+import Image from "next/image";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
+import { useRouter } from "next/navigation";
 
 export function FossilCard({ fossil }: FossilCardProps) {
   const [isPending, startTransition] = useTransition(); // ✅ Hook pour Server Actions
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const router = useRouter();
+
   const isAdmin = useUserStore((s) => s.isAdmin);
 
   const formatPrice = (price: number) => {
@@ -27,18 +53,6 @@ export function FossilCard({ fossil }: FossilCardProps) {
       style: "currency",
       currency: "EUR",
     }).format(price);
-  };
-
-  const getStatusBadge = (status: ProductStatus) => {
-    const statusConfig = {
-      AVAILABLE: { label: "Disponible", variant: "default" as const },
-      SOLD: { label: "Vendu", variant: "secondary" as const },
-      INACTIVE: { label: "Inactif", variant: "outline" as const },
-      RESERVED: { label: "Réservé", variant: "destructive" as const },
-    };
-
-    const config = statusConfig[status];
-    return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
   const getCategoryColor = (category: string) => {
@@ -77,23 +91,108 @@ export function FossilCard({ fossil }: FossilCardProps) {
     });
   };
 
+  const handleDelete = async (productId: number) => {
+    if (!isAdmin) return;
+
+    setDeletingId(productId);
+
+    try {
+      const response = await fetch(`/api/products/${productId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression");
+      }
+
+      toast.success("Produit supprimé avec succès");
+      router.refresh();
+    } catch (error) {
+      console.error("Erreur:", error);
+      toast.error("Erreur lors de la suppression du produit");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <Card className="group hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="p-0">
-        <AspectRatio
-          ratio={4 / 3}
-          className="bg-muted rounded-t-lg overflow-hidden"
-        >
-          <div className="w-full h-full bg-gradient-to-br from-stone-200 to-stone-300 flex items-center justify-center">
-            <div className="text-center text-muted-foreground">
-              <div className="text-4xl mb-2">🦕</div>
-              <p className="text-sm font-medium">Photo bientôt disponible</p>
+        <div className="relative aspect-square overflow-hidden rounded-t-lg">
+          {fossil.images?.[0] ? (
+            <Image
+              src={fossil.images[0].imageUrl}
+              alt={fossil.images[0].altText || fossil.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <span className="text-muted-foreground">Pas d&apos;image</span>
             </div>
-          </div>
-        </AspectRatio>
+          )}
 
-        <div className="absolute top-2 right-2">
-          {getStatusBadge(fossil.status)}
+          {/* ✅ Bouton favori en overlay (top-left) */}
+          <div className="absolute top-2 left-2">
+            <FavoriteButton
+              productId={fossil.id}
+              isFavorite={fossil.isFavorite || false}
+              variant="overlay"
+              size="sm"
+            />
+          </div>
+
+          {/* Boutons admin en overlay (top-right) */}
+          {isAdmin && (
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex gap-1">
+                <Button
+                  asChild
+                  size="sm"
+                  variant="secondary"
+                  className="h-8 w-8 p-0"
+                >
+                  <Link href={`/fossiles/${fossil.id}/edit`}>
+                    <Edit className="h-4 w-4" />
+                  </Link>
+                </Button>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="h-8 w-8 p-0"
+                      disabled={deletingId === fossil.id}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                        Confirmer la suppression
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Êtes-vous sûr de vouloir supprimer le fossile &quot;
+                        {fossil.title}&quot; ? Cette action est irréversible.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDelete(fossil.id)}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        Supprimer
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          )}
         </div>
       </CardHeader>
 

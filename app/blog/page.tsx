@@ -5,6 +5,8 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import BlogStats from "@/components/blog/blogStats";
 import BlogSection from "@/components/blog/blogSection";
+import { redirect } from "next/navigation";
+import { getUserData } from "@/lib/actions/dashboardActions";
 
 export default async function BlogPage({
   searchParams,
@@ -17,6 +19,17 @@ export default async function BlogPage({
   }>;
 }) {
   const { userId } = await auth();
+
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
+  const user = await getUserData(userId);
+
+  if (!user) {
+    redirect("/sign-in");
+  }
+
   const resolvedSearchParams = await searchParams;
 
   const page = parseInt(resolvedSearchParams.page || "1");
@@ -32,8 +45,7 @@ export default async function BlogPage({
   });
 
   // Vérifier si l'utilisateur peut créer des articles
-  const canCreatePost = userId;
-
+  const canCreatePost = user.role === "ADMIN";
   // Préparer les stats initiales
   const initialStats = {
     totalPosts: initialBlogData.totalPosts,

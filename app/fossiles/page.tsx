@@ -19,14 +19,14 @@ export default async function FossilesPage({
   // ✅ Récupérer userId AVANT l'appel à getFossils
   const { userId } = await auth();
 
-  if (!userId) {
+  /*  if (!userId) {
     redirect("/sign-in");
-  }
-  const user = await getUserData(userId);
+  } */
+  const user = await getUserData(userId!);
 
-  if (!user) {
+  /*  if (!user) {
     redirect("/sign-in");
-  }
+  } */
 
   // ✅ Passer userId à getFossils pour inclure les infos favoris
   const fossils = await getFossils(resolvedSearchParams, userId);
@@ -55,7 +55,7 @@ export default async function FossilesPage({
                 </Link>
               </Button>
 
-              {user.role === "ADMIN" && (
+              {user && user.role === "ADMIN" && (
                 <Button asChild>
                   <Link href="/fossiles/create">
                     <Plus className="mr-2 h-4 w-4" />
