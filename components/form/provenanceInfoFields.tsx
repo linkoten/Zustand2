@@ -21,7 +21,7 @@ import { Locality } from "@/lib/generated/prisma";
 import LocalityCreateSheet from "./localityCreateSheet";
 import { Button } from "../ui/button";
 import { Pencil } from "lucide-react";
-import LocalityEditSheet from "./LocalityEditSheet";
+import LocalityEditSheet from "./localityEditSheet";
 
 type ProvenanceInfoFieldsProps = {
   form: UseFormReturn<ProductFormData>;
