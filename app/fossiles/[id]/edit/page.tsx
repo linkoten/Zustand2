@@ -12,48 +12,16 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import EditProductForm from "@/components/fossils/editProductForm";
+import { getProduct } from "@/lib/actions/productActions";
 
 interface EditProductPageProps {
-  params: Promise<{ id: string }>; // ✅ Promise + string (les params URL sont toujours des strings)
-}
-
-async function getProduct(id: number) {
-  try {
-    const product = await prisma.product.findUnique({
-      where: { id },
-      include: {
-        images: {
-          orderBy: { order: "asc" },
-        },
-        locality: true,
-      },
-    });
-
-    if (!product) {
-      return null;
-    }
-
-    return {
-      ...product,
-      price: product.price.toNumber(),
-      createdAt: product.createdAt.toISOString(),
-      updatedAt: product.updatedAt.toISOString(),
-      images: product.images.map((image) => ({
-        ...image,
-        createdAt: image.createdAt.toISOString(),
-      })),
-    };
-  } catch (error) {
-    console.error("Erreur lors de la récupération du produit:", error);
-    return null;
-  }
+  params: Promise<{ id: number }>; // ✅ Promise + string (les params URL sont toujours des strings)
 }
 
 export default async function EditProductPage({
   params,
 }: EditProductPageProps) {
-  const { id: idString } = await params;
-  const id = parseInt(idString);
+  const { id } = await params;
   // ✅ Vérifier que l'utilisateur est admin
   await requireAdmin();
 

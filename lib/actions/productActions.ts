@@ -277,18 +277,12 @@ export async function getFossils(
 }
 
 export async function getProduct(
-  id: string
+  id: number
 ): Promise<SerializedProduct | null> {
   try {
-    const productId = parseInt(id);
-
-    if (isNaN(productId)) {
-      return null;
-    }
-
     const product = await prisma.product.findUnique({
       where: {
-        id: productId,
+        id: id,
         status: ProductStatus.AVAILABLE,
       },
       include: {

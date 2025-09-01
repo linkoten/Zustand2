@@ -39,7 +39,7 @@ const geologicalPeriodEnumValues = [
 ] as const;
 type GeologicalPeriod = (typeof geologicalPeriodEnumValues)[number];
 
-type Props = {
+type LocalityCreateProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreated: (locality: Locality) => void;
@@ -49,7 +49,7 @@ export default function LocalityCreate({
   open,
   onOpenChange,
   onCreated,
-}: Props) {
+}: LocalityCreateProps) {
   const [newLocality, setNewLocality] = useState({
     name: "",
     latitude: "",

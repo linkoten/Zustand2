@@ -1,4 +1,4 @@
-import CreateProductForm from "@/components/admin/createProductForm";
+import CreateProductForm from "@/components/form/createProductForm";
 import { getUserData } from "@/lib/actions/dashboardActions";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
