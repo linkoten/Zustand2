@@ -243,8 +243,8 @@ export default function LocalityEditSheet({
               const res = await updateLocalityAction({
                 id: locality.id,
                 name: locality.name,
-                latitude: parseFloat(locality.latitude as any),
-                longitude: parseFloat(locality.longitude as any),
+                latitude: parseFloat(locality.latitude),
+                longitude: parseFloat(locality.longitude),
                 geologicalPeriods: locality.geologicalPeriods,
                 geologicalStages: locality.geologicalStages,
               });

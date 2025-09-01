@@ -1,35 +1,10 @@
 import prisma from "@/lib/prisma";
-import { DashboardUser } from "@/types/dashboardType";
+import { User } from "../generated/prisma";
 
-export async function getUserData(
-  clerkId: string
-): Promise<DashboardUser | null> {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { clerkId },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
-    });
-
-    if (!user) return null;
-
-    // ✅ Convertir en format attendu par les composants
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role, // Sera converti en string automatiquement
-      createdAt: user.createdAt.toISOString(), // ✅ Convertir Date en string
-    };
-  } catch (error) {
-    console.error("Erreur lors de la récupération de l'utilisateur:", error);
-    return null;
-  }
+export async function getUserData(clerkId: string): Promise<User | null> {
+  return prisma.user.findUnique({
+    where: { clerkId },
+  });
 }
 
 export async function getUserDashboardData(userId: string) {
