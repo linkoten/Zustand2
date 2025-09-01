@@ -6,13 +6,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-
 import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
-import { Loader2, X, Plus } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { createProductAction } from "@/lib/actions/productActions";
 import { Locality } from "@/lib/generated/prisma";
 import GeneralInfoFields from "./generalInfoFields";
@@ -63,12 +59,13 @@ const productSchema = z.object({
 export type ProductFormData = z.infer<typeof productSchema>;
 
 export default function CreateProductForm({
-  localities,
+  localities: initialLocalities,
 }: {
   localities: Locality[];
 }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [localities, setLocalities] = useState<Locality[]>(initialLocalities);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -145,7 +142,14 @@ export default function CreateProductForm({
 
         <ScientificInfoFields form={form} />
 
-        <ProvenanceInfoFields form={form} localities={localities} />
+        <ProvenanceInfoFields
+          form={form}
+          localities={localities}
+          onLocalityCreated={(locality) => {
+            setLocalities((prev) => [...prev, locality]);
+            form.setValue("locality", locality.id.toString());
+          }}
+        />
 
         <ImageInfoFields form={form} />
 

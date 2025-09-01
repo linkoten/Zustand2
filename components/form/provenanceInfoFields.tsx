@@ -23,11 +23,13 @@ import { Locality } from "@/lib/generated/prisma";
 type ProvenanceInfoFieldsProps = {
   form: UseFormReturn<ProductFormData>;
   localities: Locality[];
+  onLocalityCreated: (locality: Locality) => void;
 };
 
 export default function ProvenanceInfoFields({
   form,
   localities: initialLocalities,
+  onLocalityCreated,
 }: ProvenanceInfoFieldsProps) {
   const [localities, setLocalities] = useState<Locality[]>(initialLocalities);
   const [showAddLocalitySheet, setShowAddLocalitySheet] = useState(false);
@@ -100,8 +102,7 @@ export default function ProvenanceInfoFields({
         open={showAddLocalitySheet}
         onOpenChange={setShowAddLocalitySheet}
         onCreated={(locality) => {
-          setLocalities((prev) => [...prev, locality]);
-          form.setValue("locality", locality.id.toString());
+          onLocalityCreated(locality);
         }}
       />
     </>
