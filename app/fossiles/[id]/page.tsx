@@ -10,7 +10,7 @@ import { getProduct, getSimilarProducts } from "@/lib/actions/productActions";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: number }>;
 }) {
   const resolvedParams = await params;
   const product = await getProduct(resolvedParams.id);
@@ -36,7 +36,7 @@ export async function generateMetadata({
 export default async function ProductPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: number }>;
 }) {
   const resolvedParams = await params;
   const product = await getProduct(resolvedParams.id);
