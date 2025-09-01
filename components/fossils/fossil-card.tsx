@@ -46,7 +46,7 @@ export function FossilCard({ fossil }: FossilCardProps) {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const router = useRouter();
 
-  const isAdmin = useUserStore((s) => s.isAdmin);
+  const isAdmin = useUserStore((s) => s.isAdmin());
   const user = useUserStore((s) => s.user);
   console.log("user in FossilCard", user, "isAdmin", isAdmin);
 
