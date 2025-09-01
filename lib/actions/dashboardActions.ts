@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma";
-import { UserRole } from "@/lib/generated/prisma";
 import { DashboardUser } from "@/types/dashboardType";
 
 export async function getUserData(

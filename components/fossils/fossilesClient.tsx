@@ -37,10 +37,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { useUser } from "@clerk/nextjs";
 import { FavoriteButton } from "../product/favoriteButton";
 import StarRating from "@/components/rating/starRating";
 import { FossilesClientProps } from "@/types/productType";
+import { useUserStore } from "@/stores/userStore";
 
 export default function FossilesClient({
   fossils,
@@ -48,9 +48,7 @@ export default function FossilesClient({
 }: FossilesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user } = useUser();
-
-  const isAdmin = user?.publicMetadata?.role === "admin";
+  const isAdmin = useUserStore((s) => s.isAdmin);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(

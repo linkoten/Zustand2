@@ -1,8 +1,4 @@
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -11,92 +7,92 @@ import {
   SheetFooter,
   SheetClose,
 } from "@/components/ui/sheet";
-import { Plus, X } from "lucide-react";
-import { toast } from "sonner";
-import { createLocalityAction } from "@/lib/actions/productActions";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Locality } from "@/lib/generated/prisma";
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { updateLocalityAction } from "@/lib/actions/productActions";
+import { toast } from "sonner";
+import { GeologicalPeriod, Locality } from "@/lib/generated/prisma";
+import { Plus, X } from "lucide-react";
+import { geologicalPeriodEnumValues } from "./localityCreateSheet";
 
-export const geologicalPeriodEnumValues = [
-  "CAMBRIEN",
-  "ORDOVICIEN",
-  "SILURIEN",
-  "DEVONIEN",
-  "CARBONIFERE",
-  "PERMIEN",
-  "TRIAS",
-  "JURASSIQUE",
-  "CRETACE",
-  "PALEOGENE",
-  "NEOGENE",
-  "QUATERNAIRE",
-] as const;
-type GeologicalPeriod = (typeof geologicalPeriodEnumValues)[number];
-
-type LocalityCreateProps = {
+type LocalityEditSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreated: (locality: Locality) => void;
+  onEdited: (locality: Locality) => void;
+  initialLocality: Locality;
 };
 
-export default function LocalityCreateSheet({
+export default function LocalityEditSheet({
   open,
   onOpenChange,
-  onCreated,
-}: LocalityCreateProps) {
-  const [newLocality, setNewLocality] = useState({
-    name: "",
-    latitude: "",
-    longitude: "",
-    geologicalPeriods: [] as string[],
-    geologicalStages: [] as string[],
+  onEdited,
+  initialLocality,
+}: LocalityEditSheetProps) {
+  const [locality, setLocality] = useState({
+    ...initialLocality,
+    latitude: initialLocality.latitude.toString(),
+    longitude: initialLocality.longitude.toString(),
     _periodInput: "",
     _stageInput: "",
   });
-  const [isCreating, setIsCreating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setLocality({
+        ...initialLocality,
+        latitude: initialLocality.latitude.toString(),
+        longitude: initialLocality.longitude.toString(),
+        _periodInput: "",
+        _stageInput: "",
+      });
+    }
+  }, [initialLocality, open]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-[400px]">
         <SheetHeader>
-          <SheetTitle>Ajouter une localité</SheetTitle>
+          <SheetTitle>Modifier la localité</SheetTitle>
         </SheetHeader>
         <div className="py-4 space-y-2">
-          <Label>Nom</Label>
+          <label>Nom</label>
           <Input
-            value={newLocality.name}
+            value={locality.name}
             onChange={(e) =>
-              setNewLocality((l) => ({ ...l, name: e.target.value }))
+              setLocality((l) => ({ ...l, name: e.target.value }))
             }
           />
-          <Label>Latitude</Label>
-          <Input
-            type="number"
-            value={newLocality.latitude}
-            onChange={(e) =>
-              setNewLocality((l) => ({ ...l, latitude: e.target.value }))
-            }
-          />
-          <Label>Longitude</Label>
+          <label>Latitude</label>
           <Input
             type="number"
-            value={newLocality.longitude}
+            value={locality.latitude}
             onChange={(e) =>
-              setNewLocality((l) => ({ ...l, longitude: e.target.value }))
+              setLocality((l) => ({ ...l, latitude: e.target.value }))
             }
           />
-          <Label>Périodes géologiques</Label>
+          <label>Longitude</label>
+          <Input
+            type="number"
+            value={locality.longitude}
+            onChange={(e) =>
+              setLocality((l) => ({ ...l, longitude: e.target.value }))
+            }
+          />
+          <label>Périodes géologiques</label>
           <div className="flex gap-2 mb-2">
             <Select
-              value={newLocality._periodInput || ""}
+              value={locality._periodInput || ""}
               onValueChange={(value) =>
-                setNewLocality((l) => ({ ...l, _periodInput: value }))
+                setLocality((l) => ({ ...l, _periodInput: value }))
               }
             >
               <SelectTrigger className="w-[180px]">
@@ -105,7 +101,7 @@ export default function LocalityCreateSheet({
               <SelectContent>
                 {geologicalPeriodEnumValues
                   .filter(
-                    (period) => !newLocality.geologicalPeriods.includes(period)
+                    (period) => !locality.geologicalPeriods.includes(period)
                   )
                   .map((period) => (
                     <SelectItem key={period} value={period}>
@@ -117,12 +113,17 @@ export default function LocalityCreateSheet({
             <Button
               type="button"
               onClick={() => {
-                if (newLocality._periodInput?.trim()) {
-                  setNewLocality((l) => ({
+                if (
+                  locality._periodInput?.trim() &&
+                  geologicalPeriodEnumValues.includes(
+                    locality._periodInput as GeologicalPeriod
+                  )
+                ) {
+                  setLocality((l) => ({
                     ...l,
                     geologicalPeriods: [
                       ...(l.geologicalPeriods || []),
-                      l._periodInput!.trim(),
+                      l._periodInput as GeologicalPeriod,
                     ],
                     _periodInput: "",
                   }));
@@ -130,13 +131,13 @@ export default function LocalityCreateSheet({
               }}
               size="sm"
               variant="outline"
-              disabled={!newLocality._periodInput}
+              disabled={!locality._periodInput}
             >
               <Plus className="w-4 h-4" />
             </Button>
           </div>
           <div className="flex flex-wrap gap-2 mb-2">
-            {(newLocality.geologicalPeriods || []).map((period, idx) => (
+            {(locality.geologicalPeriods || []).map((period, idx) => (
               <Badge
                 key={idx}
                 className="flex items-center gap-1"
@@ -146,7 +147,7 @@ export default function LocalityCreateSheet({
                 <button
                   type="button"
                   onClick={() =>
-                    setNewLocality((l) => ({
+                    setLocality((l) => ({
                       ...l,
                       geologicalPeriods: l.geologicalPeriods.filter(
                         (_, i) => i !== idx
@@ -160,17 +161,17 @@ export default function LocalityCreateSheet({
               </Badge>
             ))}
           </div>
-          <Label>Étages géologiques</Label>
+          <label>Étages géologiques</label>
           <div className="flex gap-2 mb-2">
             <Input
               placeholder="Ajouter un étage"
-              value={newLocality._stageInput || ""}
+              value={locality._stageInput || ""}
               onChange={(e) =>
-                setNewLocality((l) => ({ ...l, _stageInput: e.target.value }))
+                setLocality((l) => ({ ...l, _stageInput: e.target.value }))
               }
               onKeyDown={(e) => {
-                if (e.key === "Enter" && newLocality._stageInput?.trim()) {
-                  setNewLocality((l) => ({
+                if (e.key === "Enter" && locality._stageInput?.trim()) {
+                  setLocality((l) => ({
                     ...l,
                     geologicalStages: [
                       ...(l.geologicalStages || []),
@@ -185,8 +186,8 @@ export default function LocalityCreateSheet({
             <Button
               type="button"
               onClick={() => {
-                if (newLocality._stageInput?.trim()) {
-                  setNewLocality((l) => ({
+                if (locality._stageInput?.trim()) {
+                  setLocality((l) => ({
                     ...l,
                     geologicalStages: [
                       ...(l.geologicalStages || []),
@@ -203,7 +204,7 @@ export default function LocalityCreateSheet({
             </Button>
           </div>
           <div className="flex flex-wrap gap-2">
-            {(newLocality.geologicalStages || []).map((stage, idx) => (
+            {(locality.geologicalStages || []).map((stage, idx) => (
               <Badge
                 key={idx}
                 className="flex items-center gap-1"
@@ -213,7 +214,7 @@ export default function LocalityCreateSheet({
                 <button
                   type="button"
                   onClick={() =>
-                    setNewLocality((l) => ({
+                    setLocality((l) => ({
                       ...l,
                       geologicalStages: l.geologicalStages.filter(
                         (_, i) => i !== idx
@@ -236,32 +237,28 @@ export default function LocalityCreateSheet({
           </SheetClose>
           <Button
             type="button"
-            disabled={isCreating}
+            disabled={isSaving}
             onClick={async () => {
-              setIsCreating(true);
-              const validGeologicalPeriods = (
-                newLocality.geologicalPeriods || []
-              ).filter((period): period is GeologicalPeriod =>
-                geologicalPeriodEnumValues.includes(period as GeologicalPeriod)
-              );
-              const res = await createLocalityAction({
-                name: newLocality.name,
-                latitude: parseFloat(newLocality.latitude),
-                longitude: parseFloat(newLocality.longitude),
-                geologicalPeriods: validGeologicalPeriods,
-                geologicalStages: newLocality.geologicalStages,
+              setIsSaving(true);
+              const res = await updateLocalityAction({
+                id: locality.id,
+                name: locality.name,
+                latitude: parseFloat(locality.latitude as any),
+                longitude: parseFloat(locality.longitude as any),
+                geologicalPeriods: locality.geologicalPeriods,
+                geologicalStages: locality.geologicalStages,
               });
-              setIsCreating(false);
+              setIsSaving(false);
               if (res.success && res.data) {
-                toast.success("Localité créée !");
-                onCreated(res.data); // callback vers le parent
+                toast.success("Localité modifiée !");
+                onEdited(res.data);
                 onOpenChange(false);
               } else {
                 toast.error(res.error);
               }
             }}
           >
-            Ajouter
+            Modifier
           </Button>
         </SheetFooter>
       </SheetContent>

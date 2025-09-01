@@ -10,15 +10,17 @@ import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { ProductStatus } from "@/lib/generated/prisma";
-import { ShoppingCart, Eye, CheckCircle, Loader2 } from "lucide-react";
+import { ShoppingCart, Eye, CheckCircle, Loader2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { useTransition } from "react";
 import Link from "next/link";
 import { addToCartAction } from "@/lib/actions/cart-actions"; // ✅ Import Server Action
 import { FossilCardProps } from "@/types/type";
+import { useUserStore } from "@/stores/userStore";
 
 export function FossilCard({ fossil }: FossilCardProps) {
   const [isPending, startTransition] = useTransition(); // ✅ Hook pour Server Actions
+  const isAdmin = useUserStore((s) => s.isAdmin);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-FR", {
@@ -168,6 +170,15 @@ export function FossilCard({ fossil }: FossilCardProps) {
           )}
           {isPending ? "Ajout..." : isAvailable ? "Ajouter" : "Indisponible"}
         </Button>
+
+        {isAdmin && (
+          <Button asChild variant="secondary" size="sm" className="flex-1">
+            <Link href={`/fossiles/${fossil.id}/edit`}>
+              <Pencil className="w-4 h-4 mr-2" />
+              Modifier
+            </Link>
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

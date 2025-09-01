@@ -16,9 +16,12 @@ import {
 import { UseFormReturn } from "react-hook-form";
 import { ProductFormData } from "./createProductForm";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import LocalityCreate from "./localityCreateSheet";
 import { useState } from "react";
 import { Locality } from "@/lib/generated/prisma";
+import LocalityCreateSheet from "./localityCreateSheet";
+import { Button } from "../ui/button";
+import { Pencil } from "lucide-react";
+import LocalityEditSheet from "./LocalityEditSheet";
 
 type ProvenanceInfoFieldsProps = {
   form: UseFormReturn<ProductFormData>;
@@ -33,6 +36,14 @@ export default function ProvenanceInfoFields({
 }: ProvenanceInfoFieldsProps) {
   const [localities, setLocalities] = useState<Locality[]>(initialLocalities);
   const [showAddLocalitySheet, setShowAddLocalitySheet] = useState(false);
+  const [showEditLocalitySheet, setShowEditLocalitySheet] = useState(false);
+  const [localityToEdit, setLocalityToEdit] = useState<Locality | null>(null);
+
+  // Trouve la localité sélectionnée
+  const selectedLocality = localities.find(
+    (loc) => loc.id.toString() === form.watch("locality")
+  );
+
   return (
     <>
       <Card>
@@ -61,35 +72,51 @@ export default function ProvenanceInfoFields({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Localité</FormLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={(value) => {
-                      if (value === "__add__") {
-                        setShowAddLocalitySheet(true);
-                      } else {
-                        field.onChange(value);
-                      }
-                    }}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner une localité" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {localities.map((loc) => (
-                        <SelectItem key={loc.id} value={loc.id.toString()}>
-                          {loc.name}
+                  <div className="flex gap-2 items-center">
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        if (value === "__add__") {
+                          setShowAddLocalitySheet(true);
+                        } else {
+                          field.onChange(value);
+                        }
+                      }}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner une localité" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {localities.map((loc) => (
+                          <SelectItem key={loc.id} value={loc.id.toString()}>
+                            {loc.name}
+                          </SelectItem>
+                        ))}
+                        <SelectItem
+                          value="__add__"
+                          className="text-primary font-bold"
+                        >
+                          ➕ Ajouter une localité
                         </SelectItem>
-                      ))}
-                      <SelectItem
-                        value="__add__"
-                        className="text-primary font-bold"
+                      </SelectContent>
+                    </Select>
+                    {selectedLocality && (
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => {
+                          setLocalityToEdit(selectedLocality);
+                          setShowEditLocalitySheet(true);
+                        }}
+                        title="Modifier la localité"
                       >
-                        ➕ Ajouter une localité
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -98,13 +125,35 @@ export default function ProvenanceInfoFields({
         </CardContent>
       </Card>
 
-      <LocalityCreate
+      {/* Création */}
+      <LocalityCreateSheet
         open={showAddLocalitySheet}
         onOpenChange={setShowAddLocalitySheet}
         onCreated={(locality) => {
+          setLocalities((prev) => [...prev, locality]);
           onLocalityCreated(locality);
         }}
       />
+
+      {/* Edition */}
+      {localityToEdit && (
+        <LocalityEditSheet
+          open={showEditLocalitySheet}
+          onOpenChange={(open) => {
+            setShowEditLocalitySheet(open);
+            if (!open) setLocalityToEdit(null);
+          }}
+          onEdited={(updatedLocality) => {
+            setLocalities((prev) =>
+              prev.map((loc) =>
+                loc.id === updatedLocality.id ? updatedLocality : loc
+              )
+            );
+            onLocalityCreated(updatedLocality);
+          }}
+          initialLocality={localityToEdit}
+        />
+      )}
     </>
   );
 }

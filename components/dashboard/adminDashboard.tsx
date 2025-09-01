@@ -41,7 +41,7 @@ const statusIcons = {
   REJECTED: XCircle,
 };
 
-export default function AdminDashboard({ user, data }: AdminDashboardProps) {
+export default function AdminDashboard({ data }: AdminDashboardProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* En-tête */}

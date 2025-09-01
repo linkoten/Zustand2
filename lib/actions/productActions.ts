@@ -508,3 +508,31 @@ export async function createLocalityAction({
     };
   }
 }
+
+export async function updateLocalityAction({
+  id,
+  name,
+  latitude,
+  longitude,
+  geologicalPeriods,
+  geologicalStages,
+}: Locality) {
+  try {
+    const locality = await prisma.locality.update({
+      where: { id },
+      data: {
+        name,
+        latitude,
+        longitude,
+        geologicalPeriods,
+        geologicalStages,
+      },
+    });
+    return { success: true, data: locality };
+  } catch (error) {
+    return {
+      success: false,
+      error: "Erreur lors de la modification de la localité",
+    };
+  }
+}
