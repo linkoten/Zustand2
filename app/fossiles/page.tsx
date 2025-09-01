@@ -6,7 +6,6 @@ import FossilesClient from "@/components/fossils/fossilesClient";
 import { getFilterOptions, getFossils } from "@/lib/actions/productActions";
 import { SearchParams } from "@/types/productType";
 import { getUserData } from "@/lib/actions/dashboardActions";
-import { redirect } from "next/navigation";
 import UserProvider from "@/components/provider/userProvider";
 
 export default async function FossilesPage({

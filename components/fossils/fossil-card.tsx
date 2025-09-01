@@ -47,6 +47,8 @@ export function FossilCard({ fossil }: FossilCardProps) {
   const router = useRouter();
 
   const isAdmin = useUserStore((s) => s.isAdmin);
+  const user = useUserStore((s) => s.user);
+  console.log("user in FossilCard", user, "isAdmin", isAdmin);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-FR", {
