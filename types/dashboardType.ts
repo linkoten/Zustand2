@@ -4,7 +4,7 @@ export interface DashboardUser {
   name: string | null;
   email: string;
   role: string;
-  createdAt: string;
+  createdAt: Date;
 }
 
 export interface UserDashboardData {
