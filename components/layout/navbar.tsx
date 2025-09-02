@@ -4,16 +4,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
-import {
-  ShoppingCart,
-  Menu,
-  X,
-  User,
-  BookOpen,
-  LayoutDashboard,
-} from "lucide-react";
+import { Menu, X, User, BookOpen, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { CartSidebar } from "@/components/cart/cart-sidebar";
+import { CartIconButton } from "../cart/cartIconButton";
 
 export default function Navbar() {
   const { user, isLoaded } = useUser();
@@ -83,14 +77,7 @@ export default function Navbar() {
 
             {/* Actions desktop */}
             <div className="hidden md:flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleCart}
-                className="relative"
-              >
-                <ShoppingCart className="h-5 w-5" />
-              </Button>
+              <CartIconButton onClick={toggleCart} />
 
               {isLoaded && (
                 <>
@@ -117,14 +104,7 @@ export default function Navbar() {
 
             {/* Menu mobile button */}
             <div className="md:hidden flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleCart}
-                className="relative"
-              >
-                <ShoppingCart className="h-5 w-5" />
-              </Button>
+              <CartIconButton onClick={toggleCart} />
 
               <Button
                 variant="ghost"
