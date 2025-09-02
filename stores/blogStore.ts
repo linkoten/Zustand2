@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { BlogListProps } from "@/types/blogType";
 import { getBlogPosts } from "@/lib/actions/blogActions";
+import { BlogListProps } from "@/components/blog/blogList";
 
 interface BlogFilters {
   search?: string;
