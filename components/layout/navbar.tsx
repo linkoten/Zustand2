@@ -40,8 +40,15 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2">
-              <div className="text-2xl">🦕</div>
-              <span className="font-bold text-xl">FossilShop</span>
+              <span
+                className="font-extrabold text-2xl tracking-tight bg-gradient-to-br from-amber-600 via-amber-400 to-yellow-400 bg-clip-text text-transparent drop-shadow"
+                style={{
+                  letterSpacing: "0.04em",
+                  textShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                }}
+              >
+                Paleolitho
+              </span>
             </Link>
 
             {/* Navigation desktop */}

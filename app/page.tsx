@@ -25,7 +25,7 @@ export default function Home() {
                 textShadow: "0 4px 24px rgba(0,0,0,0.08)",
               }}
             >
-              Paléolitho
+              Paleolitho
             </h1>
             <p className="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
               Découvrez notre collection de fossiles authentiques et explorez
@@ -83,8 +83,7 @@ export default function Home() {
                 <Button
                   asChild
                   size="lg"
-                  variant="outline"
-                  className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full"
+                  className="bg-blue-600 hover:bg-blue-700 text-white w-full"
                 >
                   <Link
                     href="/blog"
@@ -141,20 +140,6 @@ export default function Home() {
           <path fill="#e0e7ff" d="M0,40 Q720,160 1440,40 L1440,120 L0,120 Z" />
         </svg>
       </div>
-
-      {/* Footer minimal avec nom */}
-      <footer className="py-12 px-4 bg-white border-t relative z-10">
-        <div className="container mx-auto max-w-4xl text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="font-semibold text-gray-900 text-lg tracking-wide">
-              Paléolitho
-            </span>
-          </div>
-          <p className="text-sm text-gray-500">
-            &copy; 2024 Paléolitho. Tous droits réservés.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
