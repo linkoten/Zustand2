@@ -114,7 +114,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-lg">
+      <SheetContent className="w-full sm:max-w-lg flex flex-col h-full">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />
@@ -123,11 +123,11 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         </SheetHeader>
 
         {loading ? (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center flex-1">
             <div className="text-center">Chargement...</div>
           </div>
         ) : !cart?.items?.length ? (
-          <div className="flex flex-col items-center justify-center h-full py-8">
+          <div className="flex flex-col items-center justify-center flex-1 py-8">
             <ShoppingCart className="w-16 h-16 text-muted-foreground mb-4" />
             <h3 className="font-semibold text-lg mb-2">
               Votre panier est vide
@@ -141,26 +141,24 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
           </div>
         ) : (
           <>
-            <ScrollArea className="flex-1 -mx-6 px-6">
-              <div className="space-y-4 py-4">
-                {cart.items.map(
-                  (
-                    item: CartItemData // ✅ Type corrigé
-                  ) => (
+            {/* Scroll sur la liste des items */}
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <ScrollArea className="h-full">
+                <div className="space-y-4 py-4">
+                  {cart.items.map((item: CartItemData) => (
                     <CartItem
                       key={item.id}
                       item={adaptItemForCartItem(item)}
                       onUpdate={handleCartUpdate}
                     />
-                  )
-                )}
-              </div>
-            </ScrollArea>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
 
-            <div className="space-y-4 pt-4">
-              <Separator />
-
-              <div className="space-y-2">
+            {/* Footer fixé */}
+            <div className="sticky bottom-0 left-0 right-0 bg-background pt-4 pb-2 border-t z-10">
+              <div className="space-y-2 px-2">
                 <div className="flex justify-between text-sm">
                   <span>Sous-total ({totalItems} articles)</span>
                   <span>{formatPrice(totalPrice)}</span>
@@ -176,7 +174,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                 </div>
               </div>
 
-              <SheetFooter className="flex-col gap-2 sm:flex-col">
+              <SheetFooter className="flex-col gap-2 sm:flex-col px-2 pt-2">
                 <Button
                   onClick={handleCheckout}
                   className="w-full"
