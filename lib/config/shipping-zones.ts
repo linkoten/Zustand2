@@ -15,7 +15,7 @@ interface ShippingZone {
 export const SHIPPING_ZONES = {
   // Zone 1 - France métropolitaine
   FRANCE: {
-    countries: ["FR"] as const,
+    countries: ["FR", "AD", "MC"] as const,
     name: "France métropolitaine",
     freeShippingThreshold: 500, // Livraison gratuite à 100€
     weightRanges: [
@@ -66,6 +66,12 @@ export const SHIPPING_ZONES = {
       "SM",
       "CH",
       "VA",
+      "FO",
+      "GG",
+      "GL",
+      "GI",
+      "IM",
+      "JE",
     ] as const,
     name: "Union Européenne",
     freeShippingThreshold: 1000,
@@ -102,6 +108,8 @@ export const SHIPPING_ZONES = {
       "TN", // Tunisie
       "TR", // Turquie
       "UA", // Ukraine
+      "XK", // Kosovo
+      "EG", // Egypte
     ] as const,
     name: "Europe hors UE + Maghreb",
     freeShippingThreshold: 2000,
@@ -175,10 +183,67 @@ export const SHIPPING_ZONES = {
       "UG",
       "ZM",
       "ZW",
-      // Canada, USA, Russie
+      // Amerique + Russie
       "CA",
       "US",
       "RU",
+      "MX",
+      "AG",
+      "BB",
+      "BZ",
+      "CR",
+      "DM",
+      "DO",
+      "GD",
+      "GT",
+      "HN",
+      "JM",
+      "KN",
+      "LC",
+      "NI",
+      "PA",
+      "SV",
+      "TT",
+      "VC",
+      // Amérique du SUD
+      "AR",
+      "BO",
+      "BR",
+      "CL",
+      "CO",
+      "EC",
+      "GY",
+      "PY",
+      "PE",
+      "SR",
+      "UY",
+      "VE",
+      // Asie-Pacifique
+      "AU",
+      "BD",
+      "BN",
+      "BT",
+      "CN",
+      "FJ",
+      "HK",
+      "ID",
+      "IN",
+      "JP",
+      "KH",
+      "KR",
+      "LA",
+      "LK",
+      "MO",
+      "MV",
+      "MY",
+      "NP",
+      "NZ",
+      "PH",
+      "PK",
+      "SG",
+      "TH",
+      "TW",
+      "VN",
       // Proche et Moyen-Orient
       "AF", // Afghanistan
       "AE", // Émirats arabes unis
