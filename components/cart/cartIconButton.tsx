@@ -15,7 +15,7 @@ export function CartIconButton({ onClick }: { onClick: () => void }) {
 
   return (
     <button onClick={onClick} className="relative">
-      <ShoppingCart className="w-6 h-6" />
+      <ShoppingCart className="w-4 h-4" />
       {cartCount > 0 && (
         <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center border border-white">
           {cartCount}

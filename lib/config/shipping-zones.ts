@@ -17,14 +17,16 @@ export const SHIPPING_ZONES = {
   FRANCE: {
     countries: ["FR"] as const,
     name: "France métropolitaine",
-    freeShippingThreshold: 100, // Livraison gratuite à 100€
+    freeShippingThreshold: 500, // Livraison gratuite à 100€
     weightRanges: [
-      { maxWeight: 250, price: 6.8 },
+      { maxWeight: 250, price: 5.3 },
       { maxWeight: 500, price: 7.5 },
-      { maxWeight: 1000, price: 8.95 },
-      { maxWeight: 2000, price: 10.5 },
-      { maxWeight: 5000, price: 14.05 },
-      { maxWeight: 10000, price: 20.35 },
+      { maxWeight: 1000, price: 9.4 },
+      { maxWeight: 2000, price: 10.7 },
+      { maxWeight: 5000, price: 16.6 },
+      { maxWeight: 10000, price: 24.2 },
+      { maxWeight: 15000, price: 30 },
+      { maxWeight: 30000, price: 38 },
     ],
     estimatedDays: "2-3 jours",
     colissimoService: "Colissimo",
@@ -59,15 +61,22 @@ export const SHIPPING_ZONES = {
       "EE",
       "LV",
       "LT",
+      "LI",
+      "GB",
+      "SM",
+      "CH",
+      "VA",
     ] as const,
     name: "Union Européenne",
-    freeShippingThreshold: 150,
+    freeShippingThreshold: 1000,
     weightRanges: [
-      { maxWeight: 500, price: 13.95 },
-      { maxWeight: 1000, price: 16.7 },
-      { maxWeight: 2000, price: 20.6 },
-      { maxWeight: 5000, price: 29.4 },
-      { maxWeight: 10000, price: 49.7 },
+      { maxWeight: 500, price: 15 },
+      { maxWeight: 1000, price: 18.5 },
+      { maxWeight: 2000, price: 21 },
+      { maxWeight: 5000, price: 27 },
+      { maxWeight: 10000, price: 45 },
+      { maxWeight: 15000, price: 65 },
+      { maxWeight: 30000, price: 84 },
     ],
     estimatedDays: "3-6 jours",
     colissimoService: "Colissimo International",
@@ -76,27 +85,34 @@ export const SHIPPING_ZONES = {
   // Zone 3 - Europe hors UE + Maghreb
   EUROPE_EXTENDED: {
     countries: [
-      "CH",
-      "NO",
-      "IS",
-      "GB",
-      "MC",
-      "AD",
-      "SM",
-      "VA",
-      "LI",
-      "DZ",
-      "MA",
-      "TN",
+      "AM", // Arménie
+      "AL", // Albanie
+      "DZ", // Algérie
+      "AZ", // Azerbaijan
+      "BY", // Biélorussie
+      "BA", // Bosnie-Herzégovine
+      "GE", // Géorgie
+      "IS", // Islande
+      "MK", // Macédoine du Nord
+      "MA", // Maroc
+      "MD", // Moldavie
+      "ME", // Monténégro
+      "NO", // Norvège
+      "RS", // Serbie
+      "TN", // Tunisie
+      "TR", // Turquie
+      "UA", // Ukraine
     ] as const,
     name: "Europe hors UE + Maghreb",
-    freeShippingThreshold: 200,
+    freeShippingThreshold: 2000,
     weightRanges: [
-      { maxWeight: 500, price: 16.35 },
-      { maxWeight: 1000, price: 20.1 },
-      { maxWeight: 2000, price: 25.85 },
-      { maxWeight: 5000, price: 38.25 },
-      { maxWeight: 10000, price: 66.15 },
+      { maxWeight: 500, price: 23 },
+      { maxWeight: 1000, price: 27 },
+      { maxWeight: 2000, price: 30 },
+      { maxWeight: 5000, price: 38 },
+      { maxWeight: 10000, price: 63 },
+      { maxWeight: 15000, price: 85 },
+      { maxWeight: 30000, price: 105 },
     ],
     estimatedDays: "4-8 jours",
     colissimoService: "Colissimo International",
@@ -105,67 +121,149 @@ export const SHIPPING_ZONES = {
   // Zone 4 - Reste du monde
   WORLDWIDE: {
     countries: [
-      // Amérique du Nord
-      "US",
-      "CA",
-      "MX",
-      // Amérique du Sud
-      "AR",
-      "BR",
-      "CL",
-      "CO",
-      "PE",
-      "UY",
-      "EC",
-      "VE",
-      "BO",
-      "PY",
-      // Asie-Pacifique
-      "AU",
-      "NZ",
-      "JP",
-      "KR",
-      "SG",
-      "HK",
-      "TW",
-      "MY",
-      "TH",
-      "PH",
-      "ID",
-      "VN",
-      "IN",
-      // Moyen-Orient
-      "AE",
-      "SA",
-      "QA",
-      "KW",
-      "BH",
-      "OM",
-      "JO",
-      "LB",
-      "IL",
-      "TR",
-      // Afrique
-      "ZA",
-      "NG",
-      "KE",
-      "GH",
-      "EG",
+      // Afrique (hors Maghreb)
+      "AO",
+      "BJ",
+      "BW",
+      "BF",
+      "BI",
+      "CM",
+      "CV",
+      "CF",
+      "TD",
+      "KM",
+      "CG",
+      "CD",
+      "DJ",
+      "GQ",
+      "ER",
+      "SZ",
       "ET",
-      "UG",
+      "GA",
+      "GM",
+      "GH",
+      "GN",
+      "GW",
+      "CI",
+      "KE",
+      "LS",
+      "LR",
+      "MG",
+      "MW",
+      "ML",
+      "MR",
+      "MU",
+      "YT",
+      "MZ",
+      "NA",
+      "NE",
+      "NG",
+      "RE",
+      "RW",
+      "ST",
+      "SN",
+      "SC",
+      "SL",
+      "SO",
+      "ZA",
+      "SS",
+      "SD",
+      "SH",
       "TZ",
+      "TG",
+      "TO",
+      "UG",
+      "ZM",
+      "ZW",
+      // Canada, USA, Russie
+      "CA",
+      "US",
+      "RU",
+      // Proche et Moyen-Orient
+      "AF", // Afghanistan
+      "AE", // Émirats arabes unis
+      "SA", // Arabie saoudite
+      "QA", // Qatar
+      "KW", // Koweït
+      "BH", // Bahreïn
+      "OM", // Oman
+      "JO", // Jordanie
+      "LB", // Liban
+      "IL", // Israël
+      "IQ", // Irak
+      "IR", // Iran
+      "PS", // Palestine
+      "SY", // Syrie
+      "YE", // Yémen
+      // Autres pays d'Asie centrale proches
+      "PK", // Pakistan
+      "TM", // Turkménistan
+      "TJ", // Tadjikistan
+      "KG", // Kirghizistan
+      "KZ", // Kazakhstan
+      "UZ", // Ouzbékistan
     ] as const,
     name: "Reste du monde",
-    freeShippingThreshold: 250,
+    freeShippingThreshold: 3000,
     weightRanges: [
-      { maxWeight: 500, price: 18.85 },
-      { maxWeight: 1000, price: 24.25 },
-      { maxWeight: 2000, price: 32.4 },
-      { maxWeight: 5000, price: 51.6 },
-      { maxWeight: 10000, price: 89.25 },
+      { maxWeight: 500, price: 33.5 },
+      { maxWeight: 1000, price: 38 },
+      { maxWeight: 2000, price: 52 },
+      { maxWeight: 5000, price: 75 },
+      { maxWeight: 10000, price: 142 },
+      { maxWeight: 15000, price: 200 },
+      { maxWeight: 30000, price: 250 },
     ],
     estimatedDays: "7-14 jours",
     colissimoService: "Colissimo International",
+  },
+
+  OUTREMER_1: {
+    countries: [
+      "RE", // Réunion
+      "GP", // Guadeloupe
+      "MQ", // Martinique
+      "YT", // Mayotte
+      "GF", // Guyane
+      "PM", // Saint-Pierre-et-Miquelon
+      "MF", // Saint-Martin
+      "BL", // Saint-Barthélemy
+    ] as const,
+    name: "Outre-Mer 1",
+    freeShippingThreshold: 2000,
+    weightRanges: [
+      { maxWeight: 500, price: 12.65 },
+      { maxWeight: 1000, price: 20.0 },
+      { maxWeight: 2000, price: 27.25 },
+      { maxWeight: 5000, price: 40.95 },
+      { maxWeight: 10000, price: 65.6 },
+      { maxWeight: 15000, price: 137.05 },
+      { maxWeight: 30000, price: 150.55 },
+    ],
+    estimatedDays: "5-10 jours",
+    colissimoService: "Colissimo Outre-Mer",
+  },
+
+  OUTREMER_2: {
+    countries: [
+      "PF", // Polynésie Française
+      "WF", // Wallis et Futuna
+      "NC", // Nouvelle-Calédonie
+      "TF", // TAAF
+    ] as const,
+    name: "Outre-Mer 2",
+    freeShippingThreshold: 3000,
+    weightRanges: [
+      { maxWeight: 500, price: 12.85 },
+      { maxWeight: 1000, price: 19.95 },
+      { maxWeight: 2000, price: 35.25 },
+      { maxWeight: 5000, price: 58.9 },
+      { maxWeight: 10000, price: 115.35 },
+      { maxWeight: 15000, price: 263.15 },
+      { maxWeight: 30000, price: 302.35 },
+    ],
+    estimatedDays: "7-15 jours",
+    colissimoService: "Colissimo Outre-Mer",
   },
 } as const satisfies Record<string, ShippingZone>;
 
