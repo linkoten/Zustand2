@@ -1,7 +1,6 @@
 import {
   Category,
   GeologicalPeriod,
-  Product,
   ProductStatus,
   CartItem as PrismaCartItem,
   BlogCategory,
@@ -119,11 +118,7 @@ export interface SerializedProduct {
   images: SerializedProductImage[]; // ✅ Array d'images au lieu d'une seule
 }
 
-export interface FossilCardProps {
-  fossil: SerializedProduct;
-}
-
-export interface FossilFiltersProps {
+/*export interface FossilFiltersProps {
   selectedCategory?: Category;
   selectedStatus?: ProductStatus;
   selectedPeriod?: GeologicalPeriod;
@@ -131,7 +126,7 @@ export interface FossilFiltersProps {
   onStatusChange: (status?: ProductStatus) => void;
   onPeriodChange: (period?: GeologicalPeriod) => void;
   onClearFilters: () => void;
-}
+} */
 
 // ✅ Type spécifique pour les items du store Zustand (UI)
 export interface ClientCartItem {
@@ -163,33 +158,6 @@ export interface CartState {
 }
 
 // ✅ Type pour les props du composant CartItem
-export interface CartItemProps {
-  item: {
-    id: string;
-    productId: number;
-    title: string;
-    price: number;
-    quantity: number;
-    category: string;
-    product: {
-      title: string;
-      price: number;
-      category: string;
-    };
-  };
-  onUpdate: () => Promise<void>;
-}
-
-export interface CartSidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export interface CheckoutButtonProps {
-  productId: number;
-  priceId: string;
-  amount: number;
-}
 
 // ✅ Type alias pour clarifier
 export type DbCartItem = PrismaCartItem; // Type de la BDD
@@ -228,7 +196,7 @@ export interface CheckoutRequest {
   };
 }
 
-export interface CheckoutFormProps {
+/*export interface CheckoutFormProps {
   cart: SerializedCart;
 }
 
@@ -238,7 +206,7 @@ export interface OrderSummaryProps {
 
 export interface SuccessPageProps {
   searchParams: Promise<{ session_id?: string }>;
-}
+} */
 
 // ✅ Type pour un produit dans le panier (sans images pour optimiser)
 export interface CartProduct {

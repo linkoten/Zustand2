@@ -37,8 +37,33 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { BlogListProps } from "@/types/blogType";
 
+export interface BlogListProps {
+  posts: Array<{
+    id: string;
+    title: string;
+    excerpt: string | null;
+    slug: string;
+    category: BlogCategory;
+    tags: Array<{
+      id: string;
+      name: string;
+      slug: string;
+      color: string | null;
+    }>;
+    featuredImage: string | null;
+    publishedAt: string;
+    readTime: number | null;
+    views: number;
+    author: {
+      name: string | null;
+      id: string;
+    };
+  }>;
+  totalPages: number;
+  currentPage: number;
+  totalPosts: number;
+}
 export default function BlogList({
   posts,
   totalPages,

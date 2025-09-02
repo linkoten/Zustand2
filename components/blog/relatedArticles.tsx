@@ -1,11 +1,15 @@
 import { getBlogArticles } from "@/lib/actions/blogActions";
 import BlogCard from "./blogCard";
-import { RelatedArticlesProps } from "@/types/blogType";
+import { BlogCategory } from "@/lib/generated/prisma";
 
+interface RelatedArticlesProps {
+  currentArticleId: string;
+  category: BlogCategory;
+  tags: string[];
+}
 export default async function RelatedArticles({
   currentArticleId,
   category,
-  tags,
 }: RelatedArticlesProps) {
   // Récupérer d'abord les articles de la même catégorie
   const { articles: categoryArticles } = await getBlogArticles({

@@ -48,48 +48,6 @@ export interface BlogPost {
   };
 }
 
-// ✅ Nouvelle interface qui correspond aux props de la page
-export interface BlogListProps {
-  posts: Array<{
-    id: string;
-    title: string;
-    excerpt: string | null;
-    slug: string;
-    category: BlogCategory;
-    tags: Array<{
-      id: string;
-      name: string;
-      slug: string;
-      color: string | null;
-    }>;
-    featuredImage: string | null;
-    publishedAt: string;
-    readTime: number | null;
-    views: number;
-    author: {
-      name: string | null;
-      id: string;
-    };
-  }>;
-  totalPages: number;
-  currentPage: number;
-  totalPosts: number;
-}
-
-export interface BlogCardProps {
-  article: BlogListItem;
-}
-
-export interface BlogContentProps {
-  content: string;
-}
-
-export interface BlogPaginationProps {
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-}
-
 // ✅ Types basés sur le schéma Prisma réel
 export interface EditableBlogPost {
   id: string;
@@ -106,39 +64,4 @@ export interface EditableBlogPost {
   publishedAt: string | null;
   seoTitle: string | null;
   seoDescription: string | null;
-}
-
-export interface EditBlogFormProps {
-  post: EditableBlogPost;
-}
-
-export interface RelatedArticlesProps {
-  currentArticleId: string;
-  category: BlogCategory;
-  tags: string[];
-}
-
-export interface RichTextEditorProps {
-  content: string;
-  onChange: (content: string) => void;
-  placeholder?: string;
-}
-
-export interface ShareButtonsProps {
-  title: string;
-  url: string;
-  description?: string;
-}
-
-export interface BlogSectionProps {
-  initialData: BlogListProps;
-}
-
-export interface BlogStatsProps {
-  initialStats: {
-    totalPosts: number;
-    currentPagePosts: number;
-    totalPages: number;
-    currentPage: number;
-  };
 }

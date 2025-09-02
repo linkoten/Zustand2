@@ -7,6 +7,7 @@ import { getFilterOptions, getFossils } from "@/lib/actions/productActions";
 import { SearchParams } from "@/types/productType";
 import { getUserData } from "@/lib/actions/dashboardActions";
 import UserProvider from "@/components/provider/userProvider";
+import { redirect } from "next/navigation";
 
 export default async function FossilesPage({
   searchParams,
@@ -18,14 +19,14 @@ export default async function FossilesPage({
   // ✅ Récupérer userId AVANT l'appel à getFossils
   const { userId } = await auth();
 
-  /*  if (!userId) {
+  if (!userId) {
     redirect("/sign-in");
-  } */
+  }
   const user = await getUserData(userId!);
 
-  /*  if (!user) {
+  if (!user) {
     redirect("/sign-in");
-  } */
+  }
 
   // ✅ Passer userId à getFossils pour inclure les infos favoris
   const fossils = await getFossils(resolvedSearchParams, userId);

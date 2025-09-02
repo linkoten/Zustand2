@@ -12,11 +12,19 @@ import { addToCartAction } from "@/lib/actions/cart-actions";
 import { formatPrice } from "@/lib/utils";
 import ProductCard from "./productCard";
 import ProductCarousel from "./productCarousel";
-import { ProductPageClientProps } from "@/types/productType";
 // ✅ Import des composants de notation
 import RatingDisplay from "@/components/rating/ratingDisplay";
 import RatingForm from "@/components/rating/ratingForm";
 import ProductMap from "./productMap";
+import { SerializedProduct } from "@/types/type";
+import { RatingStats, UserRating } from "@/types/ratingType";
+
+interface ProductPageClientProps {
+  product: SerializedProduct;
+  similarProducts: SerializedProduct[];
+  ratingStats: RatingStats;
+  userRating: UserRating | null;
+}
 
 export default function ProductPageClient({
   product,

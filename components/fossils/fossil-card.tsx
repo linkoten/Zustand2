@@ -7,7 +7,6 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { ProductStatus } from "@/lib/generated/prisma";
 import {
@@ -15,7 +14,6 @@ import {
   Eye,
   CheckCircle,
   Loader2,
-  Pencil,
   Edit,
   Trash2,
   AlertTriangle,
@@ -24,7 +22,7 @@ import { toast } from "sonner";
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { addToCartAction } from "@/lib/actions/cart-actions"; // ✅ Import Server Action
-import { FossilCardProps } from "@/types/type";
+import { SerializedProduct } from "@/types/type";
 import { useUserStore } from "@/stores/userStore";
 import { FavoriteButton } from "../product/favoriteButton";
 import Image from "next/image";
@@ -41,6 +39,9 @@ import {
 } from "../ui/alert-dialog";
 import { useRouter } from "next/navigation";
 
+interface FossilCardProps {
+  fossil: SerializedProduct;
+}
 export function FossilCard({ fossil }: FossilCardProps) {
   const [isPending, startTransition] = useTransition(); // ✅ Hook pour Server Actions
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -271,15 +272,6 @@ export function FossilCard({ fossil }: FossilCardProps) {
           )}
           {isPending ? "Ajout..." : isAvailable ? "Ajouter" : "Indisponible"}
         </Button>
-
-        {isAdmin && (
-          <Button asChild variant="secondary" size="sm" className="flex-1">
-            <Link href={`/fossiles/${fossil.id}/edit`}>
-              <Pencil className="w-4 h-4 mr-2" />
-              Modifier
-            </Link>
-          </Button>
-        )}
       </CardFooter>
     </Card>
   );

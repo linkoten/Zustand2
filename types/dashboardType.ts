@@ -28,13 +28,3 @@ export interface AdminDashboardData {
   recentUsers: any[];
   recentProducts: any[];
 }
-
-export interface UserDashboardProps {
-  user: DashboardUser;
-  data: UserDashboardData;
-}
-
-export interface AdminDashboardProps {
-  user: DashboardUser;
-  data: AdminDashboardData;
-}

@@ -1,8 +1,15 @@
 "use client";
 
 import { useBlogStore } from "@/stores/blogStore";
-import { BlogStatsProps } from "@/types/blogType";
 
+interface BlogStatsProps {
+  initialStats: {
+    totalPosts: number;
+    currentPagePosts: number;
+    totalPages: number;
+    currentPage: number;
+  };
+}
 export default function BlogStats({ initialStats }: BlogStatsProps) {
   const { blogData, isLoading } = useBlogStore();
 

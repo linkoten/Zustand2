@@ -17,21 +17,7 @@ import {
 import { UseFormReturn } from "react-hook-form";
 import { ProductFormData } from "./createProductForm";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-
-const geologicalPeriods = [
-  { value: "CAMBRIEN", label: "Cambrien" },
-  { value: "ORDOVICIEN", label: "Ordovicien" },
-  { value: "SILURIEN", label: "Silurien" },
-  { value: "DEVONIEN", label: "Dévonien" },
-  { value: "CARBONIFERE", label: "Carbonifère" },
-  { value: "PERMIEN", label: "Permien" },
-  { value: "TRIAS", label: "Trias" },
-  { value: "JURASSIQUE", label: "Jurassique" },
-  { value: "CRETACE", label: "Crétacé" },
-  { value: "PALEOGENE", label: "Paléogène" },
-  { value: "NEOGENE", label: "Néogène" },
-  { value: "QUATERNAIRE", label: "Quaternaire" },
-];
+import { geologicalPeriods } from "@/lib/constant";
 
 export default function ScientificInfoFields({
   form,

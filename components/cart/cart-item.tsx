@@ -10,8 +10,23 @@ import {
   updateCartItemQuantityAction,
   removeCartItemAction,
 } from "@/lib/actions/cart-actions";
-import { CartItemProps } from "@/types/type";
 
+interface CartItemProps {
+  item: {
+    id: string;
+    productId: number;
+    title: string;
+    price: number;
+    quantity: number;
+    category: string;
+    product: {
+      title: string;
+      price: number;
+      category: string;
+    };
+  };
+  onUpdate: () => Promise<void>;
+}
 export function CartItem({ item, onUpdate }: CartItemProps) {
   const [isPending, startTransition] = useTransition();
 

@@ -6,11 +6,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
 import { toast } from "sonner";
-import { RatingFormProps } from "@/types/ratingType";
+import { UserRating } from "@/types/ratingType";
 import { Trash2 } from "lucide-react";
 import StarRating from "./starRating";
 import { createOrUpdateRating } from "@/lib/actions/ratingActions";
 
+export interface RatingFormProps {
+  productId?: number;
+  articleId?: string;
+  initialRating?: UserRating;
+  onRatingSubmitted?: () => void;
+}
 export default function RatingForm({
   productId,
   articleId,

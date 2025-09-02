@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
-import { EditProductFormProps } from "@/types/productType";
+import { EditableProduct } from "@/types/productType";
 
 const categories = [
   { value: "TRILOBITE", label: "Trilobite" },
@@ -48,6 +48,9 @@ const statusOptions = [
   { value: "RESERVED", label: "Réservé" },
 ];
 
+interface EditProductFormProps {
+  product: EditableProduct;
+}
 export default function EditProductForm({ product }: EditProductFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);

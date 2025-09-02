@@ -9,8 +9,11 @@ import {
 } from "@/components/ui/card";
 import { CalendarDays, Clock, Eye, User } from "lucide-react";
 import { BlogCategory } from "@/lib/generated/prisma";
-import { BlogCardProps } from "@/types/blogType";
+import { BlogListItem } from "@/types/type";
 
+interface BlogCardProps {
+  article: BlogListItem;
+}
 export default function BlogCard({ article }: BlogCardProps) {
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";

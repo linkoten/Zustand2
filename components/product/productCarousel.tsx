@@ -15,8 +15,12 @@ import {
 import { Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
-import { ProductCarouselProps } from "@/types/productType";
+import { SerializedProductImage } from "@/types/type";
 
+interface ProductCarouselProps {
+  images: SerializedProductImage[];
+  productTitle: string;
+}
 export default function ProductCarousel({
   images,
   productTitle,

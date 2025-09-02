@@ -12,30 +12,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Filter, X, RefreshCw } from "lucide-react";
-import { ActiveFilters, FossilesFiltersProps } from "@/types/productType";
+import { ActiveFilters, FilterOptions } from "@/types/productType";
+import { categoryLabels, geologicalPeriodLabels } from "@/lib/constant";
 
-const categoryLabels: Record<string, string> = {
-  TRILOBITE: "Trilobite",
-  AMMONITE: "Ammonite",
-  DENT: "Dent",
-  COQUILLAGE: "Coquillage",
-};
-
-const geologicalPeriodLabels: Record<string, string> = {
-  CAMBRIEN: "Cambrien",
-  ORDOVICIEN: "Ordovicien",
-  SILURIEN: "Silurien",
-  DEVONIEN: "Dévonien",
-  CARBONIFERE: "Carbonifère",
-  PERMIEN: "Permien",
-  TRIAS: "Trias",
-  JURASSIQUE: "Jurassique",
-  CRETACE: "Crétacé",
-  PALEOGENE: "Paléogène",
-  NEOGENE: "Néogène",
-  QUATERNAIRE: "Quaternaire",
-};
-
+interface FossilesFiltersProps {
+  filterOptions: FilterOptions;
+  activeFilters: ActiveFilters;
+  onFiltersChange: (filters: ActiveFilters) => void;
+  resultsCount: number;
+}
 export default function FossilesFilters({
   filterOptions,
   activeFilters,

@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  RequestStatus,
-  RequestPriority,
-  UserRole,
-} from "@/lib/generated/prisma";
+import { RequestStatus, UserRole } from "@/lib/generated/prisma";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,7 +52,7 @@ import {
   StickyNote,
 } from "lucide-react";
 import Link from "next/link";
-import { FossilRequestListProps } from "@/types/fossilRequestType";
+import { FossilRequest } from "@/types/fossilRequestType";
 import { deleteFossilRequest } from "@/lib/actions/fossilRequestsActions";
 import { toast } from "sonner";
 
@@ -89,6 +85,13 @@ const priorityColors = {
   HIGH: "bg-orange-100 text-orange-800",
   URGENT: "bg-red-100 text-red-800",
 };
+interface FossilRequestListProps {
+  requests: FossilRequest[];
+  totalPages: number;
+  currentPage: number;
+  totalRequests: number;
+  userRole: UserRole;
+}
 
 export default function FossilRequestsList({
   requests,

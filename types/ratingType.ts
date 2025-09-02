@@ -38,26 +38,3 @@ export interface UserRating {
   comment?: string;
   canEdit: boolean;
 }
-
-export interface RatingFormProps {
-  productId?: number;
-  articleId?: string;
-  initialRating?: UserRating;
-  onRatingSubmitted?: () => void;
-}
-
-export interface RatingDisplayProps {
-  stats: RatingStats;
-  userRating?: UserRating;
-  productId?: number;
-  articleId?: string;
-  showForm?: boolean;
-}
-
-export interface StarRatingProps {
-  rating: number;
-  onRatingChange?: (rating: number) => void;
-  readonly?: boolean;
-  size?: "sm" | "md" | "lg";
-  showValue?: boolean;
-}

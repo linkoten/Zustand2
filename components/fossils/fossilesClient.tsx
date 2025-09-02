@@ -15,8 +15,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { FossilesClientProps } from "@/types/productType";
 import { FossilCard } from "./fossil-card";
+import { SerializedProduct } from "@/types/type";
+import { FilterOptions } from "@/types/productType";
+
+interface FossilesClientProps {
+  fossils: SerializedProduct[];
+  filterOptions: FilterOptions;
+}
 
 export default function FossilesClient({
   fossils,

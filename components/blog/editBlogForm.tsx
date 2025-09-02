@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
-import { EditBlogFormProps } from "@/types/blogType";
+import { EditableBlogPost } from "@/types/blogType";
 
 // ✅ Categories du schéma Prisma
 const categories = [
@@ -36,6 +36,10 @@ const statusOptions = [
   { value: "ARCHIVED", label: "Archivé" },
   { value: "SCHEDULED", label: "Programmé" },
 ];
+
+interface EditBlogFormProps {
+  post: EditableBlogPost;
+}
 
 export default function EditBlogForm({ post }: EditBlogFormProps) {
   const router = useRouter();

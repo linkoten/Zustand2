@@ -3,8 +3,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
-import { CheckoutButtonProps } from "@/types/type";
 
+interface CheckoutButtonProps {
+  productId: number;
+  priceId: string;
+  amount: number;
+}
 export default function CheckoutButton({
   productId,
   priceId,

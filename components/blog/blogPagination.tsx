@@ -3,8 +3,12 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { BlogPaginationProps } from "@/types/blogType";
 
+interface BlogPaginationProps {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+}
 export default function BlogPagination({
   currentPage,
   totalPages,

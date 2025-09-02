@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { UserDashboardProps } from "@/types/dashboardType";
+import { DashboardUser, UserDashboardData } from "@/types/dashboardType";
 
 const statusColors = {
   PENDING: "bg-yellow-100 text-yellow-800",
@@ -30,6 +30,10 @@ const priorityColors = {
   HIGH: "bg-orange-100 text-orange-800",
   URGENT: "bg-red-100 text-red-800",
 };
+interface UserDashboardProps {
+  user: DashboardUser;
+  data: UserDashboardData;
+}
 
 export default function UserDashboard({ user, data }: UserDashboardProps) {
   return (

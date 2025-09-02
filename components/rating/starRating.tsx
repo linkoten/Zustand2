@@ -2,8 +2,14 @@
 
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { StarRatingProps } from "@/types/ratingType";
 
+interface StarRatingProps {
+  rating: number;
+  onRatingChange?: (rating: number) => void;
+  readonly?: boolean;
+  size?: "sm" | "md" | "lg";
+  showValue?: boolean;
+}
 export default function StarRating({
   rating,
   onRatingChange,

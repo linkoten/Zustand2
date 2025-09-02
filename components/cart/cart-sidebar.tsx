@@ -16,8 +16,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getCartAction, clearCartAction } from "@/lib/actions/cart-actions";
 import { CartItem } from "./cart-item";
-import { CartSidebarProps, CartData, CartItemData } from "@/types/type";
+import { CartData, CartItemData } from "@/types/type";
 
+interface CartSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const router = useRouter();
   const [cart, setCart] = useState<CartData | null>(null); // ✅ Type corrigé

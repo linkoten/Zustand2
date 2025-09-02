@@ -45,12 +45,15 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { RichTextEditorProps } from "@/types/blogType";
 
+interface RichTextEditorProps {
+  content: string;
+  onChange: (content: string) => void;
+  placeholder?: string;
+}
 export default function RichTextEditor({
   content,
   onChange,
-  placeholder = "Commencez à écrire votre article...",
 }: RichTextEditorProps) {
   // ✅ État pour gérer le SSR
   const [isMounted, setIsMounted] = useState(false);

@@ -34,14 +34,6 @@ export interface FossilRequestFilters {
   userOnly?: boolean; // ✅ Ajouter cette propriété
 }
 
-export interface FossilRequestListProps {
-  requests: FossilRequest[];
-  totalPages: number;
-  currentPage: number;
-  totalRequests: number;
-  userRole: UserRole;
-}
-
 export interface FossilRequestUpdateData {
   status?: RequestStatus;
   priority?: RequestPriority;

@@ -1,6 +1,4 @@
 import { Locality } from "@/lib/generated/prisma";
-import { RatingStats, UserRating } from "./ratingType";
-import { SerializedProduct, SerializedProductImage } from "./type";
 
 export interface CreateProductData {
   title: string;
@@ -28,11 +26,6 @@ export interface FilterOptions {
   geologicalStages: string[];
 }
 
-export interface FossilesClientProps {
-  fossils: SerializedProduct[];
-  filterOptions: FilterOptions;
-}
-
 // ✅ Utiliser un type personnalisé au lieu du type Prisma brut
 export interface EditableProduct {
   id: number;
@@ -46,10 +39,6 @@ export interface EditableProduct {
   geologicalStage: string | null;
   weight: number | null;
   status: string;
-}
-
-export interface EditProductFormProps {
-  product: EditableProduct;
 }
 
 export interface FilterOptions {
@@ -68,13 +57,6 @@ export interface ActiveFilters {
   geologicalStage?: string;
 }
 
-export interface FossilesFiltersProps {
-  filterOptions: FilterOptions;
-  activeFilters: ActiveFilters;
-  onFiltersChange: (filters: ActiveFilters) => void;
-  resultsCount: number;
-}
-
 export interface FossilRequestFormData {
   name: string;
   email: string;
@@ -88,29 +70,10 @@ export interface FossilRequestFormData {
   locality: string;
 }
 
-export interface FavoriteButtonProps {
-  productId: number;
-  isFavorite: boolean;
-  variant?: "default" | "overlay";
-  size?: "sm" | "md" | "lg";
-}
-
 export interface SearchParams {
   category?: string;
   countryOfOrigin?: string;
   locality?: string;
   geologicalPeriod?: string;
   geologicalStage?: string;
-}
-
-export interface ProductCarouselProps {
-  images: SerializedProductImage[];
-  productTitle: string;
-}
-
-export interface ProductPageClientProps {
-  product: SerializedProduct;
-  similarProducts: SerializedProduct[];
-  ratingStats: RatingStats;
-  userRating: UserRating | null;
 }

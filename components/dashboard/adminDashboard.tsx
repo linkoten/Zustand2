@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { AdminDashboardProps } from "@/types/dashboardType";
+import { AdminDashboardData, DashboardUser } from "@/types/dashboardType";
 
 const statusColors = {
   PENDING: "bg-yellow-100 text-yellow-800",
@@ -40,6 +40,10 @@ const statusIcons = {
   CANCELLED: XCircle,
   REJECTED: XCircle,
 };
+interface AdminDashboardProps {
+  user: DashboardUser;
+  data: AdminDashboardData;
+}
 
 export default function AdminDashboard({ data }: AdminDashboardProps) {
   return (
