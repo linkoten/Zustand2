@@ -4,13 +4,22 @@ import { requireAdmin } from "@/lib/auth";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: number }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // ✅ Vérifier que l'utilisateur est admin
     await requireAdmin();
 
-    const { id: productId } = await params;
+    const { id } = await params;
+    const productId = Number(id); // Conversion explicite
+
+    if (isNaN(productId)) {
+      return NextResponse.json(
+        { error: "ID du produit invalide" },
+        { status: 400 }
+      );
+    }
+
     const body = await request.json();
 
     const {
@@ -97,14 +106,21 @@ export async function PUT(
 // Reprendre la fonction DELETE de l'étape 3
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: number }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // ✅ Vérifier que l'utilisateur est admin
     await requireAdmin();
 
-    const { id: productId } = await params;
+    const { id } = await params;
+    const productId = Number(id); // Conversion explicite
 
+    if (isNaN(productId)) {
+      return NextResponse.json(
+        { error: "ID du produit invalide" },
+        { status: 400 }
+      );
+    }
     if (!productId) {
       return NextResponse.json(
         { error: "ID du produit requis" },

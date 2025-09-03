@@ -13,6 +13,8 @@ import {
   StripeSession,
 } from "@/types/type";
 import { revalidatePath } from "next/cache";
+import { auth } from "@clerk/nextjs/server";
+import { getUserData } from "@/lib/actions/dashboardActions";
 
 export async function POST(req: NextRequest) {
   try {
@@ -324,16 +326,35 @@ async function handleCheckoutCompleted(session: StripeSession) {
     const amountInEuros = session.amount_total / 100;
     console.log("💰 Vente réalisée pour:", amountInEuros, "€");
 
+    // 1. Récupérer l'utilisateur via stripeCustomerId
+    const { userId } = await auth();
+
+    const user = await getUserData(userId!);
+
+    // 2. Récupérer les produits achetés
+    let orderItems: any[] = [];
+    let productIds: number[] = [];
+
     // Si vous avez des métadonnées avec des infos sur les produits
     if (session.metadata?.productIds) {
-      const productIds = session.metadata.productIds.split(",");
+      const productIds = session.metadata.productIds
+        .split(",")
+        .map((id) => parseInt(id, 10));
+      const products = await prisma.product.findMany({
+        where: { id: { in: productIds } },
+      });
+
+      // Si tu veux gérer la quantité, adapte ici (ex: session.metadata.quantities)
+      orderItems = products.map((product) => ({
+        productId: product.id,
+        quantity: 1, // à adapter si tu as la quantité
+        price: product.price,
+      }));
 
       // Marquer les produits comme vendus
       await prisma.product.updateMany({
         where: {
-          id: {
-            in: productIds.map((id) => parseInt(id)),
-          },
+          id: { in: productIds },
         },
         data: {
           status: ProductStatus.SOLD,
@@ -344,6 +365,21 @@ async function handleCheckoutCompleted(session: StripeSession) {
         `✅ ${productIds.length} produit(s) marqué(s) comme vendu(s)`
       );
     }
+
+    // 3. Créer la commande et les OrderItem
+    const order = await prisma.order.create({
+      data: {
+        userId: user!.id,
+        total: amountInEuros,
+        status: "COMPLETED",
+        items: {
+          create: orderItems,
+        },
+      },
+      include: { items: true },
+    });
+
+    console.log("✅ Commande créée:", order.id);
 
     revalidatePath("/fossiles");
     revalidatePath("/");

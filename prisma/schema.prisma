@@ -30,6 +30,10 @@ model User {
   cart        Cart?
   Payment     Payment[]
   ArticleBlog ArticleBlog[]
+
+  // 🆕 Relations produits possédés et commandes
+  productsOwned Product[] @relation("UserProductsOwned")
+  orders        Order[]   @relation("UserOrders")
 }
 
 model Product {
@@ -64,6 +68,12 @@ model Product {
   Payment       Payment[]
   images        ProductImage[] // ✅ Nouvelle relation pour les images
   userFavorites UserFavorite[] // ✅ Relation avec les favoris
+
+  // 🆕 Propriétaire du produit (optionnel)
+  ownerId String?
+  owner   User?   @relation("UserProductsOwned", fields: [ownerId], references: [id])
+
+  OrderItem OrderItem[]
 }
 
 model UserFavorite {
@@ -123,6 +133,29 @@ model Locality {
   products          Product[] // Relation inverse
 
   // Ajoute d'autres champs si besoin (description, pays, etc)
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  userId    String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  total     Decimal     @db.Decimal(10, 2)
+  status    String      @default("COMPLETED")
+  items     OrderItem[]
+
+  user User @relation("UserOrders", fields: [userId], references: [id])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId Int
+  quantity  Int     @default(1)
+  price     Decimal @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 }
 
 // Nouveau modèle pour les transactions
