@@ -7,6 +7,14 @@ export async function getUserData(clerkId: string): Promise<User | null> {
   });
 }
 
+export async function getUserDataByStripeCustomerId(
+  stripeCustomerId: string
+): Promise<User | null> {
+  return prisma.user.findUnique({
+    where: { stripeCustomerId },
+  });
+}
+
 export async function getUserDashboardData(userId: string) {
   try {
     // Récupérer les favoris de l'utilisateur
