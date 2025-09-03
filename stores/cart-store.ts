@@ -16,6 +16,11 @@ export const useCartStore = create<CartState>()(
           (item) => item.productId === product.id
         );
 
+        const firstImageUrl =
+          Array.isArray(product.images) && product.images.length > 0
+            ? product.images[0].imageUrl
+            : undefined;
+
         if (existingItem) {
           // Si le produit existe déjà, on augmente la quantité
           set((state) => ({
@@ -36,6 +41,12 @@ export const useCartStore = create<CartState>()(
             category: product.category,
             stripeProductId: product.stripeProductId,
             stripePriceId: product.stripePriceId,
+            product: {
+              title: product.title,
+              price: parseFloat(product.price.toString()),
+              category: product.category,
+            },
+            imageUrl: firstImageUrl,
           };
 
           set((state) => ({

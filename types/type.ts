@@ -138,6 +138,12 @@ export interface ClientCartItem {
   category: string;
   stripeProductId: string | null;
   stripePriceId: string | null;
+  product: {
+    title: string;
+    price: number;
+    category: string;
+  };
+  imageUrl: string;
 }
 
 // ✅ Type pour le state Zustand

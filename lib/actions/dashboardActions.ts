@@ -37,11 +37,11 @@ export async function getUserDashboardData(userId: string) {
     // Récupérer les demandes de fossiles de l'utilisateur
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
-      select: { email: true },
+      select: { email: true, id: true },
     });
 
     const orders = await prisma.order.findMany({
-      where: { userId },
+      where: { userId: user?.id },
       orderBy: { createdAt: "desc" },
       include: { items: { include: { product: true } } }, // si tu veux les produits
     });
@@ -211,6 +211,6 @@ export async function getUserOrders(clerkId: string) {
   return prisma.order.findMany({
     where: { userId: user.id },
     orderBy: { createdAt: "desc" },
-    include: { items: { include: { product: true } } },
+    include: { items: { include: { product: { include: { images: true } } } } },
   });
 }

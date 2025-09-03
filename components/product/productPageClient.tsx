@@ -14,7 +14,6 @@ import ProductCard from "./productCard";
 import ProductCarousel from "./productCarousel";
 // ✅ Import des composants de notation
 import RatingDisplay from "@/components/rating/ratingDisplay";
-import RatingForm from "@/components/rating/ratingForm";
 import ProductMap from "./productMap";
 import { SerializedProduct } from "@/types/type";
 import { RatingStats, UserRating } from "@/types/ratingType";
@@ -186,26 +185,6 @@ export default function ProductPageClient({
                 Ajouté le{" "}
                 {new Date(product.createdAt).toLocaleDateString("fr-FR")}
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ✅ Section des avis et notations */}
-        <div className="mb-12">
-          <Separator className="mb-8" />
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Avis clients</h2>
-
-            {/* Formulaire de notation */}
-            <div className="mb-8">
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">
-                    Donnez votre avis
-                  </h3>
-                  <RatingForm productId={product.id} />
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>

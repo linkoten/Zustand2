@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -14,70 +13,19 @@ import { Separator } from "@/components/ui/separator";
 import { ShoppingCart, CreditCard, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { getCartAction, clearCartAction } from "@/lib/actions/cart-actions";
 import { CartItem } from "./cart-item";
-import { CartData, CartItemData } from "@/types/type";
+import { useCartStore } from "@/stores/cart-store";
 
 interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
+  const items = useCartStore((state) => state.items);
+  const totalItems = useCartStore((state) => state.totalItems);
+  const totalPrice = useCartStore((state) => state.totalPrice);
+  const clearCart = useCartStore((state) => state.clearCart);
   const router = useRouter();
-  const [cart, setCart] = useState<CartData | null>(null); // ✅ Type corrigé
-  const [loading, setLoading] = useState(false);
-
-  // Charger le panier
-  const loadCart = async (): Promise<void> => {
-    setLoading(true);
-    try {
-      const cartData = await getCartAction(); // ✅ Maintenant compatible
-      setCart(cartData);
-    } catch (error) {
-      console.error("Erreur chargement panier:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      loadCart();
-    }
-  }, [isOpen]);
-
-  const handleCartUpdate = async (): Promise<void> => {
-    await loadCart();
-  };
-
-  // ✅ Fonction pour adapter les données pour CartItem
-  const adaptItemForCartItem = (item: CartItemData) => ({
-    id: item.id,
-    productId: item.productId,
-    title: item.product.title,
-    price: item.product.price,
-    quantity: item.quantity,
-    category: item.product.category,
-    product: {
-      title: item.product.title,
-      price: item.product.price,
-      category: item.product.category,
-    },
-  });
-
-  // ✅ Calculs typés
-  const totalItems: number =
-    cart?.items?.reduce(
-      (sum: number, item: CartItemData) => sum + item.quantity,
-      0
-    ) || 0;
-
-  const totalPrice: number =
-    cart?.items?.reduce(
-      (sum: number, item: CartItemData) =>
-        sum + item.product.price * item.quantity,
-      0
-    ) || 0;
 
   const formatPrice = (price: number): string => {
     return new Intl.NumberFormat("fr-FR", {
@@ -86,28 +34,13 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     }).format(price);
   };
 
-  const handleClearCart = async (): Promise<void> => {
-    try {
-      const result = await clearCartAction();
-      if (result.success) {
-        setCart({
-          id: cart?.id || "",
-          userId: cart?.userId || "",
-          createdAt: cart?.createdAt || "",
-          updatedAt: cart?.updatedAt || "",
-          items: [],
-        });
-        toast.success(`${result.data?.removedItems} articles supprimés`);
-      } else {
-        toast.error(result.error);
-      }
-    } catch (error) {
-      toast.error("Erreur lors du vidage du panier");
-    }
+  const handleClearCart = () => {
+    clearCart();
+    toast.success("Panier vidé !");
   };
 
   const handleCheckout = (): void => {
-    if (!cart?.items?.length) return;
+    if (!items.length) return;
     onClose();
     router.push("/checkout");
   };
@@ -122,11 +55,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
           </SheetTitle>
         </SheetHeader>
 
-        {loading ? (
-          <div className="flex items-center justify-center flex-1">
-            <div className="text-center">Chargement...</div>
-          </div>
-        ) : !cart?.items?.length ? (
+        {!items.length ? (
           <div className="flex flex-col items-center justify-center flex-1 py-8">
             <ShoppingCart className="w-16 h-16 text-muted-foreground mb-4" />
             <h3 className="font-semibold text-lg mb-2">
@@ -145,12 +74,8 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             <div className="flex-1 min-h-0 overflow-y-auto">
               <ScrollArea className="h-full">
                 <div className="space-y-4 py-4">
-                  {cart.items.map((item: CartItemData) => (
-                    <CartItem
-                      key={item.id}
-                      item={adaptItemForCartItem(item)}
-                      onUpdate={handleCartUpdate}
-                    />
+                  {items.map((item) => (
+                    <CartItem key={item.id} item={item} />
                   ))}
                 </div>
               </ScrollArea>
@@ -179,7 +104,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   onClick={handleCheckout}
                   className="w-full"
                   size="lg"
-                  disabled={!cart?.items?.length}
+                  disabled={!items.length}
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
                   Procéder au paiement

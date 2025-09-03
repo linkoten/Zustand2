@@ -4,19 +4,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
-interface OrderDetailPageProps {
-  params: Promise<{ id: string }>;
-}
-
 export default async function OrderDetailPage({
   params,
-}: OrderDetailPageProps) {
+}: {
+  params: { id: string };
+}) {
   const { userId } = await auth();
   if (!userId) return <div>Non connecté</div>;
 
-  const { id } = await params;
   const orders = await getUserOrders(userId);
-  const order = orders.find((o) => o.id === id);
+  const order = orders.find((o) => o.id === params.id);
 
   if (!order) return notFound();
 
@@ -37,21 +34,55 @@ export default async function OrderDetailPage({
             })
           : order.total?.toString()}
       </div>
+
       <div className="mb-6">
         <span className="font-semibold">Produits :</span>
-        <ul className="list-disc ml-6 mt-2">
-          {order.items.map((item) => (
-            <li key={item.id}>
-              {item.product?.title || "Produit"} &times; {item.quantity} —{" "}
-              {item.price && typeof item.price.toNumber === "function"
-                ? item.price.toNumber().toLocaleString("fr-FR", {
-                    style: "currency",
-                    currency: "EUR",
-                  })
-                : item.price?.toString()}
-            </li>
-          ))}
-        </ul>
+        <div className="mt-4 grid gap-4">
+          {order.items.map((item) => {
+            const imageUrl =
+              item.product?.images && item.product.images.length > 0
+                ? item.product.images[0].imageUrl
+                : "/placeholder.svg";
+            return (
+              <div
+                key={item.id}
+                className="flex items-center gap-4 border rounded-lg p-3 bg-muted"
+              >
+                <img
+                  src={imageUrl}
+                  alt={item.product?.title || "Produit"}
+                  className="w-16 h-16 object-cover rounded"
+                />
+                <div className="flex-1">
+                  <div className="font-semibold">
+                    {item.product?.title || "Produit"}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Quantité : {item.quantity}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Prix unitaire :{" "}
+                    {item.price && typeof item.price.toNumber === "function"
+                      ? item.price.toNumber().toLocaleString("fr-FR", {
+                          style: "currency",
+                          currency: "EUR",
+                        })
+                      : item.price?.toString()}
+                  </div>
+                  <div className="text-sm">
+                    Total ligne :{" "}
+                    {typeof item.price === "number"
+                      ? (item.price * item.quantity).toLocaleString("fr-FR", {
+                          style: "currency",
+                          currency: "EUR",
+                        })
+                      : ""}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
       <Button asChild variant="outline">
         <Link href="/dashboard/orders">Retour à mes commandes</Link>
