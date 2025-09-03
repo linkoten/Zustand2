@@ -16,6 +16,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
 import { getUserData } from "@/lib/actions/dashboardActions";
+import { Decimal } from "@/lib/generated/prisma/runtime/library";
 
 export async function POST(req: NextRequest) {
   try {
@@ -333,7 +334,8 @@ async function handleCheckoutCompleted(session: StripeSession) {
     const user = await getUserData(userId!);
 
     // 2. Récupérer les produits achetés
-    let orderItems: { productId: number; quantity: number; price: any }[] = [];
+    let orderItems: { productId: number; quantity: number; price: Decimal }[] =
+      [];
 
     // Si vous avez des métadonnées avec des infos sur les produits
     if (session.metadata?.productIds) {
