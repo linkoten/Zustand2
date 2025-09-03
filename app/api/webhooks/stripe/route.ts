@@ -332,15 +332,15 @@ async function handleCheckoutCompleted(session: StripeSession) {
     console.log("💰 Vente réalisée pour:", amountInEuros, "€");
 
     // 1. Récupérer l'utilisateur via stripeCustomerId
-    const { userId } = await auth();
-    if (!userId) {
-      redirect("/sign-in");
+    const clerkId = session.metadata?.userId;
+    if (!clerkId) {
+      console.error("❌ clerkId (userId) manquant dans les métadonnées Stripe");
+      return;
     }
-
-    const user = await getUserData(userId);
-
+    const user = await getUserData(clerkId);
     if (!user) {
-      redirect("/sign-in");
+      console.error("❌ Utilisateur non trouvé pour ce clerkId");
+      return;
     }
 
     // 2. Récupérer les produits achetés
