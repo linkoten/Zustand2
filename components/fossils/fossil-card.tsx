@@ -9,19 +9,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ProductStatus } from "@/lib/generated/prisma";
-import {
-  ShoppingCart,
-  Eye,
-  CheckCircle,
-  Loader2,
-  Edit,
-  Trash2,
-  AlertTriangle,
-} from "lucide-react";
+import { Eye, Edit, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { addToCartAction } from "@/lib/actions/cart-actions"; // ✅ Import Server Action
 import { SerializedProduct } from "@/types/type";
 import { useUserStore } from "@/stores/userStore";
 import { FavoriteButton } from "../product/favoriteButton";
@@ -38,12 +29,12 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import { useHandleAddToCart } from "@/hooks/useHandleAddToCart";
 
 interface FossilCardProps {
   fossil: SerializedProduct;
 }
 export function FossilCard({ fossil }: FossilCardProps) {
-  const [isPending, startTransition] = useTransition(); // ✅ Hook pour Server Actions
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const router = useRouter();
 
@@ -72,27 +63,7 @@ export function FossilCard({ fossil }: FossilCardProps) {
 
   const isAvailable = fossil.status === ProductStatus.AVAILABLE;
 
-  // ✅ Fonction avec Server Action
-  const handleAddToCart = () => {
-    if (!isAvailable || isPending) return;
-
-    startTransition(async () => {
-      try {
-        const result = await addToCartAction(fossil.id);
-
-        if (result.success) {
-          toast.success(`${result.data?.productTitle} ajouté au panier !`, {
-            icon: <CheckCircle className="w-4 h-4" />,
-          });
-        } else {
-          toast.error(result.error || "Erreur lors de l'ajout");
-        }
-      } catch (error) {
-        toast.error("Une erreur est survenue");
-        console.error("Erreur ajout panier:", error);
-      }
-    });
-  };
+  const { handleAddToCart, isAdding } = useHandleAddToCart();
 
   const handleDelete = async (productId: number) => {
     if (!isAdmin) return;
@@ -260,17 +231,10 @@ export function FossilCard({ fossil }: FossilCardProps) {
         </Button>
 
         <Button
-          size="sm"
-          disabled={!isAvailable || isPending}
-          onClick={handleAddToCart}
-          className="flex-1"
+          onClick={() => handleAddToCart(fossil)}
+          disabled={isAdding || !isAvailable}
         >
-          {isPending ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <ShoppingCart className="w-4 h-4 mr-2" />
-          )}
-          {isPending ? "Ajout..." : isAvailable ? "Ajouter" : "Indisponible"}
+          Ajouter au panier
         </Button>
       </CardFooter>
     </Card>

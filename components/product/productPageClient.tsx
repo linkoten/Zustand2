@@ -1,14 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
 import { ShoppingCart, ArrowLeft, MapPin, Calendar, Info } from "lucide-react";
-import { addToCartAction } from "@/lib/actions/cart-actions";
 import { formatPrice } from "@/lib/utils";
 import ProductCard from "./productCard";
 import ProductCarousel from "./productCarousel";
@@ -17,6 +14,7 @@ import RatingDisplay from "@/components/rating/ratingDisplay";
 import ProductMap from "./productMap";
 import { SerializedProduct } from "@/types/type";
 import { RatingStats, UserRating } from "@/types/ratingType";
+import { useHandleAddToCart } from "@/hooks/useHandleAddToCart";
 
 interface ProductPageClientProps {
   product: SerializedProduct;
@@ -31,26 +29,7 @@ export default function ProductPageClient({
   ratingStats,
   userRating,
 }: ProductPageClientProps) {
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-
-  const handleAddToCart = async () => {
-    try {
-      setIsAddingToCart(true);
-
-      const result = await addToCartAction(product.id);
-
-      if (result.success) {
-        toast.success(`${result.data?.productTitle} ajouté au panier !`);
-      } else {
-        toast.error(result.error || "Erreur lors de l'ajout au panier");
-      }
-    } catch (error) {
-      console.error("Erreur ajout panier:", error);
-      toast.error("Erreur lors de l'ajout au panier");
-    } finally {
-      setIsAddingToCart(false);
-    }
-  };
+  const { handleAddToCart, isAdding } = useHandleAddToCart();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -171,11 +150,11 @@ export default function ProductPageClient({
             <Button
               size="lg"
               className="w-full"
-              onClick={handleAddToCart}
-              disabled={isAddingToCart || product.status !== "AVAILABLE"}
+              onClick={() => handleAddToCart(product)}
+              disabled={isAdding || product.status !== "AVAILABLE"}
             >
               <ShoppingCart className="mr-2 h-4 w-4" />
-              {isAddingToCart ? "Ajout en cours..." : "Ajouter au panier"}
+              {isAdding ? "Ajout en cours..." : "Ajouter au panier"}
             </Button>
 
             {/* Informations supplémentaires */}
