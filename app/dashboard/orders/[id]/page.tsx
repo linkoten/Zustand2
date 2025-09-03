@@ -4,16 +4,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
+interface OrderDetailPageProps {
+  params: Promise<{ id: string }>;
+}
+
 export default async function OrderDetailPage({
   params,
-}: {
-  params: { id: string };
-}) {
+}: OrderDetailPageProps) {
   const { userId } = await auth();
   if (!userId) return <div>Non connecté</div>;
 
   const orders = await getUserOrders(userId);
-  const order = orders.find((o) => o.id === params.id);
+
+  const { id } = await params;
+
+  const order = orders.find((o) => o.id === id);
 
   if (!order) return notFound();
 
