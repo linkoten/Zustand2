@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import {
   Category,
   GeologicalPeriod,
+  OrderItem,
   ProductStatus,
 } from "@/lib/generated/prisma";
 import {
@@ -332,8 +333,7 @@ async function handleCheckoutCompleted(session: StripeSession) {
     const user = await getUserData(userId!);
 
     // 2. Récupérer les produits achetés
-    let orderItems: any[] = [];
-    let productIds: number[] = [];
+    let orderItems: { productId: number; quantity: number; price: any }[] = [];
 
     // Si vous avez des métadonnées avec des infos sur les produits
     if (session.metadata?.productIds) {
