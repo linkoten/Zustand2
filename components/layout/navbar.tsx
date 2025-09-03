@@ -8,6 +8,7 @@ import { Menu, X, User, BookOpen, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { CartSidebar } from "@/components/cart/cart-sidebar";
 import { CartIconButton } from "../cart/cartIconButton";
+import { NotificationButton } from "../notification/notificationButton";
 
 export default function Navbar() {
   const { user, isLoaded } = useUser();
@@ -84,6 +85,7 @@ export default function Navbar() {
 
             {/* Actions desktop */}
             <div className="hidden md:flex items-center space-x-4">
+              {isLoaded && user && <NotificationButton userId={user.id} />}
               <CartIconButton onClick={toggleCart} />
 
               {isLoaded && (
@@ -111,6 +113,7 @@ export default function Navbar() {
 
             {/* Menu mobile button */}
             <div className="md:hidden flex items-center space-x-2">
+              {isLoaded && user && <NotificationButton userId={user.id} />}
               <CartIconButton onClick={toggleCart} />
 
               <Button

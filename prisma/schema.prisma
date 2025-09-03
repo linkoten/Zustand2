@@ -34,6 +34,8 @@ model User {
   // 🆕 Relations produits possédés et commandes
   productsOwned Product[] @relation("UserProductsOwned")
   orders        Order[]   @relation("UserOrders")
+
+  Notification Notification[]
 }
 
 model Product {
@@ -97,6 +99,20 @@ model ProductImage {
   createdAt DateTime @default(now())
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String // ID Clerk de l'utilisateur à notifier
+  type      String // Type de notification (ex: "ORDER", "MESSAGE", "ADMIN", etc.)
+  title     String // Titre court
+  message   String // Message détaillé
+  isRead    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+  link      String? // URL vers la ressource concernée (optionnel)
+
+  user User @relation(fields: [userId], references: [clerkId])
 }
 
 // Modèle pour le panier (à venir)
