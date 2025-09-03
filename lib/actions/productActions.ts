@@ -13,6 +13,7 @@ import {
 } from "@/lib/generated/prisma";
 import { SerializedProduct } from "@/types/type";
 import { CreateProductData, SearchParams } from "@/types/productType";
+import { requireAdmin } from "../auth";
 
 export async function createProductAction(data: CreateProductData) {
   try {
@@ -172,6 +173,75 @@ export async function createProductAction(data: CreateProductData) {
           : "Une erreur est survenue lors de la création du produit",
     };
   }
+}
+
+export async function updateProductAction({
+  id,
+  title,
+  description,
+  price,
+  category,
+  countryOfOrigin,
+  locality,
+  geologicalPeriod,
+  geologicalStage,
+  weight,
+  status,
+}: {
+  id: number;
+  title: string;
+  description?: string;
+  price: number | string;
+  category: Category;
+  countryOfOrigin: string;
+  locality?: number | { id: number };
+  geologicalPeriod: GeologicalPeriod;
+  geologicalStage: string;
+  weight: number;
+  status: string;
+}) {
+  await requireAdmin();
+
+  // Validation (optionnelle)
+  if (
+    !title ||
+    !price ||
+    !category ||
+    !countryOfOrigin ||
+    !geologicalPeriod ||
+    !status
+  ) {
+    return {
+      success: false,
+      error: "Tous les champs requis doivent être remplis",
+    };
+  }
+
+  // Vérifier que le produit existe
+  const existingProduct = await prisma.product.findUnique({ where: { id } });
+  if (!existingProduct) {
+    return { success: false, error: "Produit non trouvé" };
+  }
+
+  // Mise à jour
+  const updatedProduct = await prisma.product.update({
+    where: { id },
+    data: {
+      title,
+      description: description || null,
+      price: typeof price === "string" ? parseFloat(price) : price,
+      category,
+      countryOfOrigin,
+      locality: {
+        connect: { id: typeof locality === "object" ? locality.id : locality },
+      },
+      geologicalPeriod,
+      geologicalStage: geologicalStage,
+      weight,
+    },
+  });
+
+  return { success: true, product: updatedProduct };
 }
 
 export async function getFossils(

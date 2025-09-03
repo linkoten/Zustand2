@@ -6,39 +6,17 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { toast } from "sonner";
 import { ShoppingCart, Layers } from "lucide-react";
 import { SerializedProduct } from "@/types/type";
-import { addToCartAction } from "@/lib/actions/cart-actions";
 import { formatPrice } from "@/lib/utils";
+import { useHandleAddToCart } from "@/hooks/useHandleAddToCart";
 
 interface ProductCardProps {
   product: SerializedProduct;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.preventDefault(); // Empêcher la navigation
-
-    try {
-      setIsAddingToCart(true);
-
-      const result = await addToCartAction(product.id);
-
-      if (result.success) {
-        toast.success(`${result.data?.productTitle} ajouté au panier !`);
-      } else {
-        toast.error(result.error || "Erreur lors de l'ajout au panier");
-      }
-    } catch (error) {
-      console.error("Erreur ajout panier:", error);
-      toast.error("Erreur lors de l'ajout au panier");
-    } finally {
-      setIsAddingToCart(false);
-    }
-  };
+  const { handleAddToCart, isAdding } = useHandleAddToCart();
 
   // ✅ Utiliser la première image ou afficher un placeholder
   const firstImage = product.images?.[0];
@@ -94,13 +72,13 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       <CardFooter className="p-4 pt-0">
         <Button
-          size="sm"
+          size="lg"
           className="w-full"
-          onClick={handleAddToCart}
-          disabled={isAddingToCart || product.status !== "AVAILABLE"}
+          onClick={() => handleAddToCart(product)}
+          disabled={isAdding || product.status !== "AVAILABLE"}
         >
-          <ShoppingCart className="mr-2 h-3 w-3" />
-          {isAddingToCart ? "Ajout..." : "Ajouter"}
+          <ShoppingCart className="mr-2 h-4 w-4" />
+          {isAdding ? "Ajout en cours..." : "Ajouter au panier"}
         </Button>
       </CardFooter>
     </Card>

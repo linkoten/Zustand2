@@ -1,5 +1,7 @@
 import prisma from "@/lib/prisma";
 import { User } from "../generated/prisma";
+import { SerializedProduct } from "@/types/type";
+import { getProductRatingStats } from "./ratingActions";
 
 export async function getUserData(clerkId: string): Promise<User | null> {
   return prisma.user.findUnique({
@@ -213,4 +215,92 @@ export async function getUserOrders(clerkId: string) {
     orderBy: { createdAt: "desc" },
     include: { items: { include: { product: { include: { images: true } } } } },
   });
+}
+
+export async function getUserFavorites(
+  clerkId: string
+): Promise<SerializedProduct[]> {
+  const user = await prisma.user.findUnique({ where: { clerkId } });
+  if (!user) return [];
+  try {
+    const favorites = await prisma.userFavorite.findMany({
+      where: { userId: user.id },
+      include: {
+        product: {
+          include: {
+            images: { orderBy: { order: "asc" } },
+            locality: true,
+            // Ajoute d'autres relations si besoin
+            // ratings: true, // pas utile ici, on va chercher les stats séparément
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Pour chaque favori, on complète tous les champs requis
+    const serializedFavorites: SerializedProduct[] = await Promise.all(
+      favorites
+        .filter((fav) => fav.product)
+        .map(async (fav) => {
+          const p = fav.product;
+          // Récupérer les stats de notation (optionnel, sinon valeur par défaut)
+          let ratingStats;
+          try {
+            ratingStats = await getProductRatingStats(p.id);
+          } catch {
+            ratingStats = {
+              averageRating: 0,
+              totalRatings: 0,
+              ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+            };
+          }
+
+          return {
+            id: p.id,
+            title: p.title,
+            price: p.price?.toNumber?.() ?? 0,
+            category: p.category ?? "",
+            genre: p.genre ?? "",
+            species: p.species ?? "",
+            countryOfOrigin: p.countryOfOrigin ?? "",
+            locality: p.locality ?? {
+              id: 0,
+              name: "",
+              latitude: 0,
+              longitude: 0,
+              geologicalPeriods: [],
+              geologicalStages: [],
+            },
+            geologicalPeriod: p.geologicalPeriod ?? "",
+            geologicalStage: p.geologicalStage ?? "",
+            description: p.description ?? "",
+            stripePriceId: p.stripePriceId ?? null,
+            weight: p.weight ?? 0,
+            status: p.status,
+            createdAt: p.createdAt?.toISOString?.() ?? "",
+            updatedAt: p.updatedAt?.toISOString?.() ?? "",
+            isFavorite: true,
+            averageRating: ratingStats.averageRating,
+            totalRatings: ratingStats.totalRatings,
+            ratingStats,
+            images: (p.images || []).map((img) => ({
+              id: img.id,
+              imageUrl: img.imageUrl,
+              altText: img.altText || undefined,
+              order: img.order,
+              createdAt: img.createdAt?.toISOString?.() ?? "",
+            })),
+          };
+        })
+    );
+
+    return serializedFavorites;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des favoris utilisateur:",
+      error
+    );
+    return [];
+  }
 }

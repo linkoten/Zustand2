@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,31 +16,9 @@ import {
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
 import { EditableProduct } from "@/types/productType";
-
-const categories = [
-  { value: "TRILOBITE", label: "Trilobite" },
-  { value: "AMMONITE", label: "Ammonite" },
-  { value: "BRACHIOPOD", label: "Brachiopode" },
-  { value: "CRINOID", label: "Crinoïde" },
-  { value: "CORAL", label: "Corail" },
-  { value: "PLANT", label: "Plante" },
-  { value: "SHARK_TOOTH", label: "Dent de requin" },
-  { value: "OTHER", label: "Autre" },
-];
-
-const geologicalPeriods = [
-  { value: "CAMBRIAN", label: "Cambrien" },
-  { value: "ORDOVICIAN", label: "Ordovicien" },
-  { value: "SILURIAN", label: "Silurien" },
-  { value: "DEVONIAN", label: "Dévonien" },
-  { value: "CARBONIFEROUS", label: "Carbonifère" },
-  { value: "PERMIAN", label: "Permien" },
-  { value: "TRIASSIC", label: "Trias" },
-  { value: "JURASSIC", label: "Jurassique" },
-  { value: "CRETACEOUS", label: "Crétacé" },
-  { value: "PALEOGENE", label: "Paléogène" },
-  { value: "NEOGENE", label: "Néogène" },
-];
+import { categories, geologicalPeriods } from "@/lib/constant";
+import { updateProductAction } from "@/lib/actions/productActions";
+import { Category, GeologicalPeriod } from "@/lib/generated/prisma";
 
 const statusOptions = [
   { value: "AVAILABLE", label: "Disponible" },
@@ -50,17 +28,22 @@ const statusOptions = [
 
 interface EditProductFormProps {
   product: EditableProduct;
+  localities?: { id: number; name: string }[];
 }
-export default function EditProductForm({ product }: EditProductFormProps) {
+
+export default function EditProductForm({
+  product,
+  localities,
+}: EditProductFormProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState({
     title: product.title,
     description: product.description || "",
     price: product.price.toString(),
     category: product.category,
     countryOfOrigin: product.countryOfOrigin,
-    locality: product.locality || "",
+    locality: product.locality?.id?.toString() || "",
     geologicalPeriod: product.geologicalPeriod,
     geologicalStage: product.geologicalStage || "",
     weight: product.weight?.toString() || "",
@@ -71,37 +54,35 @@ export default function EditProductForm({ product }: EditProductFormProps) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(`/api/products/${product.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
+    startTransition(async () => {
+      try {
+        const result = await updateProductAction({
+          id: product.id,
+          title: formData.title,
+          description: formData.description,
           price: parseFloat(formData.price),
-          weight: formData.weight ? parseFloat(formData.weight) : null,
-          locality: formData.locality || null,
-          geologicalStage: formData.geologicalStage || null,
-        }),
-      });
+          category: formData.category as Category,
+          countryOfOrigin: formData.countryOfOrigin,
+          locality: formData.locality ? Number(formData.locality) : undefined, // 👈 id ou undefined
+          geologicalPeriod: formData.geologicalPeriod as GeologicalPeriod,
+          geologicalStage: formData.geologicalStage,
+          weight: formData.weight ? parseFloat(formData.weight) : 0,
+          status: formData.status,
+        });
 
-      if (!response.ok) {
-        throw new Error("Erreur lors de la mise à jour");
+        if (!result?.success) {
+          throw new Error(result?.error || "Erreur lors de la mise à jour");
+        }
+
+        toast.success("Produit mis à jour avec succès !");
+        router.push(`/fossiles/${product.id}`);
+      } catch (error) {
+        console.error("Erreur:", error);
+        toast.error("Erreur lors de la mise à jour du produit");
       }
-
-      toast.success("Produit mis à jour avec succès !");
-      router.push(`/fossiles/${product.id}`);
-    } catch (error) {
-      console.error("Erreur:", error);
-      toast.error("Erreur lors de la mise à jour du produit");
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   return (
@@ -184,11 +165,30 @@ export default function EditProductForm({ product }: EditProductFormProps) {
 
         <div>
           <Label htmlFor="locality">Localité</Label>
-          <Input
-            id="locality"
-            value={formData.locality.name}
-            onChange={(e) => handleInputChange("locality", e.target.value)}
-          />
+          {localities ? (
+            <Select
+              value={formData.locality}
+              onValueChange={(value) => handleInputChange("locality", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner une localité" />
+              </SelectTrigger>
+              <SelectContent>
+                {localities.map((loc) => (
+                  <SelectItem key={loc.id} value={loc.id.toString()}>
+                    {loc.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <Input
+              id="locality"
+              value={formData.locality}
+              onChange={(e) => handleInputChange("locality", e.target.value)}
+              placeholder="ID de la localité"
+            />
+          )}
         </div>
 
         <div>
@@ -245,8 +245,8 @@ export default function EditProductForm({ product }: EditProductFormProps) {
       </div>
 
       <div className="flex justify-end">
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? (
+        <Button type="submit" disabled={isPending}>
+          {isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Mise à jour...
