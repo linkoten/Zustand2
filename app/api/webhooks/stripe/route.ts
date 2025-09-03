@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 import {
   Category,
   GeologicalPeriod,
-  OrderItem,
   ProductStatus,
 } from "@/lib/generated/prisma";
 import {
@@ -15,9 +14,8 @@ import {
 } from "@/types/type";
 import { revalidatePath } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
-import { getUserData } from "@/lib/actions/dashboardActions";
+import { getUserDataByStripeCustomerId } from "@/lib/actions/dashboardActions";
 import { Decimal } from "@/lib/generated/prisma/runtime/library";
-import { redirect } from "next/navigation";
 
 export async function POST(req: NextRequest) {
   try {
@@ -331,15 +329,8 @@ async function handleCheckoutCompleted(session: StripeSession) {
 
     // 1. Récupérer l'utilisateur via stripeCustomerId
     const { userId } = await auth();
-    if (!userId) {
-      redirect("/sign-in");
-    }
 
-    const user = await getUserData(userId);
-
-    if (!user) {
-      redirect("/sign-in");
-    }
+    const user = await getUserDataByStripeCustomerId(userId as string);
 
     // 2. Récupérer les produits achetés
     let orderItems: { productId: number; quantity: number; price: Decimal }[] =
@@ -379,7 +370,7 @@ async function handleCheckoutCompleted(session: StripeSession) {
     // 3. Créer la commande et les OrderItem
     const order = await prisma.order.create({
       data: {
-        userId: user.id,
+        userId: user!.id,
         total: amountInEuros,
         status: "COMPLETED",
         items: {
