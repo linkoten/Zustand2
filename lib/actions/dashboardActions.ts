@@ -101,6 +101,7 @@ export async function getUserDashboardData(userId: string) {
       fossilRequests: [],
       totalFavorites: 0,
       totalRequests: 0,
+      orders: [],
     };
   }
 }
