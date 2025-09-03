@@ -40,6 +40,12 @@ export async function getUserDashboardData(userId: string) {
       select: { email: true },
     });
 
+    const orders = await prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      include: { items: { include: { product: true } } }, // si tu veux les produits
+    });
+
     const fossilRequests = await prisma.fossilRequest.findMany({
       where: {
         email: user?.email,
@@ -71,6 +77,16 @@ export async function getUserDashboardData(userId: string) {
         createdAt: req.createdAt.toISOString(),
         updatedAt: req.updatedAt.toISOString(),
         respondedAt: req.respondedAt?.toISOString() || null,
+      })),
+      orders: orders.map((order) => ({
+        ...order,
+        total: order.total?.toNumber?.() ?? order.total,
+        createdAt: order.createdAt.toISOString(),
+        updatedAt: order.updatedAt.toISOString(),
+        items: order.items.map((item) => ({
+          ...item,
+          price: item.price?.toNumber?.() ?? item.price,
+        })),
       })),
       totalFavorites,
       totalRequests,
@@ -186,4 +202,14 @@ export async function getAdminDashboardData() {
       recentProducts: [],
     };
   }
+}
+
+export async function getUserOrders(clerkId: string) {
+  const user = await prisma.user.findUnique({ where: { clerkId } });
+  if (!user) return [];
+  return prisma.order.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    include: { items: { include: { product: true } } },
+  });
 }

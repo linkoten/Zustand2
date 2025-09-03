@@ -1,3 +1,5 @@
+import { Order } from "@/lib/generated/prisma";
+
 // Types pour les interfaces dashboard
 export interface DashboardUser {
   id: string;
@@ -12,6 +14,7 @@ export interface UserDashboardData {
   fossilRequests: any[];
   totalFavorites: number;
   totalRequests: number;
+  orders: Order[];
 }
 
 export interface AdminDashboardData {
