@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 interface OrderDetailPageProps {
-  params: { orderId: string };
+  params: { id: string };
 }
 
 export default async function OrderDetailPage({
@@ -15,7 +15,7 @@ export default async function OrderDetailPage({
   if (!userId) return <div>Non connecté</div>;
 
   const orders = await getUserOrders(userId);
-  const order = orders.find((o) => o.id === params.orderId);
+  const order = orders.find((o) => o.id === params.id);
 
   if (!order) return notFound();
 
