@@ -233,10 +233,9 @@ export function FossilCard({ fossil }: FossilCardProps) {
         <Button
           onClick={() => handleAddToCart(fossil)}
           size="lg"
-          className="flex-1"
           disabled={isAdding || !isAvailable}
         >
-          Ajouter au panier
+          Ajouter
         </Button>
       </CardFooter>
     </Card>
