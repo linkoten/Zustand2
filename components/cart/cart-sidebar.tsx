@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CartItem } from "./cart-item";
 import { useCartStore } from "@/stores/cart-store";
+import { clearCartAction } from "@/lib/actions/cart-actions";
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -34,9 +35,14 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     }).format(price);
   };
 
-  const handleClearCart = () => {
-    clearCart();
-    toast.success("Panier vidé !");
+  const handleClearCart = async () => {
+    clearCart(); // Optimistic update côté UI
+    const result = await clearCartAction();
+    if (result?.success) {
+      toast.success("Panier vidé !");
+    } else {
+      toast.error(result?.error || "Erreur lors du vidage du panier");
+    }
   };
 
   const handleCheckout = (): void => {

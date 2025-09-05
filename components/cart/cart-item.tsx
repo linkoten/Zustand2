@@ -27,6 +27,16 @@ export function CartItem({ item }: CartItemProps) {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
 
+  const handleRemove = async () => {
+    const result = await removeCartItemAction(item.id); // 👈 item.id = cartItemId
+    if (result.success) {
+      removeItem(item.productId);
+      toast.success(`${item.title} retiré du panier`);
+    } else {
+      toast.error(result.error || "Erreur lors de la suppression");
+    }
+  };
+
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("fr-FR", {
       style: "currency",
@@ -60,21 +70,7 @@ export function CartItem({ item }: CartItemProps) {
           -
         </Button>
         <span>{item.quantity}</span>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={async () => {
-            // Appel backend pour supprimer l'item de la BDD
-            const result = await removeCartItemAction(item.id);
-            if (result.success) {
-              // Mets à jour le store pour l'UI
-              removeItem(item.productId);
-              toast.success(`${item.title} retiré du panier`);
-            } else {
-              toast.error(result.error || "Erreur lors de la suppression");
-            }
-          }}
-        >
+        <Button size="icon" variant="ghost" onClick={handleRemove}>
           +
         </Button>
         <Button
