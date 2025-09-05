@@ -170,6 +170,8 @@ export async function removeCartItemAction(
       return { success: false, error: "Article non trouvé" };
     }
 
+    console.log("Suppression cartItemId:", cartItemId, "pour user:", user.id);
+
     // Supprimer l'article
     await prisma.cartItem.delete({
       where: { id: cartItemId },

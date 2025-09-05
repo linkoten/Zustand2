@@ -70,14 +70,14 @@ export function CartItem({ item }: CartItemProps) {
           -
         </Button>
         <span>{item.quantity}</span>
-        <Button size="icon" variant="ghost" onClick={handleRemove}>
-          +
-        </Button>
         <Button
           size="icon"
           variant="ghost"
-          onClick={() => removeItem(item.productId)}
+          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
         >
+          +
+        </Button>
+        <Button size="icon" variant="ghost" onClick={handleRemove}>
           <Trash2 className="w-4 h-4" />
         </Button>
       </div>
