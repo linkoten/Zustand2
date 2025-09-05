@@ -3,6 +3,8 @@
 import { useCartStore } from "@/stores/cart-store";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { removeCartItemAction } from "@/lib/actions/cart-actions";
+import { toast } from "sonner";
 
 interface CartItemProps {
   item: {
@@ -61,7 +63,17 @@ export function CartItem({ item }: CartItemProps) {
         <Button
           size="icon"
           variant="ghost"
-          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+          onClick={async () => {
+            // Appel backend pour supprimer l'item de la BDD
+            const result = await removeCartItemAction(item.id);
+            if (result.success) {
+              // Mets à jour le store pour l'UI
+              removeItem(item.productId);
+              toast.success(`${item.title} retiré du panier`);
+            } else {
+              toast.error(result.error || "Erreur lors de la suppression");
+            }
+          }}
         >
           +
         </Button>
