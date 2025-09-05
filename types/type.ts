@@ -233,6 +233,7 @@ export interface CartProduct {
   status: string;
   createdAt: string;
   updatedAt: string;
+  images: { imageUrl: string }[]; // 👈 Ajoute ceci
 }
 
 // ✅ Type pour les items du panier (avec produit sans images)

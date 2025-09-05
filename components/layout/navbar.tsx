@@ -5,12 +5,45 @@ import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 import { Menu, X, User, BookOpen, LayoutDashboard } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CartSidebar } from "@/components/cart/cart-sidebar";
 import { CartIconButton } from "../cart/cartIconButton";
 import { NotificationButton } from "../notification/notificationButton";
+import { getCartAction } from "@/lib/actions/cart-actions";
+import { useCartStore } from "@/stores/cart-store";
 
 export default function Navbar() {
+  useEffect(() => {
+    async function syncCart() {
+      const cart = await getCartAction();
+      if (cart && cart.items) {
+        useCartStore.setState({
+          items: cart.items.map((item) => ({
+            id: item.id,
+            productId: item.productId,
+            title: item.product.title,
+            price: item.product.price,
+            quantity: item.quantity,
+            category: item.product.category,
+            stripeProductId: item.product.stripeProductId ?? null, // 👈 force null si undefined
+            stripePriceId: item.product.stripePriceId ?? null, // 👈 force null si undefined
+            product: {
+              title: item.product.title,
+              price: item.product.price,
+              category: item.product.category,
+            },
+            imageUrl: item.product.images?.[0]?.imageUrl ?? null, // 👈 force null si undefined
+          })),
+          totalItems: cart.items.reduce((sum, item) => sum + item.quantity, 0),
+          totalPrice: cart.items.reduce(
+            (sum, item) => sum + item.product.price * item.quantity,
+            0
+          ),
+        });
+      }
+    }
+    syncCart();
+  }, []);
   const { user, isLoaded } = useUser();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

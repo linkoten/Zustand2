@@ -236,6 +236,7 @@ export async function getCartAction(): Promise<CartData | null> {
             product: {
               include: {
                 locality: true, // 👈 Ajoute ceci pour inclure la localité complète
+                images: true,
               },
             },
           },
@@ -278,6 +279,10 @@ export async function getCartAction(): Promise<CartData | null> {
           status: item.product.status,
           createdAt: item.product.createdAt.toISOString(),
           updatedAt: item.product.updatedAt.toISOString(),
+          images:
+            item.product.images?.map((img) => ({
+              imageUrl: img.imageUrl,
+            })) ?? [],
         },
       })),
     };
