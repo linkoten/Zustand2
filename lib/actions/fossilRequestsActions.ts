@@ -239,21 +239,15 @@ export async function updateFossilRequest(
 
     if (fossilRequestInDb?.clerkUserId) {
       // Récupérer le user.id interne à partir du clerkUserId
-      const user = await prisma.user.findUnique({
-        where: { clerkId: fossilRequestInDb.clerkUserId },
-        select: { id: true },
-      });
 
-      if (user?.id) {
-        await createNotification({
-          userId: user.id, // 👈 ici on utilise l'id interne
-          type: "FOSSIL_REQUEST_UPDATE",
-          title: "Mise à jour de votre demande",
-          message:
-            "Votre demande de recherche de fossile a été mise à jour par l'équipe.",
-          link: `/dashboard/requests/user/${id}`,
-        });
-      }
+      await createNotification({
+        userId: fossilRequestInDb.clerkUserId, // 👈 ici on utilise l'id interne
+        type: "FOSSIL_REQUEST_UPDATE",
+        title: "Mise à jour de votre demande",
+        message:
+          "Votre demande de recherche de fossile a été mise à jour par l'équipe.",
+        link: `/dashboard/requests/user/${id}`,
+      });
     }
 
     return {

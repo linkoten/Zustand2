@@ -9,8 +9,6 @@ export async function POST(request: NextRequest) {
     // ✅ Récupérer l'ID de l'utilisateur connecté
     const { userId } = await auth();
 
-    const user = await getUserData(userId!);
-
     const body = await request.json();
 
     const {
@@ -57,7 +55,7 @@ export async function POST(request: NextRequest) {
     });
     // 👉 Notification pour l'utilisateur
     await createNotification({
-      userId: user!.id,
+      userId: userId!,
       type: "FOSSIL_REQUEST",
       title: "Demande de recherche créée",
       message: "Votre demande de recherche de fossile a bien été enregistrée.",

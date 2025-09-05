@@ -395,7 +395,7 @@ async function handleCheckoutCompleted(session: StripeSession) {
     console.log("✅ Commande créée:", order.id);
 
     await createNotification({
-      userId: order.userId,
+      userId: clerkId,
       type: "ORDER",
       title: "Commande confirmée",
       message: `Votre commande #${order.id.slice(-8)} a bien été enregistrée.`,

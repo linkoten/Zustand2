@@ -500,7 +500,7 @@ export async function createBlogArticle(data: CreateArticleData) {
     await Promise.all(
       users.map((user) =>
         createNotification({
-          userId: user.id,
+          userId: user.clerkId,
           type: "BLOG",
           title: "Nouvel article publié",
           message: `Un nouvel article "${article.title}" vient d'être publié sur le blog.`,
