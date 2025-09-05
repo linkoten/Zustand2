@@ -11,6 +11,7 @@ import { BlogFilters, BlogResult, CreateArticleData } from "@/types/blogType";
 import { BlogListItem } from "@/types/type";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { createNotification } from "./notificationAction";
 
 export async function getBlogPosts(
   page: number = 1,
@@ -493,6 +494,20 @@ export async function createBlogArticle(data: CreateArticleData) {
         },
       },
     });
+
+    // Après la création du post :
+    const users = await prisma.user.findMany();
+    await Promise.all(
+      users.map((user) =>
+        createNotification({
+          userId: user.id,
+          type: "BLOG",
+          title: "Nouvel article publié",
+          message: `Un nouvel article "${article.title}" vient d'être publié sur le blog.`,
+          link: `/blog/${article.slug}`,
+        })
+      )
+    );
 
     console.log("✅ Article créé:", article.id);
 

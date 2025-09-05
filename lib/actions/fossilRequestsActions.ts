@@ -9,6 +9,7 @@ import {
   FossilRequestUpdateData,
 } from "@/types/fossilRequestType";
 import { getUserData } from "./dashboardActions";
+import { createNotification } from "./notificationAction";
 
 async function requireAuth() {
   const { userId } = await auth();
@@ -229,6 +230,31 @@ export async function updateFossilRequest(
       where: { id },
       data: updateData,
     });
+
+    // 👉 Notification pour l'utilisateur concerné
+    const fossilRequestInDb = await prisma.fossilRequest.findUnique({
+      where: { id },
+      select: { clerkUserId: true },
+    });
+
+    if (fossilRequestInDb?.clerkUserId) {
+      // Récupérer le user.id interne à partir du clerkUserId
+      const user = await prisma.user.findUnique({
+        where: { clerkId: fossilRequestInDb.clerkUserId },
+        select: { id: true },
+      });
+
+      if (user?.id) {
+        await createNotification({
+          userId: user.id, // 👈 ici on utilise l'id interne
+          type: "FOSSIL_REQUEST_UPDATE",
+          title: "Mise à jour de votre demande",
+          message:
+            "Votre demande de recherche de fossile a été mise à jour par l'équipe.",
+          link: `/dashboard/requests/user/${id}`,
+        });
+      }
+    }
 
     return {
       success: true,

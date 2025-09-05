@@ -18,6 +18,7 @@ import { auth } from "@clerk/nextjs/server";
 import { getUserData } from "@/lib/actions/dashboardActions";
 import { Decimal } from "@/lib/generated/prisma/runtime/library";
 import { redirect } from "next/navigation";
+import { createNotification } from "@/lib/actions/notificationAction";
 
 export async function POST(req: NextRequest) {
   try {
@@ -392,6 +393,14 @@ async function handleCheckoutCompleted(session: StripeSession) {
     });
 
     console.log("✅ Commande créée:", order.id);
+
+    await createNotification({
+      userId: order.userId,
+      type: "ORDER",
+      title: "Commande confirmée",
+      message: `Votre commande #${order.id.slice(-8)} a bien été enregistrée.`,
+      link: `/dashboard/orders/${order.id}`,
+    });
 
     revalidatePath("/fossiles");
     revalidatePath("/");

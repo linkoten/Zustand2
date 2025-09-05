@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { createNotification } from "@/lib/actions/notificationAction";
+import { getUserData } from "@/lib/actions/dashboardActions";
 
 export async function POST(request: NextRequest) {
   try {
     // ✅ Récupérer l'ID de l'utilisateur connecté
     const { userId } = await auth();
+
+    const user = await getUserData(userId!);
 
     const body = await request.json();
 
@@ -50,6 +54,14 @@ export async function POST(request: NextRequest) {
         priority: "NORMAL",
         clerkUserId: userId, // ✅ Associer à l'utilisateur connecté
       },
+    });
+    // 👉 Notification pour l'utilisateur
+    await createNotification({
+      userId: user!.id,
+      type: "FOSSIL_REQUEST",
+      title: "Demande de recherche créée",
+      message: "Votre demande de recherche de fossile a bien été enregistrée.",
+      link: "/dashboard/requests/user",
     });
 
     return NextResponse.json(
