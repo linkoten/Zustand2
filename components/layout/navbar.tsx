@@ -11,8 +11,10 @@ import { CartIconButton } from "../cart/cartIconButton";
 import { NotificationButton } from "../notification/notificationButton";
 import { getCartAction } from "@/lib/actions/cart-actions";
 import { useCartStore } from "@/stores/cart-store";
+import { LanguageSwitcher } from "./languageSwitcher";
+import { getDictionary } from "@/lib/i18n";
 
-export default function Navbar() {
+export default function Navbar({ locale }: { locale: "fr" | "en" }) {
   useEffect(() => {
     async function syncCart() {
       const cart = await getCartAction();
@@ -48,15 +50,16 @@ export default function Navbar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const dict = getDictionary(locale);
+
   const navigationLinks = [
-    { href: "/", label: "Accueil" },
-    { href: "/fossiles", label: "Fossiles" },
-    { href: "/blog", label: "Blog", icon: BookOpen },
+    { href: "/", label: dict.nav_home },
+    { href: "/fossiles", label: dict.nav_fossils },
+    { href: "/blog", label: dict.nav_blog, icon: BookOpen },
   ];
 
-  // ✅ Liens qui nécessitent une authentification
   const userLinks = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard", label: dict.nav_dashboard, icon: LayoutDashboard },
   ];
 
   const toggleMobileMenu = () => {
@@ -120,7 +123,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center space-x-4">
               {isLoaded && user && <NotificationButton userId={user.id} />}
               <CartIconButton onClick={toggleCart} />
-
+              <LanguageSwitcher locale={locale} />
               {isLoaded && (
                 <>
                   {user ? (
@@ -132,11 +135,11 @@ export default function Navbar() {
                       <Button asChild variant="ghost">
                         <Link href="/sign-in">
                           <User className="mr-2 h-4 w-4" />
-                          Connexion
+                          {dict.nav_signin}
                         </Link>
                       </Button>
                       <Button asChild>
-                        <Link href="/sign-up">S&apos;inscrire</Link>
+                        <Link href="/sign-up">{dict.nav_signup}</Link>
                       </Button>
                     </div>
                   )}
@@ -148,6 +151,7 @@ export default function Navbar() {
             <div className="md:hidden flex items-center space-x-2">
               {isLoaded && user && <NotificationButton userId={user.id} />}
               <CartIconButton onClick={toggleCart} />
+              <LanguageSwitcher locale={locale} />
 
               <Button
                 variant="ghost"
