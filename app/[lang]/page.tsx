@@ -8,8 +8,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BookOpen, ShoppingBag, ArrowRight, Globe, Star } from "lucide-react";
+import { getDictionary } from "./dictionaries";
 
-export default function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ lang: "en" | "fr" }>;
+}) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
+
   return (
     <div className="min-h-screen bg-white relative overflow-x-hidden">
       {/* Hero Section */}
@@ -25,12 +33,10 @@ export default function Home() {
                 textShadow: "0 4px 24px rgba(0,0,0,0.08)",
               }}
             >
-              Paleolitho
+              {dict.home.heroTitle}
             </h1>
             <p className="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
-              Découvrez notre collection de fossiles authentiques et explorez
-              l&apos;univers fascinant de la paléontologie à travers nos
-              articles.
+              {dict.home.heroSubtitle}
             </p>
           </div>
         </div>
@@ -46,9 +52,11 @@ export default function Home() {
                 <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-200 transition-colors shadow-md">
                   <ShoppingBag className="w-10 h-10 text-amber-600" />
                 </div>
-                <CardTitle className="text-2xl">Boutique</CardTitle>
+                <CardTitle className="text-2xl">
+                  {dict.home.shopTitle}
+                </CardTitle>
                 <CardDescription className="text-base">
-                  Explorez notre collection de fossiles authentiques
+                  {dict.home.shopDesc}
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
@@ -58,10 +66,10 @@ export default function Home() {
                   className="bg-amber-600 hover:bg-amber-700 w-full"
                 >
                   <Link
-                    href="/fossiles"
+                    href={`/${lang}/fossiles`} // ✅ Ajouter la locale aux liens
                     className="flex items-center justify-center gap-2"
                   >
-                    Voir les fossiles
+                    {dict.home.shopBtn}
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </Button>
@@ -74,9 +82,11 @@ export default function Home() {
                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors shadow-md">
                   <BookOpen className="w-10 h-10 text-blue-600" />
                 </div>
-                <CardTitle className="text-2xl">Blog</CardTitle>
+                <CardTitle className="text-2xl">
+                  {dict.home.blogTitle}
+                </CardTitle>
                 <CardDescription className="text-base">
-                  Approfondissez vos connaissances en paléontologie
+                  {dict.home.blogDesc}
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
@@ -86,10 +96,10 @@ export default function Home() {
                   className="bg-blue-600 hover:bg-blue-700 text-white w-full"
                 >
                   <Link
-                    href="/blog"
+                    href={`/${lang}/blog`} // ✅ Ajouter la locale aux liens
                     className="flex items-center justify-center gap-2"
                   >
-                    Lire les articles
+                    {dict.home.blogBtn}
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </Button>
@@ -108,21 +118,21 @@ export default function Home() {
                 <Star className="w-7 h-7 text-amber-400 mr-2" />
                 <span className="text-4xl font-bold text-amber-600">500+</span>
               </div>
-              <div className="text-gray-600">Fossiles disponibles</div>
+              <div className="text-gray-600">{dict.home.statsFossils}</div>
             </div>
             <div>
               <div className="flex items-center justify-center mb-2">
                 <BookOpen className="w-7 h-7 text-blue-400 mr-2" />
                 <span className="text-4xl font-bold text-blue-600">50+</span>
               </div>
-              <div className="text-gray-600">Articles de blog</div>
+              <div className="text-gray-600">{dict.home.statsArticles}</div>
             </div>
             <div>
               <div className="flex items-center justify-center mb-2">
                 <Globe className="w-7 h-7 text-gray-400 mr-2" />
                 <span className="text-4xl font-bold text-gray-600">10k+</span>
               </div>
-              <div className="text-gray-600">Visiteurs par mois</div>
+              <div className="text-gray-600">{dict.home.statsVisitors}</div>
             </div>
           </div>
         </div>

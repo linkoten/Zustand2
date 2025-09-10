@@ -12,9 +12,13 @@ import { NotificationButton } from "../notification/notificationButton";
 import { getCartAction } from "@/lib/actions/cart-actions";
 import { useCartStore } from "@/stores/cart-store";
 import { LanguageSwitcher } from "./languageSwitcher";
-import { getDictionary } from "@/lib/i18n";
 
-export default function Navbar({ locale }: { locale: "fr" | "en" }) {
+type NavbarProps = {
+  lang: "fr" | "en"; // ✅ Changer de "fr-FR" | "en-US" vers "fr" | "en"
+  dict: any;
+};
+
+export default function Navbar({ lang, dict }: NavbarProps) {
   useEffect(() => {
     async function syncCart() {
       const cart = await getCartAction();
@@ -49,8 +53,6 @@ export default function Navbar({ locale }: { locale: "fr" | "en" }) {
   const { user, isLoaded } = useUser();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const dict = getDictionary(locale);
 
   const navigationLinks = [
     { href: "/", label: dict.nav_home },
@@ -123,7 +125,7 @@ export default function Navbar({ locale }: { locale: "fr" | "en" }) {
             <div className="hidden md:flex items-center space-x-4">
               {isLoaded && user && <NotificationButton userId={user.id} />}
               <CartIconButton onClick={toggleCart} />
-              <LanguageSwitcher locale={locale} />
+              <LanguageSwitcher lang={lang} />
               {isLoaded && (
                 <>
                   {user ? (
@@ -151,7 +153,7 @@ export default function Navbar({ locale }: { locale: "fr" | "en" }) {
             <div className="md:hidden flex items-center space-x-2">
               {isLoaded && user && <NotificationButton userId={user.id} />}
               <CartIconButton onClick={toggleCart} />
-              <LanguageSwitcher locale={locale} />
+              <LanguageSwitcher lang={lang} />
 
               <Button
                 variant="ghost"

@@ -2,12 +2,12 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 
-export function LanguageSwitcher({ locale }: { locale: "fr" | "en" }) {
+export function LanguageSwitcher({ lang }: { lang: "en" | "fr" }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const otherLocale = locale === "fr" ? "en" : "fr";
-  const newPath = pathname.replace(/^\/(fr|en)/, `/${otherLocale}`);
+  const otherLang = lang === "fr" ? "en" : "fr";
+  const newPath = pathname.replace(/^\/(fr|en)/, `/${otherLang}`);
 
   return (
     <Button
@@ -21,7 +21,7 @@ export function LanguageSwitcher({ locale }: { locale: "fr" | "en" }) {
         cursor: "pointer",
       }}
     >
-      {otherLocale === "fr" ? "Français" : "English"}
+      {otherLang === "fr" ? "Français" : "English"}
     </Button>
   );
 }

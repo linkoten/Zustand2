@@ -4,7 +4,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import Navbar from "@/components/layout/navbar";
-import { getDictionary } from "@/lib/i18n"; // 👈 Import du dictionnaire
+import { getDictionary } from "./dictionaries";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,50 +23,43 @@ const cinzel = Cinzel({
   weight: ["400", "500", "600", "700"],
 });
 
-// 👇 Fonction pour générer les métadonnées traduites
 export async function generateMetadata({
   params,
 }: {
-  params: { locale: "fr" | "en" };
+  params: Promise<{ lang: "fr" | "en" }>; // ✅ Corriger le nom du paramètre
 }): Promise<Metadata> {
-  const dict = getDictionary(params.locale);
+  const { lang } = await params; // ✅ Utiliser 'lang' au lieu de 'locale'
+  const dict = await getDictionary(lang);
   return {
-    title: dict.siteTitle || "FossilShop",
-    description:
-      dict.siteDescription ||
-      "Découvrez notre collection de fossiles authentiques et explorez l'univers fascinant de la paléontologie",
+    title: dict.siteTitle,
+    description: dict.siteDescription,
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: "fr" | "en" };
+  params: Promise<{ lang: "fr" | "en" }>; // ✅ Corriger le nom du paramètre
 }>) {
-  const dict = getDictionary(params.locale);
+  const { lang } = await params; // ✅ Utiliser 'lang' au lieu de 'locale'
+  const dict = await getDictionary(lang);
 
   return (
     <ClerkProvider>
       <html
-        lang={params.locale}
+        lang={lang} // ✅ Utiliser 'lang' directement
         className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable}`}
       >
         <body className={`${cinzel.className} antialiased`}>
-          <Navbar locale={params.locale} />
+          <Navbar lang={lang} dict={dict} />
           <main className="flex-1">{children}</main>
-
-          {/* Footer traduit */}
           <footer className="border-t bg-muted/50 py-6 mt-12">
             <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-              <p>
-                © 2025 Paleolitho.{" "}
-                {dict.footerCopyright || "Tous droits réservés."}
-              </p>
+              <p>© 2025 Paleolitho. {dict.footerCopyright}</p>
             </div>
           </footer>
-
           <Toaster position="bottom-right" />
         </body>
       </html>

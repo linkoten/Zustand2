@@ -1,0 +1,25 @@
+{
+  "siteTitle": "FossilShop - Paleontology & Fossils",
+  "siteDescription": "Discover our collection of authentic fossils and explore the fascinating world of paleontology.",
+  "footerCopyright": "All rights reserved.",
+  "navbar": {
+    "home": "Home",
+    "cart": "Cart"
+  },
+  "home": {
+    "heroTitle": "Paleolitho",
+    "heroSubtitle": "Discover our collection of authentic fossils and explore the fascinating world of paleontology through our articles.",
+    "shopTitle": "Shop",
+    "shopDesc": "Explore our collection of authentic fossils",
+    "shopBtn": "See fossils",
+    "blogTitle": "Blog",
+    "blogDesc": "Deepen your knowledge of paleontology",
+    "blogBtn": "Read articles",
+    "statsFossils": "Fossils available",
+    "statsArticles": "Blog articles",
+    "statsVisitors": "Visitors per month"
+  },
+  "products": {
+    "cart": "Add to Cart"
+  }
+}
