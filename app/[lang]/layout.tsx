@@ -31,8 +31,8 @@ export async function generateMetadata({
   const { lang } = await params; // ✅ Utiliser 'lang' au lieu de 'locale'
   const dict = await getDictionary(lang);
   return {
-    title: dict.siteTitle,
-    description: dict.siteDescription,
+    title: dict.home.siteTitle,
+    description: dict.home.siteDescription,
   };
 }
 
@@ -57,7 +57,7 @@ export default async function RootLayout({
           <main className="flex-1">{children}</main>
           <footer className="border-t bg-muted/50 py-6 mt-12">
             <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-              <p>© 2025 Paleolitho. {dict.footerCopyright}</p>
+              <p>© 2025 Paleolitho. {dict.home.footerCopyright}</p>
             </div>
           </footer>
           <Toaster position="bottom-right" />

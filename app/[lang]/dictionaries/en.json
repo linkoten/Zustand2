@@ -1,12 +1,13 @@
 {
-  "siteTitle": "FossilShop - Paleontology & Fossils",
-  "siteDescription": "Discover our collection of authentic fossils and explore the fascinating world of paleontology.",
-  "footerCopyright": "All rights reserved.",
+  
   "navbar": {
     "home": "Home",
     "cart": "Cart"
   },
   "home": {
+    "siteTitle": "FossilShop - Paleontology & Fossils",
+  "siteDescription": "Discover our collection of authentic fossils and explore the fascinating world of paleontology.",
+  "footerCopyright": "All rights reserved.",
     "heroTitle": "Paleolitho",
     "heroSubtitle": "Discover our collection of authentic fossils and explore the fascinating world of paleontology through our articles.",
     "shopTitle": "Shop",

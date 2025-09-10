@@ -15,7 +15,8 @@ import { LanguageSwitcher } from "./languageSwitcher";
 
 type NavbarProps = {
   lang: "fr" | "en"; // ✅ Changer de "fr-FR" | "en-US" vers "fr" | "en"
-  dict: Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dict: any;
 };
 
 export default function Navbar({ lang, dict }: NavbarProps) {
