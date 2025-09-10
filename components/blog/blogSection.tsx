@@ -8,8 +8,15 @@ import { useBlogStore } from "@/stores/blogStore";
 
 interface BlogSectionProps {
   initialData: BlogListProps;
+  lang: "fr" | "en";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dict: any;
 }
-export default function BlogSection({ initialData }: BlogSectionProps) {
+export default function BlogSection({
+  initialData,
+  lang,
+  dict,
+}: BlogSectionProps) {
   const { blogData, isLoading, filters, setBlogData, loadBlogData } =
     useBlogStore();
 
@@ -50,14 +57,13 @@ export default function BlogSection({ initialData }: BlogSectionProps) {
   return (
     <div className="space-y-6">
       {/* Filtres de recherche */}
-      <BlogFilters />
-
+      <BlogFilters lang={lang} dict={dict} />
       {/* Indicateur de chargement */}
       {isLoading && (
         <div className="flex items-center justify-center py-8">
           <div className="flex items-center gap-2 text-muted-foreground">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-            <span>Chargement des articles...</span>
+            <span>{dict.blog.blogSection.loading}</span>
           </div>
         </div>
       )}
@@ -74,35 +80,49 @@ export default function BlogSection({ initialData }: BlogSectionProps) {
             searchParams.get("tag") ? (
               <>
                 <span className="font-medium">{currentData.totalPosts}</span>{" "}
-                résultat
-                {currentData.totalPosts > 1 ? "s" : ""} trouvé
-                {currentData.totalPosts > 1 ? "s" : ""}
+                {currentData.totalPosts > 1
+                  ? dict.blog.blogSection.resultsPlural
+                  : dict.blog.blogSection.results}{" "}
+                {currentData.totalPosts > 1
+                  ? dict.blog.blogSection.foundPlural
+                  : dict.blog.blogSection.found}
                 {searchParams.get("search") && (
-                  <span> pour &quot;{searchParams.get("search")}&quot;</span>
+                  <span>
+                    {" "}
+                    {dict.blog.blogSection.for} &quot;
+                    {searchParams.get("search")}
+                    &quot;
+                  </span>
                 )}
                 {searchParams.get("category") && (
-                  <span> dans {searchParams.get("category")}</span>
+                  <span>
+                    {" "}
+                    {dict.blog.blogSection.in} {searchParams.get("category")}
+                  </span>
                 )}
                 {searchParams.get("tag") && (
-                  <span> avec #{searchParams.get("tag")}</span>
+                  <span>
+                    {" "}
+                    {dict.blog.blogSection.with} {dict.blog.blogSection.tag}
+                    {searchParams.get("tag")}
+                  </span>
                 )}
               </>
             ) : (
               <>
                 <span className="font-medium">{currentData.totalPosts}</span>{" "}
-                article
-                {currentData.totalPosts > 1 ? "s" : ""} au total
+                {dict.blog.blogSection.total}
               </>
             )}
           </div>
 
           <div className="text-sm text-muted-foreground">
-            Page {currentData.currentPage} sur {currentData.totalPages}
+            {dict.blog.pageLabel || "Page"} {currentData.currentPage}{" "}
+            {dict.blog.ofLabel || "sur"} {currentData.totalPages}
           </div>
         </div>
-
         {/* Liste des articles */}
-        <BlogList {...currentData} />
+        <BlogList {...currentData} lang={lang} dict={dict} />{" "}
       </div>
     </div>
   );

@@ -2,12 +2,17 @@
   
   "navbar": {
     "home": "Accueil",
-    "cart": "Panier"
+    "cart": "Panier",
+    "fossils": "Fossiles",
+    "blog": "Blog",
+    "dashboard": "Tableau de bord",
+    "signin": "Connexion",
+    "signup": "S'inscrire"
   },
   "home": {
     "siteTitle": "FossilShop - Paléontologie & Fossiles",
-  "siteDescription": "Découvrez notre collection de fossiles authentiques et explorez l'univers fascinant de la paléontologie",
-  "footerCopyright": "Tous droits réservés.",
+    "siteDescription": "Découvrez notre collection de fossiles authentiques et explorez l'univers fascinant de la paléontologie",
+    "footerCopyright": "Tous droits réservés.",
     "heroTitle": "Paleolitho",
     "heroSubtitle": "Découvrez notre collection de fossiles authentiques et explorez l'univers fascinant de la paléontologie à travers nos articles.",
     "shopTitle": "Boutique",
@@ -19,6 +24,79 @@
     "statsFossils": "Fossiles disponibles",
     "statsArticles": "Articles de blog",
     "statsVisitors": "Visiteurs par mois"
+  },
+  "blog": {
+    "blogSection": {
+      "loading": "Chargement des articles...",
+      "results": "résultat",
+      "resultsPlural": "résultats",
+      "found": "trouvé",
+      "foundPlural": "trouvés",
+      "for": "pour",
+      "in": "dans",
+      "with": "avec",
+      "tag": "#",
+      "total": "au total"
+    },
+    "blogFilters": {
+      "activeFilters": "Filtres actifs :",
+      "clear": "Effacer",
+      "searchLabel": "Rechercher",
+      "searchPlaceholder": "Rechercher dans les articles...",
+      "categoryLabel": "Catégorie",
+      "allCategories": "Toutes les catégories",
+      "categoryPaleontology": "Paléontologie",
+      "categoryDiscovery": "Découvertes",
+      "categoryGuides": "Guides",
+      "categoryHistory": "Histoire",
+      "categoryActualite": "Actualité",
+      "categoryTechnique": "Technique",
+      "categoryExposition": "Exposition",
+      "categoryPortrait": "Portrait"
+    },
+    "blogList": {
+      "unknownAuthor": "Auteur inconnu",
+      "min": "min",
+      "publishedOn": "Publié le",
+      "deleteTitle": "Confirmer la suppression",
+      "deleteDescription": "Êtes-vous sûr de vouloir supprimer l'article \"{title}\" ? Cette action est irréversible.",
+      "deleteCancel": "Annuler",
+      "deleteConfirm": "Supprimer",
+      "noPostsFound": "Aucun article trouvé",
+    "tryChangingFilters": "Essayez de modifier vos critères de recherche.",
+    "noPostsYet": "Aucun article n'a encore été publié.",
+    "createFirstPost": "Créer le premier article",
+
+      "categoryPaleontology": "Paléontologie",
+    "categoryDiscovery": "Découvertes",
+    "categoryGuides": "Guides",
+    "categoryHistory": "Histoire",
+    "categoryActualite": "Actualité",
+    "categoryTechnique": "Technique",
+    "categoryExposition": "Exposition",
+    "categoryPortrait": "Portrait"
+    },
+    "blogStats": {
+      "statsTotalPosts": "Articles publiés",
+      "statsCurrentPagePosts": "Cette page",
+      "statsTotalPages": "Pages",
+      "statsCurrentPage": "Page actuelle"
+    },
+    "title": "Blog FossilShop",
+    "subtitle": "Découvrez nos articles sur la paléontologie et l'univers des fossiles",
+    "create": "Nouvel article",
+    "exploreCategories": "Explorez nos catégories",
+    "ctaTitle": "Vous êtes passionné de paléontologie ?",
+    "ctaText": "Rejoignez notre communauté et découvrez notre collection exceptionnelle de fossiles authentiques.",
+    "ctaFossils": "Voir les fossiles",
+    "ctaContact": "Nous contacter",
+    "pageLabel": "Page",
+    "ofLabel": "sur",
+    "postLabel": "article",
+    "pluralS": "s",
+    "totalLabel": "au total",
+    "prevLabel": "Précédent",
+    "nextLabel": "Suivant"
   },
   "products": {
     "cart": "Ajouter au panier"

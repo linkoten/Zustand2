@@ -9,8 +9,15 @@ interface BlogStatsProps {
     totalPages: number;
     currentPage: number;
   };
+  lang: "fr" | "en";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dict: any;
 }
-export default function BlogStats({ initialStats }: BlogStatsProps) {
+export default function BlogStats({
+  initialStats,
+  lang,
+  dict,
+}: BlogStatsProps) {
   const { blogData, isLoading } = useBlogStore();
 
   // Utiliser les données du store ou les données initiales
@@ -32,7 +39,9 @@ export default function BlogStats({ initialStats }: BlogStatsProps) {
         <div className="text-2xl font-bold text-blue-600">
           {stats.totalPosts}
         </div>
-        <div className="text-sm text-blue-600/80">Articles publiés</div>
+        <div className="text-sm text-blue-600/80">
+          {dict.blog.blogStats.statsTotalPosts || "Articles publiés"}
+        </div>
       </div>
 
       <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 relative">
@@ -44,7 +53,9 @@ export default function BlogStats({ initialStats }: BlogStatsProps) {
         <div className="text-2xl font-bold text-green-600">
           {stats.currentPagePosts}
         </div>
-        <div className="text-sm text-green-600/80">Cette page</div>
+        <div className="text-sm text-green-600/80">
+          {dict.blog.blogStats.statsCurrentPagePosts || "Cette page"}
+        </div>
       </div>
 
       <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 relative">
@@ -56,7 +67,9 @@ export default function BlogStats({ initialStats }: BlogStatsProps) {
         <div className="text-2xl font-bold text-purple-600">
           {stats.totalPages}
         </div>
-        <div className="text-sm text-purple-600/80">Pages</div>
+        <div className="text-sm text-purple-600/80">
+          {dict.blog.blogStats.statsTotalPages || "Pages"}
+        </div>
       </div>
 
       <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-4 relative">
@@ -68,7 +81,9 @@ export default function BlogStats({ initialStats }: BlogStatsProps) {
         <div className="text-2xl font-bold text-amber-600">
           {stats.currentPage}
         </div>
-        <div className="text-sm text-amber-600/80">Page actuelle</div>
+        <div className="text-sm text-amber-600/80">
+          {dict.blog.blogStats.statsCurrentPage || "Page actuelle"}
+        </div>
       </div>
     </div>
   );

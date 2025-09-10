@@ -64,12 +64,19 @@ export interface BlogListProps {
   currentPage: number;
   totalPosts: number;
 }
+interface BlogListExtraProps {
+  lang: "fr" | "en";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dict: any;
+}
 export default function BlogList({
   posts,
   totalPages,
   currentPage,
   totalPosts,
-}: BlogListProps) {
+  lang,
+  dict,
+}: BlogListProps & BlogListExtraProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [localPosts, setLocalPosts] = useState(posts);
   const { user } = useUser();
@@ -108,17 +115,17 @@ export default function BlogList({
     return colors[category] || "bg-gray-100 text-gray-800";
   };
 
-  // ✅ Fonction pour obtenir le label de la catégorie
+  // ✅ Fonction pour obtenir le label de la catégorie (i18n)
   const getCategoryLabel = (category: BlogCategory) => {
     const labels = {
-      [BlogCategory.PALEONTOLOGIE]: "Paléontologie",
-      [BlogCategory.DECOUVERTE]: "Découverte",
-      [BlogCategory.GUIDE_COLLECTION]: "Guide Collection",
-      [BlogCategory.HISTOIRE_GEOLOGIQUE]: "Histoire Géologique",
-      [BlogCategory.ACTUALITE]: "Actualité",
-      [BlogCategory.TECHNIQUE]: "Technique",
-      [BlogCategory.EXPOSITION]: "Exposition",
-      [BlogCategory.PORTRAIT]: "Portrait",
+      [BlogCategory.PALEONTOLOGIE]: dict.blog.blogListcategoryPaleontology,
+      [BlogCategory.DECOUVERTE]: dict.blog.blogListcategoryDiscovery,
+      [BlogCategory.GUIDE_COLLECTION]: dict.blog.blogListcategoryGuides,
+      [BlogCategory.HISTOIRE_GEOLOGIQUE]: dict.blog.blogListcategoryHistory,
+      [BlogCategory.ACTUALITE]: dict.blog.blogListcategoryActualite,
+      [BlogCategory.TECHNIQUE]: dict.blog.blogListcategoryTechnique,
+      [BlogCategory.EXPOSITION]: dict.blog.blogListcategoryExposition,
+      [BlogCategory.PORTRAIT]: dict.blog.blogListcategoryPortrait,
     };
     return labels[category] || category;
   };
@@ -159,17 +166,24 @@ export default function BlogList({
       <div className="text-center py-12">
         <div className="max-w-md mx-auto">
           <div className="text-6xl mb-4">📝</div>
-          <h3 className="text-xl font-semibold mb-2">Aucun article trouvé</h3>
+          <h3 className="text-xl font-semibold mb-2">
+            {dict.blog.blogList?.noPostsFound || "Aucun article trouvé"}
+          </h3>
           <p className="text-gray-500 mb-6">
             {searchParams.get("search") ||
             searchParams.get("category") ||
             searchParams.get("tag")
-              ? "Essayez de modifier vos critères de recherche."
-              : "Aucun article n'a encore été publié."}
+              ? dict.blog.blogList?.tryChangingFilters ||
+                "Essayez de modifier vos critères de recherche."
+              : dict.blog.blogList?.noPostsYet ||
+                "Aucun article n'a encore été publié."}
           </p>
           {canEditBlog && (
             <Button asChild>
-              <Link href="/blog/create">Créer le premier article</Link>
+              <Link href="/blog/create">
+                {dict.blog.blogList?.createFirstPost ||
+                  "Créer le premier article"}
+              </Link>
             </Button>
           )}
         </div>
@@ -232,21 +246,27 @@ export default function BlogList({
                           <AlertDialogHeader>
                             <AlertDialogTitle className="flex items-center gap-2">
                               <AlertTriangle className="h-5 w-5 text-destructive" />
-                              Confirmer la suppression
+                              {dict.blog.blogList?.deleteTitle ||
+                                "Confirmer la suppression"}
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              Êtes-vous sûr de vouloir supprimer l&apos;article
-                              &quot;{post.title}&quot; ? Cette action est
-                              irréversible.
+                              {dict.blog.blogList?.deleteDescription
+                                ? dict.blog.blogList.deleteDescription.replace(
+                                    "{title}",
+                                    post.title
+                                  )
+                                : `Êtes-vous sûr de vouloir supprimer l'article "${post.title}" ? Cette action est irréversible.`}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogCancel>
+                              {dict.blog.blogList?.deleteCancel || "Annuler"}
+                            </AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleDelete(post.id)}
                               className="bg-destructive hover:bg-destructive/90"
                             >
-                              Supprimer
+                              {dict.blog.blogList?.deleteConfirm || "Supprimer"}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -315,21 +335,31 @@ export default function BlogList({
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1">
                       <User className="w-3 h-3" />
-                      <span>{post.author.name || "Auteur inconnu"}</span>
+                      <span>
+                        {post.author.name ||
+                          dict.blog.blogList?.unknownAuthor ||
+                          "Auteur inconnu"}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      <span>{post.readTime || 5} min</span>
+                      <span>
+                        {post.readTime || 5} {dict.blog.blogList?.min || "min"}
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
                     <CalendarDays className="w-3 h-3" />
                     <span>
-                      {new Date(post.publishedAt).toLocaleDateString("fr-FR", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                      {dict.blog.blogList?.publishedOn || "Publié le"}{" "}
+                      {new Date(post.publishedAt).toLocaleDateString(
+                        lang === "fr" ? "fr-FR" : "en-US",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        }
+                      )}
                     </span>
                   </div>
                 </div>
@@ -344,8 +374,10 @@ export default function BlogList({
         <div className="flex flex-col items-center gap-4">
           {/* Informations de pagination */}
           <div className="text-sm text-muted-foreground">
-            Page {currentPage} sur {totalPages} • {totalPosts} article
-            {totalPosts > 1 ? "s" : ""} au total
+            {dict.pageLabel || "Page"} {currentPage} {dict.ofLabel || "sur"}{" "}
+            {totalPages} • {totalPosts} {dict.postLabel || "article"}
+            {totalPosts > 1 ? dict.pluralS || "s" : ""}{" "}
+            {dict.totalLabel || "au total"}
           </div>
 
           {/* Boutons de pagination */}
@@ -360,7 +392,7 @@ export default function BlogList({
             >
               <Link href={createPageUrl(currentPage - 1)}>
                 <ChevronLeft className="h-4 w-4" />
-                Précédent
+                {dict.prevLabel || "Précédent"}
               </Link>
             </Button>
 
@@ -424,7 +456,7 @@ export default function BlogList({
               className="gap-1"
             >
               <Link href={createPageUrl(currentPage + 1)}>
-                Suivant
+                {dict.nextLabel || "Suivant"}
                 <ChevronRight className="h-4 w-4" />
               </Link>
             </Button>

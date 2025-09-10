@@ -56,13 +56,13 @@ export default function Navbar({ lang, dict }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigationLinks = [
-    { href: "/", label: dict.nav_home },
-    { href: "/fossiles", label: dict.nav_fossils },
-    { href: "/blog", label: dict.nav_blog, icon: BookOpen },
+    { href: "/", label: dict.navbar.home },
+    { href: "/fossiles", label: dict.navbar.fossils },
+    { href: "/blog", label: dict.navbar.blog, icon: BookOpen },
   ];
 
   const userLinks = [
-    { href: "/dashboard", label: dict.nav_dashboard, icon: LayoutDashboard },
+    { href: "/dashboard", label: dict.navbar.dashboard, icon: LayoutDashboard },
   ];
 
   const toggleMobileMenu = () => {
@@ -138,11 +138,11 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                       <Button asChild variant="ghost">
                         <Link href="/sign-in">
                           <User className="mr-2 h-4 w-4" />
-                          {dict.nav_signin}
+                          {dict.navbar.signin}
                         </Link>
                       </Button>
                       <Button asChild>
-                        <Link href="/sign-up">{dict.nav_signup}</Link>
+                        <Link href="/sign-up">{dict.navbar.signup}</Link>
                       </Button>
                     </div>
                   )}
