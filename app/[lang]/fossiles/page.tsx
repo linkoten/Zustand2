@@ -14,11 +14,13 @@ export default async function FossilesPage({
   params,
   searchParams,
 }: {
-  params: { lang: "en" | "fr" };
+  params: Promise<{ lang: "en" | "fr" }>;
   searchParams: Promise<SearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
-  const dict = await getDictionary(params.lang);
+  const { lang } = await params;
+
+  const dict = await getDictionary(lang);
 
   // ✅ Récupérer userId AVANT l'appel à getFossils
   const { userId } = await auth();
@@ -71,7 +73,7 @@ export default async function FossilesPage({
         <FossilesClient
           fossils={fossils}
           filterOptions={filterOptions}
-          lang={params.lang}
+          lang={lang}
           dict={dict}
         />
       </div>
