@@ -21,6 +21,9 @@ interface ProductPageClientProps {
   similarProducts: SerializedProduct[];
   ratingStats: RatingStats;
   userRating: UserRating | null;
+  lang: "en" | "fr";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dict: any;
 }
 
 export default function ProductPageClient({
@@ -28,6 +31,8 @@ export default function ProductPageClient({
   similarProducts,
   ratingStats,
   userRating,
+  lang,
+  dict,
 }: ProductPageClientProps) {
   const { handleAddToCart, isAdding } = useHandleAddToCart();
 
@@ -41,7 +46,9 @@ export default function ProductPageClient({
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour aux fossiles
+            {dict?.fossils?.backToFossils ||
+              dict?.checkout?.backToFossils ||
+              (lang === "en" ? "Back to fossils" : "Retour aux fossiles")}
           </Link>
         </div>
 
@@ -74,6 +81,7 @@ export default function ProductPageClient({
                   stats={ratingStats}
                   userRating={userRating || undefined}
                   showForm={true}
+                  dict={dict}
                 />
               </div>
             </div>
@@ -89,24 +97,47 @@ export default function ProductPageClient({
               <CardContent className="p-6 space-y-4">
                 <h3 className="font-semibold flex items-center">
                   <Info className="mr-2 h-4 w-4" />
-                  Informations scientifiques
+                  {dict?.products?.scientificInfo ||
+                    (lang === "en"
+                      ? "Scientific information"
+                      : "Informations scientifiques")}
                 </h3>
 
                 <div className="grid grid-cols-1 gap-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="font-medium">Genre :</span>
+                    <span className="font-medium">
+                      {dict?.products?.genre ||
+                        (lang === "en" ? "Genus" : "Genre")}{" "}
+                      :
+                    </span>
                     <span>{product.genre}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-medium">Espèce :</span>
+                    <span className="font-medium">
+                      {dict?.products?.species ||
+                        (lang === "en" ? "Species" : "Espèce")}{" "}
+                      :
+                    </span>
                     <span className="italic">{product.species}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-medium">Période géologique :</span>
+                    <span className="font-medium">
+                      {dict?.fossils?.periodLabel ||
+                        (lang === "en"
+                          ? "Geological period"
+                          : "Période géologique")}{" "}
+                      :
+                    </span>
                     <span>{product.geologicalPeriod}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-medium">Étage géologique :</span>
+                    <span className="font-medium">
+                      {dict?.fossils?.stageLabel ||
+                        (lang === "en"
+                          ? "Geological stage"
+                          : "Étage géologique")}{" "}
+                      :
+                    </span>
                     <span>{product.geologicalStage}</span>
                   </div>
                 </div>
@@ -118,16 +149,30 @@ export default function ProductPageClient({
               <CardContent className="p-6 space-y-4">
                 <h3 className="font-semibold flex items-center">
                   <MapPin className="mr-2 h-4 w-4" />
-                  Provenance
+                  {dict?.products?.provenance ||
+                    (lang === "en" ? "Provenance" : "Provenance")}
                 </h3>
 
                 <div className="grid grid-cols-1 gap-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="font-medium">Pays d&apos;origine :</span>
-                    <span>{product.countryOfOrigin}</span>
+                    <span className="font-medium">
+                      {dict?.fossils?.countryLabel ||
+                        (lang === "en"
+                          ? "Country of origin"
+                          : "Pays d'origine")}{" "}
+                      :
+                    </span>
+                    <span>
+                      {dict?.countries?.[product.countryOfOrigin] ||
+                        product.countryOfOrigin}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-medium">Localité :</span>
+                    <span className="font-medium">
+                      {dict?.fossils?.localityLabel ||
+                        (lang === "en" ? "Locality" : "Localité")}{" "}
+                      :
+                    </span>
                     <span>{product.locality.name}</span>
                   </div>
                 </div>
@@ -138,7 +183,10 @@ export default function ProductPageClient({
             {product.description && (
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="font-semibold mb-4">Description</h3>
+                  <h3 className="font-semibold mb-4">
+                    {dict?.products?.description ||
+                      (lang === "en" ? "Description" : "Description")}
+                  </h3>
                   <p className="text-sm leading-relaxed">
                     {product.description}
                   </p>
@@ -154,15 +202,22 @@ export default function ProductPageClient({
               disabled={isAdding || product.status !== "AVAILABLE"}
             >
               <ShoppingCart className="mr-2 h-4 w-4" />
-              {isAdding ? "Ajout en cours..." : "Ajouter au panier"}
+              {isAdding
+                ? dict?.products?.addingToCart ||
+                  (lang === "en" ? "Adding..." : "Ajout en cours...")
+                : dict?.products?.cart ||
+                  (lang === "en" ? "Add to Cart" : "Ajouter au panier")}
             </Button>
 
             {/* Informations supplémentaires */}
             <div className="text-xs text-muted-foreground space-y-1">
               <div className="flex items-center">
                 <Calendar className="mr-1 h-3 w-3" />
-                Ajouté le{" "}
-                {new Date(product.createdAt).toLocaleDateString("fr-FR")}
+                {dict?.products?.addedOn ||
+                  (lang === "en" ? "Added on" : "Ajouté le")}{" "}
+                {new Date(product.createdAt).toLocaleDateString(
+                  lang === "en" ? "en-US" : "fr-FR"
+                )}
               </div>
             </div>
           </div>
@@ -172,10 +227,18 @@ export default function ProductPageClient({
         {similarProducts.length > 0 && (
           <div>
             <Separator className="mb-8" />
-            <h2 className="text-2xl font-bold mb-6">Produits similaires</h2>
+            <h2 className="text-2xl font-bold mb-6">
+              {dict?.products?.similarProducts ||
+                (lang === "en" ? "Similar products" : "Produits similaires")}
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {similarProducts.map((similarProduct) => (
-                <ProductCard key={similarProduct.id} product={similarProduct} />
+                <ProductCard
+                  key={similarProduct.id}
+                  product={similarProduct}
+                  lang={lang}
+                  dict={dict}
+                />
               ))}
             </div>
           </div>

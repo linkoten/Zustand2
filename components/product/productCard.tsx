@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -13,9 +12,11 @@ import { useHandleAddToCart } from "@/hooks/useHandleAddToCart";
 
 interface ProductCardProps {
   product: SerializedProduct;
+  lang: "en" | "fr";
+  dict: any;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, lang, dict }: ProductCardProps) {
   const { handleAddToCart, isAdding } = useHandleAddToCart();
 
   // ✅ Utiliser la première image ou afficher un placeholder
@@ -78,7 +79,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           disabled={isAdding || product.status !== "AVAILABLE"}
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
-          {isAdding ? "Ajout en cours..." : "Ajouter au panier"}
+          {isAdding ? dict.products.addingToCart : dict.products.cart}
         </Button>
       </CardFooter>
     </Card>

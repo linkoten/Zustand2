@@ -5,12 +5,13 @@ import {
   getUserProductRating,
 } from "@/lib/actions/ratingActions";
 import { getProduct, getSimilarProducts } from "@/lib/actions/productActions";
+import { getDictionary } from "../../dictionaries";
 
 // ✅ Générer les métadonnées SEO
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; lang: "en" | "fr" }>;
 }) {
   const resolvedParams = await params;
   const product = await getProduct(resolvedParams.id);
@@ -36,10 +37,12 @@ export async function generateMetadata({
 export default async function ProductPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; lang: "en" | "fr" }>;
 }) {
   const resolvedParams = await params;
   const product = await getProduct(resolvedParams.id);
+  const lang = resolvedParams.lang;
+  const dict = await getDictionary(lang);
 
   if (!product) {
     notFound();
@@ -58,6 +61,8 @@ export default async function ProductPage({
       similarProducts={similarProducts}
       ratingStats={ratingStats}
       userRating={userRating}
+      lang={lang}
+      dict={dict}
     />
   );
 }

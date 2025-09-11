@@ -1,5 +1,15 @@
-  
+
 {
+    
+  "rating": {
+    "title": "Notations",
+    "reviews": "avis",
+    "yourRating": "Votre note",
+    "edit": "Modifier",
+    "cancel": "Annuler",
+    "giveYourReview": "Donnez votre avis",
+    "rateThisItem": "Noter cet élément"
+  },
   "fossils": {
     "searchLabel": "Rechercher",
     "searchPlaceholder": "Rechercher un fossile...",
@@ -280,10 +290,35 @@
     "ZM": "Zambie"
   },
   "products": {
-  "cart": "Ajouter au panier",
-  "mustBeLoggedIn": "Vous devez être connecté pour ajouter aux favoris",
-  "favoriteError": "Erreur lors de la mise à jour des favoris",
-  "addedToFavorites": "Ajouté aux favoris",
-  "removedFromFavorites": "Retiré des favoris"
+    "cart": "Ajouter au panier",
+    "addingToCart": "Ajout en cours...",
+    "mustBeLoggedIn": "Vous devez être connecté pour ajouter aux favoris",
+    "favoriteError": "Erreur lors de la mise à jour des favoris",
+    "addedToFavorites": "Ajouté aux favoris",
+    "removedFromFavorites": "Retiré des favoris",
+    "scientificInfo": "Informations scientifiques",
+    "genre": "Genre",
+    "species": "Espèce",
+    "provenance": "Provenance",
+    "description": "Description",
+    "addedOn": "Ajouté le",
+    "similarProducts": "Produits similaires"
+  },
+  "ratingForm": {
+    "selectRating": "Veuillez sélectionner une note",
+    "updated": "Votre note a été mise à jour",
+    "saved": "Votre note a été enregistrée",
+    "saveError": "Erreur lors de l'enregistrement",
+    "deleted": "Votre note a été supprimée",
+    "deleteError": "Erreur lors de la suppression",
+    "editYourRating": "Modifier votre note",
+    "rateThisItem": "Notez cet élément",
+    "commentLabel": "Commentaire (optionnel)",
+    "commentPlaceholder": "Partagez votre expérience...",
+    "saving": "Enregistrement...",
+    "save": "Enregistrer",
+    "update": "Mettre à jour",
+    "deleting": "Suppression...",
+    "delete": "Supprimer"
   }
 }

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-
 import { toast } from "sonner";
 import { UserRating } from "@/types/ratingType";
 import { Trash2 } from "lucide-react";
@@ -16,12 +15,15 @@ export interface RatingFormProps {
   articleId?: string;
   initialRating?: UserRating;
   onRatingSubmitted?: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dict: any;
 }
 export default function RatingForm({
   productId,
   articleId,
   initialRating,
   onRatingSubmitted,
+  dict,
 }: RatingFormProps) {
   const [rating, setRating] = useState(initialRating?.rating || 0);
   const [comment, setComment] = useState(initialRating?.comment || "");
@@ -32,7 +34,9 @@ export default function RatingForm({
     e.preventDefault();
 
     if (rating === 0) {
-      toast.error("Veuillez sélectionner une note");
+      toast.error(
+        dict?.ratingForm?.selectRating || "Veuillez sélectionner une note"
+      );
       return;
     }
 
@@ -48,15 +52,21 @@ export default function RatingForm({
       if (result.success) {
         toast.success(
           initialRating
-            ? "Votre note a été mise à jour"
-            : "Votre note a été enregistrée"
+            ? dict?.ratingForm?.updated || "Votre note a été mise à jour"
+            : dict?.ratingForm?.saved || "Votre note a été enregistrée"
         );
         onRatingSubmitted?.();
       } else {
-        toast.error(result.error || "Erreur lors de l'enregistrement");
+        toast.error(
+          result.error ||
+            dict?.ratingForm?.saveError ||
+            "Erreur lors de l'enregistrement"
+        );
       }
     } catch (error) {
-      toast.error("Erreur lors de l'enregistrement");
+      toast.error(
+        dict?.ratingForm?.saveError || "Erreur lors de l'enregistrement"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -69,12 +79,14 @@ export default function RatingForm({
     try {
       // Note: Il faudrait passer l'ID de la notation ici
       // Pour simplifier, on pourrait récupérer l'ID via une action supplémentaire
-      toast.success("Votre note a été supprimée");
+      toast.success(dict?.ratingForm?.deleted || "Votre note a été supprimée");
       setRating(0);
       setComment("");
       onRatingSubmitted?.();
     } catch (error) {
-      toast.error("Erreur lors de la suppression");
+      toast.error(
+        dict?.ratingForm?.deleteError || "Erreur lors de la suppression"
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -84,7 +96,9 @@ export default function RatingForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label className="text-base font-medium">
-          {initialRating ? "Modifier votre note" : "Notez cet élément"}
+          {initialRating
+            ? dict?.ratingForm?.editYourRating || "Modifier votre note"
+            : dict?.ratingForm?.rateThisItem || "Notez cet élément"}
         </Label>
         <div className="mt-2">
           <StarRating rating={rating} onRatingChange={setRating} size="lg" />
@@ -92,12 +106,17 @@ export default function RatingForm({
       </div>
 
       <div>
-        <Label htmlFor="comment">Commentaire (optionnel)</Label>
+        <Label htmlFor="comment">
+          {dict?.ratingForm?.commentLabel || "Commentaire (optionnel)"}
+        </Label>
         <Textarea
           id="comment"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Partagez votre expérience..."
+          placeholder={
+            dict?.ratingForm?.commentPlaceholder ||
+            "Partagez votre expérience..."
+          }
           rows={3}
           className="mt-1"
         />
@@ -106,10 +125,10 @@ export default function RatingForm({
       <div className="flex gap-2">
         <Button type="submit" disabled={isSubmitting || rating === 0}>
           {isSubmitting
-            ? "Enregistrement..."
+            ? dict?.ratingForm?.saving || "Enregistrement..."
             : initialRating
-              ? "Mettre à jour"
-              : "Enregistrer"}
+              ? dict?.ratingForm?.update || "Mettre à jour"
+              : dict?.ratingForm?.save || "Enregistrer"}
         </Button>
 
         {initialRating && (
@@ -121,7 +140,9 @@ export default function RatingForm({
             className="text-red-600 hover:text-red-700"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            {isDeleting ? "Suppression..." : "Supprimer"}
+            {isDeleting
+              ? dict?.ratingForm?.deleting || "Suppression..."
+              : dict?.ratingForm?.delete || "Supprimer"}
           </Button>
         )}
       </div>

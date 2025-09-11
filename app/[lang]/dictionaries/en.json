@@ -1,5 +1,15 @@
 
+
 {
+  "rating": {
+    "title": "Ratings",
+    "reviews": "reviews",
+    "yourRating": "Your rating",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "giveYourReview": "Give your review",
+    "rateThisItem": "Rate this item"
+  },
     "fossils": {
     "searchLabel": "Search",
     "searchPlaceholder": "Search for a fossil...",
@@ -280,10 +290,35 @@
     "ZM": "Zambia"
   },
   "products": {
-  "cart": "Add to Cart",
-  "mustBeLoggedIn": "You must be logged in to add to favorites",
-  "favoriteError": "Error updating favorites",
-  "addedToFavorites": "Added to favorites",
-  "removedFromFavorites": "Removed from favorites"
+    "cart": "Add to Cart",
+    "addingToCart": "Adding...",
+    "mustBeLoggedIn": "You must be logged in to add to favorites",
+    "favoriteError": "Error updating favorites",
+    "addedToFavorites": "Added to favorites",
+    "removedFromFavorites": "Removed from favorites",
+    "scientificInfo": "Scientific information",
+    "genre": "Genus",
+    "species": "Species",
+    "provenance": "Provenance",
+    "description": "Description",
+    "addedOn": "Added on",
+    "similarProducts": "Similar products"
+  },
+  "ratingForm": {
+    "selectRating": "Please select a rating",
+    "updated": "Your rating has been updated",
+    "saved": "Your rating has been saved",
+    "saveError": "Error saving rating",
+    "deleted": "Your rating has been deleted",
+    "deleteError": "Error deleting rating",
+    "editYourRating": "Edit your rating",
+    "rateThisItem": "Rate this item",
+    "commentLabel": "Comment (optional)",
+    "commentPlaceholder": "Share your experience...",
+    "saving": "Saving...",
+    "save": "Save",
+    "update": "Update",
+    "deleting": "Deleting...",
+    "delete": "Delete"
   }
 }

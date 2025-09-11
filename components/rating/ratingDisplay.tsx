@@ -15,6 +15,8 @@ interface RatingDisplayProps {
   productId?: number;
   articleId?: string;
   showForm?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dict: any;
 }
 
 export default function RatingDisplay({
@@ -23,6 +25,7 @@ export default function RatingDisplay({
   productId,
   articleId,
   showForm = true,
+  dict,
 }: RatingDisplayProps) {
   const [showRatingForm, setShowRatingForm] = useState(false);
 
@@ -37,7 +40,7 @@ export default function RatingDisplay({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Star className="h-5 w-5" />
-          Notations
+          {dict?.rating?.title || "Notations"}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -49,7 +52,7 @@ export default function RatingDisplay({
             </div>
             <StarRating rating={stats.averageRating} readonly size="md" />
             <div className="text-sm text-muted-foreground mt-1">
-              {stats.totalRatings} avis
+              {stats.totalRatings} {dict?.rating?.reviews || "avis"}
             </div>
           </div>
 
@@ -89,13 +92,17 @@ export default function RatingDisplay({
             {userRating ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-medium">Votre note</h4>
+                  <h4 className="font-medium">
+                    {dict?.rating?.yourRating || "Votre note"}
+                  </h4>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setShowRatingForm(!showRatingForm)}
                   >
-                    {showRatingForm ? "Annuler" : "Modifier"}
+                    {showRatingForm
+                      ? dict?.rating?.cancel || "Annuler"
+                      : dict?.rating?.edit || "Modifier"}
                   </Button>
                 </div>
 
@@ -112,7 +119,9 @@ export default function RatingDisplay({
               </div>
             ) : (
               <div className="space-y-4">
-                <h4 className="font-medium">Donnez votre avis</h4>
+                <h4 className="font-medium">
+                  {dict?.rating?.giveYourReview || "Donnez votre avis"}
+                </h4>
                 {!showRatingForm && (
                   <Button
                     variant="outline"
@@ -120,7 +129,7 @@ export default function RatingDisplay({
                     className="w-full"
                   >
                     <MessageSquare className="h-4 w-4 mr-2" />
-                    Noter cet élément
+                    {dict?.rating?.rateThisItem || "Noter cet élément"}
                   </Button>
                 )}
               </div>
@@ -133,6 +142,7 @@ export default function RatingDisplay({
                   articleId={articleId}
                   initialRating={userRating}
                   onRatingSubmitted={handleRatingSubmitted}
+                  dict={dict}
                 />
               </div>
             )}
