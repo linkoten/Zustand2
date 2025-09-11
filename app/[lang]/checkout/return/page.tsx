@@ -12,7 +12,7 @@ import {
 import { getDictionary } from "../../dictionaries";
 
 interface ReturnPageProps {
-  params: { lang: "en" | "fr" };
+  params: Promise<{ lang: "en" | "fr" }>;
   searchParams: Promise<{ session_id?: string }>;
 }
 
@@ -20,7 +20,7 @@ export default async function CheckoutReturnPage({
   params,
   searchParams,
 }: ReturnPageProps) {
-  const { lang } = params;
+  const { lang } = await params;
   const dict = await getDictionary(lang);
   const { session_id } = await searchParams;
 
