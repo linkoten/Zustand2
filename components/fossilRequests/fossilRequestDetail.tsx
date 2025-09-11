@@ -61,6 +61,7 @@ interface FossilRequestDetailProps {
     clerkUserId?: string | null;
     userRole?: UserRole;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any;
 }
 

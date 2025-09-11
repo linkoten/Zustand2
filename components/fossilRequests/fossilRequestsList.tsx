@@ -91,6 +91,7 @@ interface FossilRequestListProps {
   currentPage: number;
   totalRequests: number;
   userRole: UserRole;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any;
 }
 
