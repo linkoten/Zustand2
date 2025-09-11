@@ -2,18 +2,31 @@ import { Button } from "@/components/ui/button";
 import { getUserOrders } from "@/lib/actions/dashboardActions";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
+import { getDictionary } from "../../dictionaries";
 
-export default async function OrdersPage() {
+export default async function OrdersPage({
+  params,
+}: {
+  params: Promise<{ lang: "en" | "fr" }>;
+}) {
   const { userId } = await auth();
   if (!userId) return <div>Non connecté</div>;
 
   const orders = await getUserOrders(userId);
 
+  const { lang } = await params;
+
+  const dict = await getDictionary(lang);
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Mes commandes</h1>
+      <h1 className="text-2xl font-bold mb-6">
+        {dict.dashboard?.ordersTitle || "Mes commandes"}
+      </h1>
       {orders.length === 0 ? (
-        <p>Vous n&apos;avez pas encore passé de commande.</p>
+        <p>
+          {dict.dashboard?.ordersEmpty ||
+            "Vous n'avez pas encore passé de commande."}
+        </p>
       ) : (
         <div className="space-y-4">
           {orders.map((order) => (
@@ -23,25 +36,30 @@ export default async function OrdersPage() {
             >
               <div>
                 <div className="font-semibold">
-                  Commande #{order.id.slice(-8).toUpperCase()}
+                  {dict.dashboard?.orderLabel || "Commande"} #
+                  {order.id.slice(-8).toUpperCase()}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Passée le{" "}
-                  {new Date(order.createdAt).toLocaleDateString("fr-FR")}
+                  {dict.dashboard?.orderPlacedOn || "Passée le"}{" "}
+                  {new Date(order.createdAt).toLocaleDateString(
+                    lang === "en" ? "en-GB" : "fr-FR"
+                  )}
                 </div>
                 <div className="text-sm">
-                  Total :{" "}
+                  {dict.dashboard?.orderTotal || "Total"} :{" "}
                   {order.total && typeof order.total.toNumber === "function"
-                    ? order.total.toNumber().toLocaleString("fr-FR", {
-                        style: "currency",
-                        currency: "EUR",
-                      })
+                    ? order.total
+                        .toNumber()
+                        .toLocaleString(lang === "en" ? "en-GB" : "fr-FR", {
+                          style: "currency",
+                          currency: "EUR",
+                        })
                     : order.total?.toString()}
                 </div>
               </div>
               <Button asChild>
                 <Link href={`/dashboard/orders/${order.id}`}>
-                  Voir le détail
+                  {dict.dashboard?.orderDetailsButton || "Voir le détail"}
                 </Link>
               </Button>
             </div>

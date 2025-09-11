@@ -9,7 +9,14 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export function NotificationButton({ userId }: { userId: string }) {
+export function NotificationButton({
+  userId,
+  dict,
+}: {
+  userId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dict: any;
+}) {
   const [open, setOpen] = useState(false);
   const notifications = useNotificationStore((s) => s.notifications);
   const setNotifications = useNotificationStore((s) => s.setNotifications);
@@ -52,7 +59,7 @@ export function NotificationButton({ userId }: { userId: string }) {
         variant="ghost"
         size="icon"
         onClick={() => setOpen((v) => !v)}
-        aria-label="Notifications"
+        aria-label={dict.notification.ariaLabel}
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
@@ -63,9 +70,13 @@ export function NotificationButton({ userId }: { userId: string }) {
       </Button>
       {open && (
         <div className="absolute right-0 mt-2 w-80 bg-white border rounded shadow-lg z-50 max-h-96 overflow-y-auto">
-          <div className="p-4 border-b font-semibold">Notifications</div>
+          <div className="p-4 border-b font-semibold">
+            {dict.notification.title}
+          </div>
           {notifications.length === 0 ? (
-            <div className="p-4 text-sm text-gray-500">Aucune notification</div>
+            <div className="p-4 text-sm text-gray-500">
+              {dict.notification.empty}
+            </div>
           ) : (
             notifications.map((notif) => (
               <div
@@ -81,17 +92,19 @@ export function NotificationButton({ userId }: { userId: string }) {
                       variant="outline"
                       onClick={() => handleMarkAsRead(notif.id)}
                     >
-                      Marquer comme lue
+                      {dict.notification.markAsRead}
                     </Button>
                   )}
                   {notif.link && (
                     <Button asChild size="sm" variant="link">
-                      <Link href={notif.link}>Voir</Link>
+                      <Link href={notif.link}>{dict.notification.see}</Link>
                     </Button>
                   )}
                 </div>
                 <div className="text-xs text-gray-400 mt-1">
-                  {new Date(notif.createdAt).toLocaleString("fr-FR")}
+                  {new Date(notif.createdAt).toLocaleString(
+                    dict.notification.dateLocale || "fr-FR"
+                  )}
                 </div>
               </div>
             ))

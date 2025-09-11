@@ -21,9 +21,11 @@ interface CartItemProps {
     };
     imageUrl: string;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dict: any;
 }
 
-export function CartItem({ item }: CartItemProps) {
+export function CartItem({ item, dict }: CartItemProps) {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
 
@@ -31,9 +33,17 @@ export function CartItem({ item }: CartItemProps) {
     const result = await removeCartItemAction(item.id); // 👈 item.id = cartItemId
     if (result.success) {
       removeItem(item.productId);
-      toast.success(`${item.title} retiré du panier`);
+      toast.success(
+        dict.cartItem.removedSuccess
+          ? dict.cartItem.removedSuccess.replace("{title}", item.title)
+          : `${item.title} retiré du panier`
+      );
     } else {
-      toast.error(result.error || "Erreur lors de la suppression");
+      toast.error(
+        result.error ||
+          dict.cartItem.removedError ||
+          "Erreur lors de la suppression"
+      );
     }
   };
 

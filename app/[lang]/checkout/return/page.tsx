@@ -9,14 +9,19 @@ import {
   sendAdminNotificationEmail,
   sendOrderConfirmationEmail,
 } from "@/components/resend/sendOrderConfirmationEmail";
+import { getDictionary } from "../../dictionaries";
 
 interface ReturnPageProps {
+  params: { lang: "en" | "fr" };
   searchParams: Promise<{ session_id?: string }>;
 }
 
 export default async function CheckoutReturnPage({
+  params,
   searchParams,
 }: ReturnPageProps) {
+  const { lang } = params;
+  const dict = await getDictionary(lang);
   const { session_id } = await searchParams;
 
   if (!session_id) {
@@ -32,22 +37,20 @@ export default async function CheckoutReturnPage({
     const customerEmail = customer_details?.email;
     const customerName = customer_details?.name;
 
-    // Rediriger si la session est toujours ouverte
+    // Redirect if session is still open
     if (status === "open") {
       redirect("/checkout");
     }
 
-    // Paiement réussi
+    // Payment success
     if (status === "complete") {
-      // Vider le panier après paiement réussi
       await clearCartAction();
 
-      // Envoyer l'email de confirmation
       if (customerEmail && customerName && line_items) {
         try {
           const orderItems = line_items.data.map((item) => ({
-            name: item.description || "Article",
-            price: new Intl.NumberFormat("fr-FR", {
+            name: item.description || dict.checkoutReturn.itemDefault,
+            price: new Intl.NumberFormat(lang === "fr" ? "fr-FR" : "en-US", {
               style: "currency",
               currency: "EUR",
             }).format((item.amount_total || 0) / 100),
@@ -58,28 +61,33 @@ export default async function CheckoutReturnPage({
             customerEmail,
             customerName,
             orderNumber: session_id.slice(-8).toUpperCase(),
-            orderTotal: new Intl.NumberFormat("fr-FR", {
-              style: "currency",
-              currency: "EUR",
-            }).format((session.amount_total || 0) / 100),
+            orderTotal: new Intl.NumberFormat(
+              lang === "fr" ? "fr-FR" : "en-US",
+              {
+                style: "currency",
+                currency: "EUR",
+              }
+            ).format((session.amount_total || 0) / 100),
             orderItems,
-            // ✅ Simplifier l'adresse de livraison pour éviter les erreurs TypeScript
             shippingAddress: {
               name: customerName,
-              line1: customer_details?.address?.line1 || "Adresse à préciser",
-              city: customer_details?.address?.city || "Ville à préciser",
+              line1:
+                customer_details?.address?.line1 ||
+                dict.checkoutReturn.addressDefault,
+              city:
+                customer_details?.address?.city ||
+                dict.checkoutReturn.cityDefault,
               postal_code: customer_details?.address?.postal_code || "",
-              country: customer_details?.address?.country || "France",
+              country:
+                customer_details?.address?.country ||
+                dict.checkoutReturn.countryDefault,
             },
           };
 
-          // Envoyer email client
           await sendOrderConfirmationEmail(emailData);
-
-          // Envoyer notification admin (optionnel)
           await sendAdminNotificationEmail(emailData);
         } catch (emailError) {
-          console.error("❌ Erreur envoi email:", emailError);
+          console.error("❌ Email error:", emailError);
         }
       }
 
@@ -92,16 +100,14 @@ export default async function CheckoutReturnPage({
                   <CheckCircle className="h-8 w-8 text-green-600" />
                 </div>
                 <CardTitle className="text-2xl text-green-600">
-                  Paiement réussi !
+                  {dict.checkoutReturn.successTitle}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="text-center text-muted-foreground">
-                  <p className="mb-2">
-                    Merci pour votre commande ! Nous apprécions votre confiance.
-                  </p>
+                  <p className="mb-2">{dict.checkoutReturn.successMessage}</p>
                   <p>
-                    Un email de confirmation a été envoyé à{" "}
+                    {dict.checkoutReturn.confirmationSent}{" "}
                     <span className="font-medium text-foreground">
                       {customerEmail}
                     </span>
@@ -111,19 +117,26 @@ export default async function CheckoutReturnPage({
                 <div className="bg-muted p-4 rounded-lg">
                   <div className="grid grid-cols-1 gap-2 text-sm">
                     <div>
-                      <span className="font-medium">Numéro de commande :</span>
+                      <span className="font-medium">
+                        {dict.checkoutReturn.orderNumberLabel}
+                      </span>
                       <p className="text-muted-foreground font-mono text-xs">
                         #{session_id.slice(-8).toUpperCase()}
                       </p>
                     </div>
                     <div>
-                      <span className="font-medium">Montant total :</span>
+                      <span className="font-medium">
+                        {dict.checkoutReturn.orderTotalLabel}
+                      </span>
                       <p className="text-muted-foreground">
                         {session.amount_total
-                          ? new Intl.NumberFormat("fr-FR", {
-                              style: "currency",
-                              currency: "EUR",
-                            }).format(session.amount_total / 100)
+                          ? new Intl.NumberFormat(
+                              lang === "fr" ? "fr-FR" : "en-US",
+                              {
+                                style: "currency",
+                                currency: "EUR",
+                              }
+                            ).format(session.amount_total / 100)
                           : "N/A"}
                       </p>
                     </div>
@@ -132,7 +145,7 @@ export default async function CheckoutReturnPage({
 
                 <div className="text-center text-sm text-muted-foreground">
                   <p>
-                    Si vous avez des questions, contactez-nous à{" "}
+                    {dict.checkoutReturn.questions}{" "}
                     <a
                       href="mailto:support@votre-domaine.com"
                       className="font-medium text-primary hover:underline"
@@ -145,12 +158,14 @@ export default async function CheckoutReturnPage({
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button asChild className="flex-1">
                     <Link href="/fossiles">
-                      Continuer les achats
+                      {dict.checkoutReturn.continueShopping}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
                   <Button variant="outline" asChild className="flex-1">
-                    <Link href="/commandes">Voir mes commandes</Link>
+                    <Link href="/commandes">
+                      {dict.checkoutReturn.viewOrders}
+                    </Link>
                   </Button>
                 </div>
               </CardContent>
@@ -160,7 +175,7 @@ export default async function CheckoutReturnPage({
       );
     }
 
-    // Autres statuts...
+    // Other statuses (expired, etc.)
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto">
@@ -169,19 +184,20 @@ export default async function CheckoutReturnPage({
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
                 <XCircle className="h-8 w-8 text-red-600" />
               </div>
-              <CardTitle className="text-2xl">Session expirée</CardTitle>
+              <CardTitle className="text-2xl">
+                {dict.checkoutReturn.expiredTitle}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="text-center text-muted-foreground">
-                <p>
-                  Votre session de paiement a expiré. Veuillez recommencer votre
-                  commande.
-                </p>
+                <p>{dict.checkoutReturn.expiredMessage}</p>
               </div>
 
               <div className="flex justify-center">
                 <Button asChild>
-                  <Link href="/checkout">Recommencer le paiement</Link>
+                  <Link href="/checkout">
+                    {dict.checkoutReturn.retryPayment}
+                  </Link>
                 </Button>
               </div>
             </CardContent>
@@ -190,7 +206,7 @@ export default async function CheckoutReturnPage({
       </div>
     );
   } catch (error) {
-    console.error("Erreur récupération session:", error);
+    console.error("Session error:", error);
     redirect("/");
   }
 }

@@ -124,7 +124,9 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
             {/* Actions desktop */}
             <div className="hidden md:flex items-center space-x-4">
-              {isLoaded && user && <NotificationButton userId={user.id} />}
+              {isLoaded && user && (
+                <NotificationButton userId={user.id} dict={dict} />
+              )}
               <CartIconButton onClick={toggleCart} />
               <LanguageSwitcher lang={lang} />
               {isLoaded && (
@@ -152,7 +154,9 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
             {/* Menu mobile button */}
             <div className="md:hidden flex items-center space-x-2">
-              {isLoaded && user && <NotificationButton userId={user.id} />}
+              {isLoaded && user && (
+                <NotificationButton userId={user.id} dict={dict} />
+              )}
               <CartIconButton onClick={toggleCart} />
               <LanguageSwitcher lang={lang} />
 
@@ -252,7 +256,11 @@ export default function Navbar({ lang, dict }: NavbarProps) {
       </nav>
 
       {/* Sidebar du panier */}
-      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <CartSidebar
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        dict={dict}
+      />
     </>
   );
 }

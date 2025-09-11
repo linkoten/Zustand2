@@ -3,9 +3,10 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { getDictionary } from "@/app/[lang]/dictionaries";
 
 interface OrderDetailPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; lang: "en" | "fr" }>;
 }
 
 export default async function OrderDetailPage({
@@ -16,7 +17,9 @@ export default async function OrderDetailPage({
 
   const orders = await getUserOrders(userId);
 
-  const { id } = await params;
+  const { id, lang } = await params;
+
+  const dict = await getDictionary(lang);
 
   const order = orders.find((o) => o.id === id);
 
@@ -25,23 +28,33 @@ export default async function OrderDetailPage({
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">
-        Détail de la commande #{order.id.slice(-8).toUpperCase()}
+        {dict.dashboard?.orderDetailTitle || "Détail de la commande"} #
+        {order.id.slice(-8).toUpperCase()}
       </h1>
       <div className="mb-4 text-muted-foreground">
-        Passée le {new Date(order.createdAt).toLocaleDateString("fr-FR")}
+        {dict.dashboard?.orderPlacedOn || "Passée le"}{" "}
+        {new Date(order.createdAt).toLocaleDateString(
+          lang === "en" ? "en-GB" : "fr-FR"
+        )}
       </div>
       <div className="mb-4">
-        <span className="font-semibold">Total :</span>{" "}
+        <span className="font-semibold">
+          {dict.dashboard?.orderTotal || "Total"} :
+        </span>{" "}
         {order.total && typeof order.total.toNumber === "function"
-          ? order.total.toNumber().toLocaleString("fr-FR", {
-              style: "currency",
-              currency: "EUR",
-            })
+          ? order.total
+              .toNumber()
+              .toLocaleString(lang === "en" ? "en-GB" : "fr-FR", {
+                style: "currency",
+                currency: "EUR",
+              })
           : order.total?.toString()}
       </div>
 
       <div className="mb-6">
-        <span className="font-semibold">Produits :</span>
+        <span className="font-semibold">
+          {dict.dashboard?.orderProducts || "Produits"} :
+        </span>
         <div className="mt-4 grid gap-4">
           {order.items.map((item) => {
             const imageUrl =
@@ -55,32 +68,44 @@ export default async function OrderDetailPage({
               >
                 <img
                   src={imageUrl}
-                  alt={item.product?.title || "Produit"}
+                  alt={
+                    item.product?.title ||
+                    dict.dashboard?.orderProduct ||
+                    "Produit"
+                  }
                   className="w-16 h-16 object-cover rounded"
                 />
                 <div className="flex-1">
                   <div className="font-semibold">
-                    {item.product?.title || "Produit"}
+                    {item.product?.title ||
+                      dict.dashboard?.orderProduct ||
+                      "Produit"}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    Quantité : {item.quantity}
+                    {dict.dashboard?.orderQuantity || "Quantité"} :{" "}
+                    {item.quantity}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    Prix unitaire :{" "}
+                    {dict.dashboard?.orderUnitPrice || "Prix unitaire"} :{" "}
                     {item.price && typeof item.price.toNumber === "function"
-                      ? item.price.toNumber().toLocaleString("fr-FR", {
-                          style: "currency",
-                          currency: "EUR",
-                        })
+                      ? item.price
+                          .toNumber()
+                          .toLocaleString(lang === "en" ? "en-GB" : "fr-FR", {
+                            style: "currency",
+                            currency: "EUR",
+                          })
                       : item.price?.toString()}
                   </div>
                   <div className="text-sm">
-                    Total ligne :{" "}
+                    {dict.dashboard?.orderLineTotal || "Total ligne"} :{" "}
                     {typeof item.price === "number"
-                      ? (item.price * item.quantity).toLocaleString("fr-FR", {
-                          style: "currency",
-                          currency: "EUR",
-                        })
+                      ? (item.price * item.quantity).toLocaleString(
+                          lang === "en" ? "en-GB" : "fr-FR",
+                          {
+                            style: "currency",
+                            currency: "EUR",
+                          }
+                        )
                       : ""}
                   </div>
                 </div>
@@ -90,7 +115,9 @@ export default async function OrderDetailPage({
         </div>
       </div>
       <Button asChild variant="outline">
-        <Link href="/dashboard/orders">Retour à mes commandes</Link>
+        <Link href="/dashboard/orders">
+          {dict.dashboard?.orderBackToOrders || "Retour à mes commandes"}
+        </Link>
       </Button>
     </div>
   );

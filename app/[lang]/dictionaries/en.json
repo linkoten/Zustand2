@@ -1,5 +1,10 @@
 
 {
+   "cartItem": {
+    "removedSuccess": "{title} removed from cart",
+    "removedError": "Error removing item from cart",
+    "priceLocale": "en-US"
+  },
     "dashboardRequests": {
     "backToDashboard": "Back to dashboard",
     "title": "My fossil requests",
@@ -461,6 +466,62 @@
     "discoverFossils": "Discover fossils",
     "recentRequests": "My recent requests",
     "noRequests": "No search requests",
-    "makeRequest": "Make a request"
-  }
+    "makeRequest": "Make a request",
+    "ordersTitle": "My orders",
+    "ordersEmpty": "You have not placed any orders yet.",
+    "orderLabel": "Order",
+    "orderPlacedOn": "Placed on",
+    "orderTotal": "Total",
+    "orderDetailsButton": "View details",
+    "notLoggedIn": "Not logged in",
+    "orderDetailTitle": "Order details",
+    "orderProducts": "Products",
+    "orderProduct": "Product",
+    "orderQuantity": "Quantity",
+    "orderUnitPrice": "Unit price",
+    "orderLineTotal": "Line total",
+    "orderBackToOrders": "Back to my orders"
+    },
+  "checkoutReturn": {
+      "successTitle": "Payment successful!",
+      "successMessage": "Thank you for your order! We appreciate your trust.",
+      "confirmationSent": "A confirmation email has been sent to",
+      "orderNumberLabel": "Order number:",
+      "orderTotalLabel": "Total amount:",
+      "questions": "If you have any questions, contact us at",
+      "continueShopping": "Continue shopping",
+      "viewOrders": "View my orders",
+      "expiredTitle": "Session expired",
+      "expiredMessage": "Your payment session has expired. Please restart your order.",
+      "retryPayment": "Retry payment",
+      "itemDefault": "Item",
+      "addressDefault": "Address to be specified",
+      "cityDefault": "City to be specified",
+      "countryDefault": "France"
+    },
+  "cartSidebar": {
+        "title": "Cart",
+        "itemLabel": "item",
+        "itemPlural": "s",
+        "emptyTitle": "Your cart is empty",
+        "emptyDesc": "Add fossils to start shopping",
+        "continueShopping": "Continue shopping",
+        "subtotalLabel": "Subtotal ({count} items)",
+        "shippingLabel": "Shipping",
+        "shippingNextStep": "Calculated at next step",
+        "totalLabel": "Total",
+        "checkoutButton": "Proceed to checkout",
+        "clearButton": "Clear",
+        "clearedSuccess": "Cart cleared!",
+        "clearedError": "Error clearing cart",
+        "priceLocale": "en-US"
+      },
+      "notification": {
+        "ariaLabel": "Notifications",
+        "title": "Notifications",
+        "empty": "No notifications",
+        "markAsRead": "Mark as read",
+        "see": "See",
+        "dateLocale": "en-US"
+      }
 }

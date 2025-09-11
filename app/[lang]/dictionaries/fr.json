@@ -1,5 +1,10 @@
 
 {
+  "cartItem": {
+    "removedSuccess": "{title} retiré du panier",
+    "removedError": "Erreur lors de la suppression",
+    "priceLocale": "fr-FR"
+  },
       "dashboardRequests": {
     "backToDashboard": "Retour au dashboard",
     "title": "Mes demandes de fossiles",
@@ -461,6 +466,62 @@
     "discoverFossils": "Découvrir des fossiles",
     "recentRequests": "Mes demandes récentes",
     "noRequests": "Aucune demande de recherche",
-    "makeRequest": "Faire une demande"
-  }
+    "makeRequest": "Faire une demande",
+    "ordersTitle": "Mes commandes",
+    "ordersEmpty": "Vous n'avez pas encore passé de commande.",
+    "orderLabel": "Commande",
+    "orderPlacedOn": "Passée le",
+    "orderTotal": "Total",
+    "orderDetailsButton": "Voir le détail",
+    "notLoggedIn": "Non connecté",
+    "orderDetailTitle": "Détail de la commande",
+    "orderProducts": "Produits",
+    "orderProduct": "Produit",
+    "orderQuantity": "Quantité",
+    "orderUnitPrice": "Prix unitaire",
+    "orderLineTotal": "Total ligne",
+    "orderBackToOrders": "Retour à mes commandes"
+    },
+  "checkoutReturn": {
+      "successTitle": "Paiement réussi !",
+      "successMessage": "Merci pour votre commande ! Nous apprécions votre confiance.",
+      "confirmationSent": "Un email de confirmation a été envoyé à",
+      "orderNumberLabel": "Numéro de commande :",
+      "orderTotalLabel": "Montant total :",
+      "questions": "Si vous avez des questions, contactez-nous à",
+      "continueShopping": "Continuer les achats",
+      "viewOrders": "Voir mes commandes",
+      "expiredTitle": "Session expirée",
+      "expiredMessage": "Votre session de paiement a expiré. Veuillez recommencer votre commande.",
+      "retryPayment": "Recommencer le paiement",
+      "itemDefault": "Article",
+      "addressDefault": "Adresse à préciser",
+      "cityDefault": "Ville à préciser",
+      "countryDefault": "France"
+      },
+      "cartSidebar": {
+        "title": "Panier",
+        "itemLabel": "article",
+        "itemPlural": "s",
+        "emptyTitle": "Votre panier est vide",
+        "emptyDesc": "Ajoutez des fossiles pour commencer vos achats",
+        "continueShopping": "Continuer les achats",
+        "subtotalLabel": "Sous-total ({count} articles)",
+        "shippingLabel": "Livraison",
+        "shippingNextStep": "Calculée à l'étape suivante",
+        "totalLabel": "Total",
+        "checkoutButton": "Procéder au paiement",
+        "clearButton": "Vider",
+        "clearedSuccess": "Panier vidé !",
+        "clearedError": "Erreur lors du vidage du panier",
+        "priceLocale": "fr-FR"
+      },
+      "notification": {
+        "ariaLabel": "Notifications",
+        "title": "Notifications",
+        "empty": "Aucune notification",
+        "markAsRead": "Marquer comme lue",
+        "see": "Voir",
+        "dateLocale": "fr-FR"
+      }
 }

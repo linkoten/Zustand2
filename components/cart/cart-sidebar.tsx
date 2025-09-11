@@ -20,8 +20,10 @@ import { clearCartAction } from "@/lib/actions/cart-actions";
 interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dict: any;
 }
-export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
+export function CartSidebar({ isOpen, onClose, dict }: CartSidebarProps) {
   const items = useCartStore((state) => state.items);
   const totalItems = useCartStore((state) => state.totalItems);
   const totalPrice = useCartStore((state) => state.totalPrice);
@@ -39,9 +41,9 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     clearCart(); // Optimistic update côté UI
     const result = await clearCartAction();
     if (result?.success) {
-      toast.success("Panier vidé !");
+      toast.success(dict.cartSidebar.clearedSuccess);
     } else {
-      toast.error(result?.error || "Erreur lors du vidage du panier");
+      toast.error(result?.error || dict.cartSidebar.clearedError);
     }
   };
 
@@ -57,7 +59,8 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />
-            Panier ({totalItems} article{totalItems > 1 ? "s" : ""})
+            {dict.cartSidebar.title}
+            {` (${totalItems} ${dict.cartSidebar.itemLabel}${totalItems > 1 ? dict.cartSidebar.itemPlural : ""})`}
           </SheetTitle>
         </SheetHeader>
 
@@ -65,13 +68,13 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
           <div className="flex flex-col items-center justify-center flex-1 py-8">
             <ShoppingCart className="w-16 h-16 text-muted-foreground mb-4" />
             <h3 className="font-semibold text-lg mb-2">
-              Votre panier est vide
+              {dict.cartSidebar.emptyTitle}
             </h3>
             <p className="text-muted-foreground text-center mb-4">
-              Ajoutez des fossiles pour commencer vos achats
+              {dict.cartSidebar.emptyDesc}
             </p>
             <Button onClick={onClose} variant="outline">
-              Continuer les achats
+              {dict.cartSidebar.continueShopping}
             </Button>
           </div>
         ) : (
@@ -81,7 +84,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               <ScrollArea className="h-full">
                 <div className="space-y-4 py-4">
                   {items.map((item) => (
-                    <CartItem key={item.id} item={item} />
+                    <CartItem key={item.id} item={item} dict={dict} />
                   ))}
                 </div>
               </ScrollArea>
@@ -91,16 +94,21 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             <div className="sticky bottom-0 left-0 right-0 bg-background pt-4 pb-2 border-t z-10">
               <div className="space-y-2 px-2">
                 <div className="flex justify-between text-sm">
-                  <span>Sous-total ({totalItems} articles)</span>
+                  <span>
+                    {dict.cartSidebar.subtotalLabel.replace(
+                      "{count}",
+                      totalItems
+                    )}
+                  </span>
                   <span>{formatPrice(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Livraison</span>
-                  <span>Calculée à l&apos;étape suivante</span>
+                  <span>{dict.cartSidebar.shippingLabel}</span>
+                  <span>{dict.cartSidebar.shippingNextStep}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold text-lg">
-                  <span>Total</span>
+                  <span>{dict.cartSidebar.totalLabel}</span>
                   <span>{formatPrice(totalPrice)}</span>
                 </div>
               </div>
@@ -113,7 +121,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   disabled={!items.length}
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Procéder au paiement
+                  {dict.cartSidebar.checkoutButton}
                 </Button>
 
                 <div className="flex gap-2">
@@ -122,7 +130,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     variant="outline"
                     className="flex-1"
                   >
-                    Continuer les achats
+                    {dict.cartSidebar.continueShopping}
                   </Button>
 
                   <Button
@@ -131,7 +139,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     className="flex-1"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Vider
+                    {dict.cartSidebar.clearButton}
                   </Button>
                 </div>
               </SheetFooter>
