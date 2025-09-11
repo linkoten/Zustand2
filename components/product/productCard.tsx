@@ -13,6 +13,7 @@ import { useHandleAddToCart } from "@/hooks/useHandleAddToCart";
 interface ProductCardProps {
   product: SerializedProduct;
   lang: "en" | "fr";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any;
 }
 
