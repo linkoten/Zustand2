@@ -22,11 +22,14 @@ import { FilterOptions } from "@/types/productType";
 interface FossilesClientProps {
   fossils: SerializedProduct[];
   filterOptions: FilterOptions;
+  lang?: "en" | "fr";
+  dict?: any;
 }
-
 export default function FossilesClient({
   fossils,
   filterOptions,
+  lang = "fr",
+  dict,
 }: FossilesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -118,12 +121,16 @@ export default function FossilesClient({
       <div className="space-y-4">
         <div className="flex gap-4">
           <div className="flex-1">
-            <Label htmlFor="search">Rechercher</Label>
+            <Label htmlFor="search">
+              {dict?.fossils?.searchLabel || "Rechercher"}
+            </Label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 id="search"
-                placeholder="Rechercher un fossile..."
+                placeholder={
+                  dict?.fossils?.searchPlaceholder || "Rechercher un fossile..."
+                }
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -136,7 +143,7 @@ export default function FossilesClient({
             className="flex items-center gap-2"
           >
             <SlidersHorizontal className="w-4 h-4" />
-            Filtres
+            {dict?.fossils?.filters || "Filtres"}
           </Button>
         </div>
 
@@ -144,21 +151,33 @@ export default function FossilesClient({
         {showFilters && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Filtres</CardTitle>
+              <CardTitle className="text-lg">
+                {dict?.fossils?.filters || "Filtres"}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="category">Catégorie</Label>
+                  <Label htmlFor="category">
+                    {dict?.fossils?.categoryLabel || "Catégorie"}
+                  </Label>
                   <Select
                     value={selectedCategory}
                     onValueChange={setSelectedCategory}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Toutes les catégories" />
+                      <SelectValue
+                        placeholder={
+                          dict?.fossils?.allCategories ||
+                          "Toutes les catégories"
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Toutes les catégories</SelectItem>
+                      <SelectItem value="all">
+                        {dict?.fossils?.allCategories ||
+                          "Toutes les catégories"}
+                      </SelectItem>
                       {filterOptions.categories.map((category) => (
                         <SelectItem key={category} value={category}>
                           {category}
@@ -169,16 +188,27 @@ export default function FossilesClient({
                 </div>
 
                 <div>
-                  <Label htmlFor="country">Pays d&apos;origine</Label>
+                  <Label htmlFor="country">
+                    {dict?.fossils?.countryLabel ||
+                      (lang === "fr" ? "Pays d'origine" : "Country of origin")}
+                  </Label>
                   <Select
                     value={selectedCountry}
                     onValueChange={setSelectedCountry}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Tous les pays" />
+                      <SelectValue
+                        placeholder={
+                          dict?.fossils?.allCountries ||
+                          (lang === "fr" ? "Tous les pays" : "All countries")
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Tous les pays</SelectItem>
+                      <SelectItem value="all">
+                        {dict?.fossils?.allCountries ||
+                          (lang === "fr" ? "Tous les pays" : "All countries")}
+                      </SelectItem>
                       {filterOptions.countries.map((country) => (
                         <SelectItem key={country} value={country}>
                           {country}
@@ -189,16 +219,31 @@ export default function FossilesClient({
                 </div>
 
                 <div>
-                  <Label htmlFor="locality">Localité</Label>
+                  <Label htmlFor="locality">
+                    {dict?.fossils?.localityLabel ||
+                      (lang === "fr" ? "Localité" : "Locality")}
+                  </Label>
                   <Select
                     value={selectedLocality}
                     onValueChange={setSelectedLocality}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Toutes les localités" />
+                      <SelectValue
+                        placeholder={
+                          dict?.fossils?.allLocalities ||
+                          (lang === "fr"
+                            ? "Toutes les localités"
+                            : "All localities")
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Toutes les localités</SelectItem>
+                      <SelectItem value="all">
+                        {dict?.fossils?.allLocalities ||
+                          (lang === "fr"
+                            ? "Toutes les localités"
+                            : "All localities")}
+                      </SelectItem>
                       {filterOptions.localities.map((locality) => (
                         <SelectItem key={locality} value={locality}>
                           {locality}
@@ -209,16 +254,33 @@ export default function FossilesClient({
                 </div>
 
                 <div>
-                  <Label htmlFor="period">Période géologique</Label>
+                  <Label htmlFor="period">
+                    {dict?.fossils?.periodLabel ||
+                      (lang === "fr"
+                        ? "Période géologique"
+                        : "Geological period")}
+                  </Label>
                   <Select
                     value={selectedPeriod}
                     onValueChange={setSelectedPeriod}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Toutes les périodes" />
+                      <SelectValue
+                        placeholder={
+                          dict?.fossils?.allPeriods ||
+                          (lang === "fr"
+                            ? "Toutes les périodes"
+                            : "All periods")
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Toutes les périodes</SelectItem>
+                      <SelectItem value="all">
+                        {dict?.fossils?.allPeriods ||
+                          (lang === "fr"
+                            ? "Toutes les périodes"
+                            : "All periods")}
+                      </SelectItem>
                       {filterOptions.geologicalPeriods.map((period) => (
                         <SelectItem key={period} value={period}>
                           {period}
@@ -229,16 +291,27 @@ export default function FossilesClient({
                 </div>
 
                 <div>
-                  <Label htmlFor="stage">Étage géologique</Label>
+                  <Label htmlFor="stage">
+                    {dict?.fossils?.stageLabel ||
+                      (lang === "fr" ? "Étage géologique" : "Geological stage")}
+                  </Label>
                   <Select
                     value={selectedStage}
                     onValueChange={setSelectedStage}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Tous les étages" />
+                      <SelectValue
+                        placeholder={
+                          dict?.fossils?.allStages ||
+                          (lang === "fr" ? "Tous les étages" : "All stages")
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Tous les étages</SelectItem>
+                      <SelectItem value="all">
+                        {dict?.fossils?.allStages ||
+                          (lang === "fr" ? "Tous les étages" : "All stages")}
+                      </SelectItem>
                       {filterOptions.geologicalStages.map((stage) => (
                         <SelectItem key={stage} value={stage}>
                           {stage}
@@ -250,9 +323,13 @@ export default function FossilesClient({
               </div>
 
               <div className="flex gap-2">
-                <Button onClick={applyFilters}>Appliquer les filtres</Button>
+                <Button onClick={applyFilters}>
+                  {dict?.fossils?.applyFilters ||
+                    (lang === "fr" ? "Appliquer les filtres" : "Apply filters")}
+                </Button>
                 <Button variant="outline" onClick={clearFilters}>
-                  Effacer
+                  {dict?.fossils?.clear ||
+                    (lang === "fr" ? "Effacer" : "Clear")}
                 </Button>
               </div>
             </CardContent>
@@ -265,17 +342,21 @@ export default function FossilesClient({
       {/* Grille des fossiles */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredFossils.map((fossil) => (
-          <FossilCard key={fossil.id} fossil={fossil} />
+          <FossilCard key={fossil.id} fossil={fossil} dict={dict} />
         ))}
       </div>
 
       {filteredFossils.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground text-lg">
-            Aucun fossile ne correspond à vos critères de recherche.
+            {dict?.fossils?.empty ||
+              (lang === "fr"
+                ? "Aucun fossile ne correspond à vos critères de recherche."
+                : "No fossils match your search criteria.")}
           </p>
           <Button variant="outline" onClick={clearFilters} className="mt-4">
-            Effacer les filtres
+            {dict?.fossils?.clearFilters ||
+              (lang === "fr" ? "Effacer les filtres" : "Clear filters")}
           </Button>
         </div>
       )}

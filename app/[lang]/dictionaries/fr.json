@@ -1,5 +1,32 @@
-{
   
+{
+  "fossils": {
+    "searchLabel": "Rechercher",
+    "searchPlaceholder": "Rechercher un fossile...",
+    "filters": "Filtres",
+    "applyFilters": "Appliquer les filtres",
+    "clear": "Effacer",
+    "categoryLabel": "Catégorie",
+    "allCategories": "Toutes les catégories",
+    "countryLabel": "Pays d'origine",
+    "allCountries": "Tous les pays",
+    "localityLabel": "Localité",
+    "allLocalities": "Toutes les localités",
+    "periodLabel": "Période géologique",
+    "allPeriods": "Toutes les périodes",
+    "stageLabel": "Étage géologique",
+    "allStages": "Tous les étages",
+    "empty": "Aucun fossile ne correspond à vos critères de recherche.",
+  "clearFilters": "Effacer les filtres",
+  "noImage": "Pas d'image",
+  "deleteTitle": "Confirmer la suppression",
+  "deleteDescription": "Êtes-vous sûr de vouloir supprimer le fossile \"{title}\" ? Cette action est irréversible.",
+  "deleteCancel": "Annuler",
+  "deleteConfirm": "Supprimer",
+  "viewDetails": "Voir détails",
+  "deleteSuccess": "Fossile supprimé avec succès",
+  "deleteError": "Erreur lors de la suppression du fossile"
+  },
   "navbar": {
     "home": "Accueil",
     "cart": "Panier",
@@ -253,6 +280,10 @@
     "ZM": "Zambie"
   },
   "products": {
-    "cart": "Ajouter au panier"
+  "cart": "Ajouter au panier",
+  "mustBeLoggedIn": "Vous devez être connecté pour ajouter aux favoris",
+  "favoriteError": "Erreur lors de la mise à jour des favoris",
+  "addedToFavorites": "Ajouté aux favoris",
+  "removedFromFavorites": "Retiré des favoris"
   }
 }

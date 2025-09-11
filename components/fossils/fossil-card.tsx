@@ -33,8 +33,9 @@ import { useHandleAddToCart } from "@/hooks/useHandleAddToCart";
 
 interface FossilCardProps {
   fossil: SerializedProduct;
+  dict?: any;
 }
-export function FossilCard({ fossil }: FossilCardProps) {
+export function FossilCard({ fossil, dict }: FossilCardProps) {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const router = useRouter();
 
@@ -76,14 +77,16 @@ export function FossilCard({ fossil }: FossilCardProps) {
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de la suppression");
+        throw new Error(dict?.fossils?.deleteError || "Error deleting fossil");
       }
 
-      toast.success("Produit supprimé avec succès");
+      toast.success(
+        dict?.fossils?.deleteSuccess || "Fossil deleted successfully"
+      );
       router.refresh();
     } catch (error) {
       console.error("Erreur:", error);
-      toast.error("Erreur lors de la suppression du produit");
+      toast.error(dict?.fossils?.deleteError || "Error deleting fossil");
     } finally {
       setDeletingId(null);
     }
@@ -102,7 +105,9 @@ export function FossilCard({ fossil }: FossilCardProps) {
             />
           ) : (
             <div className="w-full h-full bg-muted flex items-center justify-center">
-              <span className="text-muted-foreground">Pas d&apos;image</span>
+              <span className="text-muted-foreground">
+                {dict?.fossils?.noImage || "Pas d'image"}
+              </span>
             </div>
           )}
 
@@ -113,6 +118,7 @@ export function FossilCard({ fossil }: FossilCardProps) {
               isFavorite={fossil.isFavorite || false}
               variant="overlay"
               size="sm"
+              dict={dict}
             />
           </div>
 
@@ -146,20 +152,27 @@ export function FossilCard({ fossil }: FossilCardProps) {
                     <AlertDialogHeader>
                       <AlertDialogTitle className="flex items-center gap-2">
                         <AlertTriangle className="h-5 w-5 text-destructive" />
-                        Confirmer la suppression
+                        {dict?.fossils?.deleteTitle ||
+                          "Confirmer la suppression"}
                       </AlertDialogTitle>
                       <AlertDialogDescription>
-                        Êtes-vous sûr de vouloir supprimer le fossile &quot;
-                        {fossil.title}&quot; ? Cette action est irréversible.
+                        {dict?.fossils?.deleteDescription
+                          ? dict.fossils.deleteDescription.replace(
+                              "{title}",
+                              fossil.title
+                            )
+                          : `Êtes-vous sûr de vouloir supprimer le fossile "${fossil.title}" ? Cette action est irréversible.`}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogCancel>
+                        {dict?.fossils?.deleteCancel || "Annuler"}
+                      </AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => handleDelete(fossil.id)}
                         className="bg-destructive hover:bg-destructive/90"
                       >
-                        Supprimer
+                        {dict?.fossils?.deleteConfirm || "Supprimer"}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -209,13 +222,17 @@ export function FossilCard({ fossil }: FossilCardProps) {
         <div className="text-xs text-muted-foreground space-y-1">
           {fossil.locality && (
             <p>
-              <span className="font-medium">Localité:</span>{" "}
+              <span className="font-medium">
+                {dict?.fossils?.localityLabel || "Localité"}:
+              </span>{" "}
               {fossil.locality.name}
             </p>
           )}
           {fossil.geologicalStage && (
             <p>
-              <span className="font-medium">Étage:</span>{" "}
+              <span className="font-medium">
+                {dict?.fossils?.stageLabel || "Étage"}:
+              </span>{" "}
               {fossil.geologicalStage}
             </p>
           )}
@@ -226,7 +243,7 @@ export function FossilCard({ fossil }: FossilCardProps) {
         <Button asChild variant="outline" size="sm" className="flex-1">
           <Link href={`/fossiles/${fossil.id}`}>
             <Eye className="w-4 h-4 mr-2" />
-            Voir détails
+            {dict?.fossils?.viewDetails || "Voir détails"}
           </Link>
         </Button>
 
@@ -235,7 +252,7 @@ export function FossilCard({ fossil }: FossilCardProps) {
           size="lg"
           disabled={isAdding || !isAvailable}
         >
-          Ajouter
+          {dict?.products?.cart || "Ajouter"}
         </Button>
       </CardFooter>
     </Card>

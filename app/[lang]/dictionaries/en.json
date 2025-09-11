@@ -1,5 +1,32 @@
+
 {
-  
+    "fossils": {
+    "searchLabel": "Search",
+    "searchPlaceholder": "Search for a fossil...",
+    "filters": "Filters",
+    "applyFilters": "Apply filters",
+    "clear": "Clear",
+    "categoryLabel": "Category",
+    "allCategories": "All categories",
+    "countryLabel": "Country of origin",
+    "allCountries": "All countries",
+    "localityLabel": "Locality",
+    "allLocalities": "All localities",
+    "periodLabel": "Geological period",
+    "allPeriods": "All periods",
+    "stageLabel": "Geological stage",
+    "allStages": "All stages",
+    "empty": "No fossils match your search criteria.",
+  "clearFilters": "Clear filters",
+  "noImage": "No image",
+  "deleteTitle": "Confirm deletion",
+  "deleteDescription": "Are you sure you want to delete the fossil \"{title}\"? This action cannot be undone.",
+  "deleteCancel": "Cancel",
+  "deleteConfirm": "Delete",
+  "viewDetails": "View details",
+  "deleteSuccess": "Fossil deleted successfully",
+  "deleteError": "Error deleting fossil"
+  },
   "navbar": {
     "home": "Home",
     "cart": "Cart",
@@ -253,6 +280,10 @@
     "ZM": "Zambia"
   },
   "products": {
-    "cart": "Add to Cart"
+  "cart": "Add to Cart",
+  "mustBeLoggedIn": "You must be logged in to add to favorites",
+  "favoriteError": "Error updating favorites",
+  "addedToFavorites": "Added to favorites",
+  "removedFromFavorites": "Removed from favorites"
   }
 }

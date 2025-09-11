@@ -13,12 +13,14 @@ interface FavoriteButtonProps {
   isFavorite: boolean;
   variant?: "default" | "overlay";
   size?: "sm" | "md" | "lg";
+  dict?: any;
 }
 export function FavoriteButton({
   productId,
   isFavorite: initialIsFavorite,
   variant = "default",
   size = "md",
+  dict,
 }: FavoriteButtonProps) {
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [isPending, startTransition] = useTransition();
@@ -27,7 +29,10 @@ export function FavoriteButton({
 
   const handleToggleFavorite = () => {
     if (!user) {
-      toast.error("Vous devez être connecté pour ajouter aux favoris");
+      toast.error(
+        dict?.products?.mustBeLoggedIn ||
+          "Vous devez être connecté pour ajouter aux favoris"
+      );
       router.push("/sign-in");
       return;
     }
@@ -43,21 +48,29 @@ export function FavoriteButton({
         });
 
         if (!response.ok) {
-          throw new Error("Erreur lors de la mise à jour des favoris");
+          throw new Error(
+            dict?.products?.favoriteError ||
+              "Erreur lors de la mise à jour des favoris"
+          );
         }
 
         const data = await response.json();
         setIsFavorite(!isFavorite);
 
         toast.success(
-          isFavorite ? "Retiré des favoris" : "Ajouté aux favoris",
+          isFavorite
+            ? dict?.products?.removedFromFavorites || "Retiré des favoris"
+            : dict?.products?.addedToFavorites || "Ajouté aux favoris",
           {
             icon: isFavorite ? "💔" : "❤️",
           }
         );
       } catch (error) {
         console.error("Erreur:", error);
-        toast.error("Erreur lors de la mise à jour des favoris");
+        toast.error(
+          dict?.products?.favoriteError ||
+            "Erreur lors de la mise à jour des favoris"
+        );
       }
     });
   };

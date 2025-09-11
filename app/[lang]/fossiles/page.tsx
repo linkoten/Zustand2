@@ -8,22 +8,24 @@ import { SearchParams } from "@/types/productType";
 import { getUserData } from "@/lib/actions/dashboardActions";
 import UserProvider from "@/components/provider/userProvider";
 import { redirect } from "next/navigation";
+import { getDictionary } from "../dictionaries";
 
 export default async function FossilesPage({
+  params,
   searchParams,
 }: {
+  params: { lang: "en" | "fr" };
   searchParams: Promise<SearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
+  const dict = await getDictionary(params.lang);
 
   // ✅ Récupérer userId AVANT l'appel à getFossils
   const { userId } = await auth();
-
   if (!userId) {
     redirect("/sign-in");
   }
   const user = await getUserData(userId!);
-
   if (!user) {
     redirect("/sign-in");
   }
@@ -33,25 +35,24 @@ export default async function FossilesPage({
   const filterOptionsRaw = await getFilterOptions();
   const filterOptions = {
     ...filterOptionsRaw,
-    localities: filterOptionsRaw.localities.map((loc) => loc.name), // ou `.map(loc => String(loc.id))` si tu veux filtrer par id
+    localities: filterOptionsRaw.localities.map((loc) => loc.name),
   };
+
   return (
     <UserProvider user={user}>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Nos Fossiles</h1>
-              <p className="text-muted-foreground">
-                Découvrez notre collection de fossiles authentiques
-              </p>
+              <h1 className="text-3xl font-bold mb-2">{dict.home.shopTitle}</h1>
+              <p className="text-muted-foreground">{dict.home.shopDesc}</p>
             </div>
 
             <div className="flex gap-2">
               <Button asChild variant="outline">
                 <Link href="/fossiles/request">
                   <Search className="mr-2 h-4 w-4" />
-                  Demande de recherche
+                  {dict.home.blogBtn}
                 </Link>
               </Button>
 
@@ -67,7 +68,12 @@ export default async function FossilesPage({
           </div>
         </div>
 
-        <FossilesClient fossils={fossils} filterOptions={filterOptions} />
+        <FossilesClient
+          fossils={fossils}
+          filterOptions={filterOptions}
+          lang={params.lang}
+          dict={dict}
+        />
       </div>
     </UserProvider>
   );
