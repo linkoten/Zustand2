@@ -23,6 +23,7 @@ interface FossilesClientProps {
   fossils: SerializedProduct[];
   filterOptions: FilterOptions;
   lang?: "en" | "fr";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
 }
 export default function FossilesClient({

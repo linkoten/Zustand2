@@ -33,6 +33,7 @@ import { useHandleAddToCart } from "@/hooks/useHandleAddToCart";
 
 interface FossilCardProps {
   fossil: SerializedProduct;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
 }
 export function FossilCard({ fossil, dict }: FossilCardProps) {

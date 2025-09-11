@@ -13,6 +13,7 @@ interface FavoriteButtonProps {
   isFavorite: boolean;
   variant?: "default" | "overlay";
   size?: "sm" | "md" | "lg";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
 }
 export function FavoriteButton({
