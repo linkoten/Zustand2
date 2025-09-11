@@ -1,5 +1,4 @@
 
-
 {
   "rating": {
     "title": "Ratings",
@@ -320,5 +319,40 @@
     "update": "Update",
     "deleting": "Deleting...",
     "delete": "Delete"
+  },
+  "fossilRequest": {
+    "backToFossils": "Back to fossils",
+    "title": "Fossil search request",
+    "description": "Looking for a specific fossil? Describe what you're searching for and we'll help you find it through our partner network."
+  },
+  "fossilRequestForm": {
+    "contactInfo": "Contact information",
+    "fullNameLabel": "Full name *",
+    "fullNamePlaceholder": "Your full name",
+    "emailLabel": "Email *",
+    "emailPlaceholder": "your@email.com",
+    "phoneLabel": "Phone",
+    "phonePlaceholder": "+1 234 567 8901",
+    "searchDetails": "Search details",
+    "fossilTypeLabel": "Fossil type sought *",
+    "fossilTypePlaceholder": "E.g. Calymene trilobite, Pachydiscus ammonite...",
+    "descLabel": "Detailed description *",
+    "descPlaceholder": "Describe in detail the fossil you are looking for: size, era, desired provenance, state of preservation, etc.",
+    "categoryLabel": "Category",
+    "categoryPlaceholder": "Select a category",
+    "periodLabel": "Geological period",
+    "periodPlaceholder": "Select a period",
+    "countryLabel": "Desired country of origin",
+    "countryPlaceholder": "E.g. France, Morocco, United States...",
+    "localityLabel": "Specific locality",
+    "localityPlaceholder": "E.g. Jorf, Solnhofen, Green River...",
+    "budgetLabel": "Maximum budget (€)",
+    "budgetPlaceholder": "Your maximum budget in euros",
+    "sending": "Sending...",
+    "submit": "Submit request",
+    "successTitle": "Request sent successfully!",
+    "successDesc": "We will contact you as soon as possible.",
+    "submitError": "Error sending request",
+    "submitErrorDesc": "Please try again later."
   }
 }

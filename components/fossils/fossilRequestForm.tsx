@@ -32,7 +32,12 @@ const initialFormData: FossilRequestFormData = {
   locality: "",
 };
 
-export default function FossilRequestForm() {
+interface FossilRequestFormProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dict: any;
+}
+
+export default function FossilRequestForm({ dict }: FossilRequestFormProps) {
   const [formData, setFormData] =
     useState<FossilRequestFormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,20 +71,35 @@ export default function FossilRequestForm() {
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de l'envoi de la demande");
+        throw new Error(
+          dict?.fossilRequestForm?.submitError ||
+            "Erreur lors de l'envoi de la demande"
+        );
       }
 
-      toast.success("Demande envoyée avec succès !", {
-        description: "Nous vous contacterons dans les plus brefs délais.",
-      });
+      toast.success(
+        dict?.fossilRequestForm?.successTitle ||
+          "Demande envoyée avec succès !",
+        {
+          description:
+            dict?.fossilRequestForm?.successDesc ||
+            "Nous vous contacterons dans les plus brefs délais.",
+        }
+      );
 
       // Rediriger vers la page des fossiles
       router.push("/fossiles");
     } catch (error) {
       console.error("Erreur:", error);
-      toast.error("Erreur lors de l'envoi de la demande", {
-        description: "Veuillez réessayer plus tard.",
-      });
+      toast.error(
+        dict?.fossilRequestForm?.submitError ||
+          "Erreur lors de l'envoi de la demande",
+        {
+          description:
+            dict?.fossilRequestForm?.submitErrorDesc ||
+            "Veuillez réessayer plus tard.",
+        }
+      );
     } finally {
       setIsLoading(false);
     }
@@ -90,40 +110,55 @@ export default function FossilRequestForm() {
       {/* Informations personnelles */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Informations de contact</CardTitle>
+          <CardTitle className="text-lg">
+            {dict?.fossilRequestForm?.contactInfo || "Informations de contact"}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name">Nom complet *</Label>
+              <Label htmlFor="name">
+                {dict?.fossilRequestForm?.fullNameLabel || "Nom complet *"}
+              </Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 required
-                placeholder="Votre nom complet"
+                placeholder={
+                  dict?.fossilRequestForm?.fullNamePlaceholder ||
+                  "Votre nom complet"
+                }
               />
             </div>
             <div>
-              <Label htmlFor="email">Email *</Label>
+              <Label htmlFor="email">
+                {dict?.fossilRequestForm?.emailLabel || "Email *"}
+              </Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 required
-                placeholder="votre@email.com"
+                placeholder={
+                  dict?.fossilRequestForm?.emailPlaceholder || "votre@email.com"
+                }
               />
             </div>
           </div>
           <div>
-            <Label htmlFor="phone">Téléphone</Label>
+            <Label htmlFor="phone">
+              {dict?.fossilRequestForm?.phoneLabel || "Téléphone"}
+            </Label>
             <Input
               id="phone"
               type="tel"
               value={formData.phone}
               onChange={(e) => handleInputChange("phone", e.target.value)}
-              placeholder="+33 1 23 45 67 89"
+              placeholder={
+                dict?.fossilRequestForm?.phonePlaceholder || "+33 1 23 45 67 89"
+              }
             />
           </div>
         </CardContent>
@@ -132,40 +167,61 @@ export default function FossilRequestForm() {
       {/* Détails de la recherche */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Détails de votre recherche</CardTitle>
+          <CardTitle className="text-lg">
+            {dict?.fossilRequestForm?.searchDetails ||
+              "Détails de votre recherche"}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="fossilType">Type de fossile recherché *</Label>
+            <Label htmlFor="fossilType">
+              {dict?.fossilRequestForm?.fossilTypeLabel ||
+                "Type de fossile recherché *"}
+            </Label>
             <Input
               id="fossilType"
               value={formData.fossilType}
               onChange={(e) => handleInputChange("fossilType", e.target.value)}
               required
-              placeholder="Ex: Trilobite Calymene, Ammonite Pachydiscus..."
+              placeholder={
+                dict?.fossilRequestForm?.fossilTypePlaceholder ||
+                "Ex: Trilobite Calymene, Ammonite Pachydiscus..."
+              }
             />
           </div>
 
           <div>
-            <Label htmlFor="description">Description détaillée *</Label>
+            <Label htmlFor="description">
+              {dict?.fossilRequestForm?.descLabel || "Description détaillée *"}
+            </Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
               required
-              placeholder="Décrivez en détail le fossile que vous recherchez : taille, époque, provenance souhaitée, état de conservation, etc."
+              placeholder={
+                dict?.fossilRequestForm?.descPlaceholder ||
+                "Décrivez en détail le fossile que vous recherchez : taille, époque, provenance souhaitée, état de conservation, etc."
+              }
               rows={4}
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="category">Catégorie</Label>
+              <Label htmlFor="category">
+                {dict?.fossilRequestForm?.categoryLabel || "Catégorie"}
+              </Label>
               <Select
                 onValueChange={(value) => handleInputChange("category", value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une catégorie" />
+                  <SelectValue
+                    placeholder={
+                      dict?.fossilRequestForm?.categoryPlaceholder ||
+                      "Sélectionner une catégorie"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
@@ -178,14 +234,21 @@ export default function FossilRequestForm() {
             </div>
 
             <div>
-              <Label htmlFor="geologicalPeriod">Période géologique</Label>
+              <Label htmlFor="geologicalPeriod">
+                {dict?.fossilRequestForm?.periodLabel || "Période géologique"}
+              </Label>
               <Select
                 onValueChange={(value) =>
                   handleInputChange("geologicalPeriod", value)
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une période" />
+                  <SelectValue
+                    placeholder={
+                      dict?.fossilRequestForm?.periodPlaceholder ||
+                      "Sélectionner une période"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {geologicalPeriods.map((period) => (
@@ -201,7 +264,8 @@ export default function FossilRequestForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="countryOfOrigin">
-                Pays de provenance souhaité
+                {dict?.fossilRequestForm?.countryLabel ||
+                  "Pays de provenance souhaité"}
               </Label>
               <Input
                 id="countryOfOrigin"
@@ -209,23 +273,34 @@ export default function FossilRequestForm() {
                 onChange={(e) =>
                   handleInputChange("countryOfOrigin", e.target.value)
                 }
-                placeholder="Ex: France, Maroc, États-Unis..."
+                placeholder={
+                  dict?.fossilRequestForm?.countryPlaceholder ||
+                  "Ex: France, Maroc, États-Unis..."
+                }
               />
             </div>
 
             <div>
-              <Label htmlFor="locality">Localité spécifique</Label>
+              <Label htmlFor="locality">
+                {dict?.fossilRequestForm?.localityLabel ||
+                  "Localité spécifique"}
+              </Label>
               <Input
                 id="locality"
                 value={formData.locality}
                 onChange={(e) => handleInputChange("locality", e.target.value)}
-                placeholder="Ex: Jorf, Solnhofen, Green River..."
+                placeholder={
+                  dict?.fossilRequestForm?.localityPlaceholder ||
+                  "Ex: Jorf, Solnhofen, Green River..."
+                }
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="maxBudget">Budget maximum (€)</Label>
+            <Label htmlFor="maxBudget">
+              {dict?.fossilRequestForm?.budgetLabel || "Budget maximum (€)"}
+            </Label>
             <Input
               id="maxBudget"
               type="number"
@@ -233,7 +308,10 @@ export default function FossilRequestForm() {
               min="0"
               value={formData.maxBudget}
               onChange={(e) => handleInputChange("maxBudget", e.target.value)}
-              placeholder="Votre budget maximum en euros"
+              placeholder={
+                dict?.fossilRequestForm?.budgetPlaceholder ||
+                "Votre budget maximum en euros"
+              }
             />
           </div>
         </CardContent>
@@ -245,12 +323,12 @@ export default function FossilRequestForm() {
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Envoi en cours...
+              {dict?.fossilRequestForm?.sending || "Envoi en cours..."}
             </>
           ) : (
             <>
               <Send className="mr-2 h-4 w-4" />
-              Envoyer la demande
+              {dict?.fossilRequestForm?.submit || "Envoyer la demande"}
             </>
           )}
         </Button>
