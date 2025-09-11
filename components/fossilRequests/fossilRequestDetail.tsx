@@ -61,6 +61,7 @@ interface FossilRequestDetailProps {
     clerkUserId?: string | null;
     userRole?: UserRole;
   };
+  dict: any;
 }
 
 const statusLabels: Record<RequestStatus, string> = {
@@ -95,6 +96,7 @@ const priorityColors = {
 
 export default function FossilRequestDetail({
   request,
+  dict,
 }: FossilRequestDetailProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
@@ -140,33 +142,36 @@ export default function FossilRequestDetail({
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
+      {/* Header */}
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Demande #{request.id.slice(-8)}
+                {`${dict.fossilRequests?.requestTitle || "Request"} #${request.id.slice(-8)}`}
               </CardTitle>
               <CardDescription>
-                Type de fossile recherché : {request.fossilType}
+                {dict.fossilRequests?.fossilTypeLabel || "Fossil type"}:{" "}
+                {request.fossilType}
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <Badge className={statusColors[request.status]}>
-                {statusLabels[request.status]}
+                {dict.fossilRequests?.[`status_${request.status}`] ||
+                  statusLabels[request.status]}
               </Badge>
               <Badge className={priorityColors[request.priority]}>
-                {priorityLabels[request.priority]}
+                {dict.fossilRequests?.[`priority_${request.priority}`] ||
+                  priorityLabels[request.priority]}
               </Badge>
-              {/* ✅ Bouton d'édition seulement pour les admins */}
+              {/* Edit button for admins only */}
               {isAdmin &&
                 (isEditing ? (
                   <div className="flex gap-2">
                     <Button onClick={handleSave} disabled={loading} size="sm">
                       <Save className="h-4 w-4 mr-2" />
-                      Sauvegarder
+                      {dict.fossilRequests?.saveButton || "Save"}
                     </Button>
                     <Button
                       variant="outline"
@@ -174,7 +179,7 @@ export default function FossilRequestDetail({
                       disabled={loading}
                       size="sm"
                     >
-                      Annuler
+                      {dict.fossilRequests?.cancelButton || "Cancel"}
                     </Button>
                   </div>
                 ) : (
@@ -183,7 +188,7 @@ export default function FossilRequestDetail({
                     variant="outline"
                     size="sm"
                   >
-                    Modifier
+                    {dict.fossilRequests?.editButton || "Edit"}
                   </Button>
                 ))}
             </div>
@@ -192,18 +197,20 @@ export default function FossilRequestDetail({
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Informations du client */}
+        {/* Client info */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Informations du client
+              {dict.fossilRequests?.clientInfoTitle || "Client information"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium">Nom</Label>
+                <Label className="text-sm font-medium">
+                  {dict.fossilRequestForm?.fullNameLabel || "Full name"}
+                </Label>
                 <p className="text-sm text-muted-foreground">{request.name}</p>
               </div>
               <div>
@@ -213,26 +220,30 @@ export default function FossilRequestDetail({
             </div>
             {request.phone && (
               <div>
-                <Label className="text-sm font-medium">Téléphone</Label>
+                <Label className="text-sm font-medium">
+                  {dict.fossilRequestForm?.phoneLabel || "Phone"}
+                </Label>
                 <p className="text-sm text-muted-foreground">{request.phone}</p>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Statut et priorité - Modifiable pour admin seulement */}
+        {/* Status and priority - editable for admin only */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5" />
-              Statut de la demande
+              {dict.fossilRequests?.statusSectionTitle || "Request status"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {isAdmin && isEditing ? (
               <>
                 <div>
-                  <Label htmlFor="status">Statut</Label>
+                  <Label htmlFor="status">
+                    {dict.fossilRequests?.statusLabel || "Status"}
+                  </Label>
                   <Select
                     value={status}
                     onValueChange={(value: RequestStatus) => setStatus(value)}
@@ -243,14 +254,16 @@ export default function FossilRequestDetail({
                     <SelectContent>
                       {Object.entries(statusLabels).map(([value, label]) => (
                         <SelectItem key={value} value={value}>
-                          {label}
+                          {dict.fossilRequests?.[`status_${value}`] || label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="priority">Priorité</Label>
+                  <Label htmlFor="priority">
+                    {dict.fossilRequests?.priorityLabel || "Priority"}
+                  </Label>
                   <Select
                     value={priority}
                     onValueChange={(value: RequestPriority) =>
@@ -263,7 +276,7 @@ export default function FossilRequestDetail({
                     <SelectContent>
                       {Object.entries(priorityLabels).map(([value, label]) => (
                         <SelectItem key={value} value={value}>
-                          {label}
+                          {dict.fossilRequests?.[`priority_${value}`] || label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -273,18 +286,25 @@ export default function FossilRequestDetail({
             ) : (
               <>
                 <div>
-                  <Label className="text-sm font-medium">Statut actuel</Label>
+                  <Label className="text-sm font-medium">
+                    {dict.fossilRequests?.currentStatusLabel ||
+                      "Current status"}
+                  </Label>
                   <div className="mt-1">
                     <Badge className={statusColors[request.status]}>
-                      {statusLabels[request.status]}
+                      {dict.fossilRequests?.[`status_${request.status}`] ||
+                        statusLabels[request.status]}
                     </Badge>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Priorité</Label>
+                  <Label className="text-sm font-medium">
+                    {dict.fossilRequests?.priorityLabel || "Priority"}
+                  </Label>
                   <div className="mt-1">
                     <Badge className={priorityColors[request.priority]}>
-                      {priorityLabels[request.priority]}
+                      {dict.fossilRequests?.[`priority_${request.priority}`] ||
+                        priorityLabels[request.priority]}
                     </Badge>
                   </div>
                 </div>
@@ -294,11 +314,14 @@ export default function FossilRequestDetail({
             {request.respondedBy && request.respondedAt && (
               <div>
                 <Label className="text-sm font-medium">
-                  Dernière mise à jour
+                  {dict.fossilRequests?.lastUpdateLabel || "Last update"}
                 </Label>
                 <p className="text-sm text-muted-foreground">
-                  Par {request.respondedBy} le{" "}
-                  {new Date(request.respondedAt).toLocaleDateString("fr-FR")}
+                  {dict.fossilRequests?.byLabel || "By"} {request.respondedBy}{" "}
+                  {dict.fossilRequests?.onLabel || "on"}{" "}
+                  {new Date(request.respondedAt).toLocaleDateString(
+                    dict.lang || "fr-FR"
+                  )}
                 </p>
               </div>
             )}
@@ -306,18 +329,18 @@ export default function FossilRequestDetail({
         </Card>
       </div>
 
-      {/* Détails de la demande */}
+      {/* Request details */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Détails de la demande
+            {dict.fossilRequests?.detailsSectionTitle || "Request details"}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <Label className="text-sm font-medium">
-              Type de fossile recherché
+              {dict.fossilRequests?.fossilTypeLabel || "Fossil type"}
             </Label>
             <p className="text-sm text-muted-foreground mt-1">
               {request.fossilType}
@@ -325,7 +348,9 @@ export default function FossilRequestDetail({
           </div>
 
           <div>
-            <Label className="text-sm font-medium">Description détaillée</Label>
+            <Label className="text-sm font-medium">
+              {dict.fossilRequestForm?.descLabel || "Detailed description"}
+            </Label>
             <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
               {request.description}
             </p>
@@ -334,16 +359,18 @@ export default function FossilRequestDetail({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {request.maxBudget && (
               <div>
-                <Label className="text-sm font-medium">Budget maximum</Label>
+                <Label className="text-sm font-medium">
+                  {dict.fossilRequestForm?.budgetLabel || "Maximum budget"}
+                </Label>
                 <p className="text-sm text-muted-foreground">
-                  {request.maxBudget.toLocaleString("fr-FR")} €
+                  {request.maxBudget.toLocaleString(dict.lang || "fr-FR")} €
                 </p>
               </div>
             )}
             {request.geologicalPeriod && (
               <div>
                 <Label className="text-sm font-medium">
-                  Période géologique
+                  {dict.fossilRequestForm?.periodLabel || "Geological period"}
                 </Label>
                 <p className="text-sm text-muted-foreground">
                   {request.geologicalPeriod}
@@ -352,7 +379,9 @@ export default function FossilRequestDetail({
             )}
             {request.category && (
               <div>
-                <Label className="text-sm font-medium">Catégorie</Label>
+                <Label className="text-sm font-medium">
+                  {dict.fossilRequestForm?.categoryLabel || "Category"}
+                </Label>
                 <p className="text-sm text-muted-foreground">
                   {request.category}
                 </p>
@@ -361,7 +390,7 @@ export default function FossilRequestDetail({
             {request.countryOfOrigin && (
               <div>
                 <Label className="text-sm font-medium">
-                  Pays d`&apos;origine souhaité
+                  {dict.fossilRequestForm?.countryLabel || "Country of origin"}
                 </Label>
                 <p className="text-sm text-muted-foreground">
                   {request.countryOfOrigin}
@@ -371,7 +400,7 @@ export default function FossilRequestDetail({
             {request.locality && (
               <div>
                 <Label className="text-sm font-medium">
-                  Localité spécifique
+                  {dict.fossilRequestForm?.localityLabel || "Specific locality"}
                 </Label>
                 <p className="text-sm text-muted-foreground">
                   {request.locality}
@@ -382,16 +411,17 @@ export default function FossilRequestDetail({
         </CardContent>
       </Card>
 
-      {/* ✅ Notes administratives - Seulement pour les admins */}
+      {/* Admin notes - admin only */}
       {isAdmin && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <StickyNote className="h-5 w-5" />
-              Notes administratives
+              {dict.fossilRequests?.adminNotesTitle || "Admin notes"}
             </CardTitle>
             <CardDescription>
-              Notes privées, visibles uniquement par les administrateurs
+              {dict.fossilRequests?.adminNotesDesc ||
+                "Private notes, visible only to administrators"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -399,28 +429,34 @@ export default function FossilRequestDetail({
               <Textarea
                 value={adminNotes}
                 onChange={(e) => setAdminNotes(e.target.value)}
-                placeholder="Ajouter des notes privées..."
+                placeholder={
+                  dict.fossilRequests?.adminNotesPlaceholder ||
+                  "Add private notes..."
+                }
                 rows={4}
               />
             ) : (
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {request.adminNotes || "Aucune note administrative"}
+                {request.adminNotes ||
+                  dict.fossilRequests?.noAdminNotes ||
+                  "No admin notes"}
               </p>
             )}
           </CardContent>
         </Card>
       )}
 
-      {/* ✅ Message au client - Seulement pour les admins */}
+      {/* Message to client - admin only */}
       {isAdmin && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
-              Message au client
+              {dict.fossilRequests?.clientMsgTitle || "Message to client"}
             </CardTitle>
             <CardDescription>
-              Message qui sera envoyé au client concernant cette demande
+              {dict.fossilRequests?.clientMsgDesc ||
+                "Message that will be sent to the client regarding this request"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -428,34 +464,46 @@ export default function FossilRequestDetail({
               <Textarea
                 value={responseMessage}
                 onChange={(e) => setResponseMessage(e.target.value)}
-                placeholder="Rédigez votre message au client..."
+                placeholder={
+                  dict.fossilRequests?.clientMsgPlaceholder ||
+                  "Write your message to the client..."
+                }
                 rows={4}
               />
             ) : (
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {request.responseMessage || "Aucun message envoyé au client"}
+                {request.responseMessage ||
+                  dict.fossilRequests?.noClientMsg ||
+                  "No message sent to client"}
               </p>
             )}
           </CardContent>
         </Card>
       )}
 
-      {/* ✅ Message de l'administrateur - Seulement pour les utilisateurs */}
+      {/* Admin message to user - user only */}
       {!isAdmin && request.responseMessage && (
         <Card className="border-blue-200 bg-blue-50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-blue-700">
               <MessageSquare className="h-5 w-5" />
-              Message de l`&apos;équipe FossilShop
+              {dict.fossilRequests?.adminMsgTitle ||
+                "Message from the FossilShop team"}
             </CardTitle>
             {request.respondedAt && (
               <CardDescription>
-                Reçu le{" "}
-                {new Date(request.respondedAt).toLocaleDateString("fr-FR")} à{" "}
-                {new Date(request.respondedAt).toLocaleTimeString("fr-FR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {dict.fossilRequests?.receivedLabel || "Received on"}{" "}
+                {new Date(request.respondedAt).toLocaleDateString(
+                  dict.lang || "fr-FR"
+                )}{" "}
+                {dict.fossilRequests?.atLabel || "at"}{" "}
+                {new Date(request.respondedAt).toLocaleTimeString(
+                  dict.lang || "fr-FR",
+                  {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }
+                )}
               </CardDescription>
             )}
           </CardHeader>
@@ -467,36 +515,50 @@ export default function FossilRequestDetail({
         </Card>
       )}
 
-      {/* Informations sur la demande */}
+      {/* Request info */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Informations sur la demande
+            {dict.fossilRequests?.infoSectionTitle || "Request information"}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm font-medium">Date de création</Label>
+              <Label className="text-sm font-medium">
+                {dict.fossilRequests?.createdAtLabel || "Created at"}
+              </Label>
               <p className="text-sm text-muted-foreground">
-                {new Date(request.createdAt).toLocaleDateString("fr-FR")} à{" "}
-                {new Date(request.createdAt).toLocaleTimeString("fr-FR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {new Date(request.createdAt).toLocaleDateString(
+                  dict.lang || "fr-FR"
+                )}{" "}
+                {dict.fossilRequests?.atLabel || "at"}{" "}
+                {new Date(request.createdAt).toLocaleTimeString(
+                  dict.lang || "fr-FR",
+                  {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }
+                )}
               </p>
             </div>
             <div>
               <Label className="text-sm font-medium">
-                Dernière modification
+                {dict.fossilRequests?.updatedAtLabel || "Last modified"}
               </Label>
               <p className="text-sm text-muted-foreground">
-                {new Date(request.updatedAt).toLocaleDateString("fr-FR")} à{" "}
-                {new Date(request.updatedAt).toLocaleTimeString("fr-FR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {new Date(request.updatedAt).toLocaleDateString(
+                  dict.lang || "fr-FR"
+                )}{" "}
+                {dict.fossilRequests?.atLabel || "at"}{" "}
+                {new Date(request.updatedAt).toLocaleTimeString(
+                  dict.lang || "fr-FR",
+                  {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }
+                )}
               </p>
             </div>
           </div>

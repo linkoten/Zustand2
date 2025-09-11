@@ -54,7 +54,7 @@ export default async function FossilesPage({
               <Button asChild variant="outline">
                 <Link href="/fossiles/request">
                   <Search className="mr-2 h-4 w-4" />
-                  {dict.home.blogBtn}
+                  {dict.fossilRequest.title}
                 </Link>
               </Button>
 

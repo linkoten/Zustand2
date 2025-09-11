@@ -91,6 +91,7 @@ interface FossilRequestListProps {
   currentPage: number;
   totalRequests: number;
   userRole: UserRole;
+  dict: any;
 }
 
 export default function FossilRequestsList({
@@ -99,6 +100,7 @@ export default function FossilRequestsList({
   currentPage,
   totalRequests,
   userRole, // ✅ Récupérer le rôle utilisateur
+  dict,
 }: FossilRequestListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -185,19 +187,24 @@ export default function FossilRequestsList({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Filter className="h-5 w-5" />
-            Filtres
+            {dict?.fossilRequests?.filtersTitle || "Filtres"}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             {/* Recherche */}
             <form onSubmit={handleSearch} className="space-y-2">
-              <Label htmlFor="search">Rechercher</Label>
+              <Label htmlFor="search">
+                {dict?.fossilRequests?.searchLabel || "Rechercher"}
+              </Label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   id="search"
-                  placeholder="Nom, email, type de fossile..."
+                  placeholder={
+                    dict?.fossilRequests?.searchPlaceholder ||
+                    "Nom, email, type de fossile..."
+                  }
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -207,7 +214,7 @@ export default function FossilRequestsList({
 
             {/* Statut */}
             <div className="space-y-2">
-              <Label>Statut</Label>
+              <Label>{dict?.fossilRequests?.statusLabel || "Statut"}</Label>
               <Select
                 value={currentStatus || undefined}
                 onValueChange={(value) =>
@@ -215,7 +222,11 @@ export default function FossilRequestsList({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Tous les statuts" />
+                  <SelectValue
+                    placeholder={
+                      dict?.fossilRequests?.allStatuses || "Tous les statuts"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous les statuts</SelectItem>
@@ -230,7 +241,7 @@ export default function FossilRequestsList({
 
             {/* Priorité */}
             <div className="space-y-2">
-              <Label>Priorité</Label>
+              <Label>{dict?.fossilRequests?.priorityLabel || "Priorité"}</Label>
               <Select
                 value={currentPriority || undefined}
                 onValueChange={(value) =>
@@ -238,10 +249,17 @@ export default function FossilRequestsList({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Toutes les priorités" />
+                  <SelectValue
+                    placeholder={
+                      dict?.fossilRequests?.allPriorities ||
+                      "Toutes les priorités"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Toutes les priorités</SelectItem>
+                  <SelectItem value="all">
+                    {dict?.fossilRequests?.allPriorities}
+                  </SelectItem>
                   {Object.entries(priorityLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {label}
@@ -255,11 +273,11 @@ export default function FossilRequestsList({
             <div className="flex gap-2">
               <Button type="submit" onClick={handleSearch}>
                 <Search className="h-4 w-4 mr-2" />
-                Rechercher
+                {dict?.fossilRequests?.searchButton || "Rechercher"}
               </Button>
               {hasActiveFilters && (
                 <Button variant="outline" onClick={clearFilters}>
-                  Effacer
+                  {dict?.fossilRequests?.clearButton || "Effacer"}
                 </Button>
               )}
             </div>
@@ -274,16 +292,18 @@ export default function FossilRequestsList({
             <div>
               <CardTitle>
                 {userRole === UserRole.ADMIN
-                  ? "Demandes de fossiles"
-                  : "Mes demandes"}
+                  ? dict?.fossilRequests?.adminTitle || "Fossil requests"
+                  : dict?.fossilRequests?.userTitle || "My requests"}
               </CardTitle>
               <CardDescription>
-                {totalRequests} demande{totalRequests > 1 ? "s" : ""} au total
-                {userRole === UserRole.USER && " pour vous"}
+                {userRole === UserRole.ADMIN
+                  ? `${totalRequests} ${dict?.fossilRequests?.adminTotalLabel || "requests in total"}`
+                  : `${totalRequests} ${dict?.fossilRequests?.userTotalLabel || "requests in total"}`}
               </CardDescription>
             </div>
             <div className="text-sm text-muted-foreground">
-              Page {currentPage} sur {totalPages}
+              {dict?.fossilRequests?.pageLabel || "Page"} {currentPage}{" "}
+              {dict?.fossilRequests?.ofLabel || "of"} {totalPages}
             </div>
           </div>
         </CardHeader>
@@ -292,13 +312,15 @@ export default function FossilRequestsList({
             <div className="text-center py-8">
               <p className="text-muted-foreground">
                 {userRole === UserRole.ADMIN
-                  ? "Aucune demande trouvée"
-                  : "Vous n'avez pas encore de demandes"}
+                  ? dict?.fossilRequests?.emptyTitle || "No requests found"
+                  : dict?.fossilRequests?.emptyDesc ||
+                    "You have not made any fossil requests yet."}
               </p>
               {userRole === UserRole.USER && (
                 <Button asChild className="mt-4">
                   <Link href="/fossiles/request">
-                    Créer ma première demande
+                    {dict?.fossilRequests?.createFirstRequest ||
+                      "Create my first request"}
                   </Link>
                 </Button>
               )}
@@ -312,23 +334,45 @@ export default function FossilRequestsList({
                     <TableRow>
                       {/* ✅ Afficher la colonne Client seulement pour les admins */}
                       {userRole === UserRole.ADMIN && (
-                        <TableHead>Client</TableHead>
+                        <TableHead>
+                          {dict?.fossilRequests?.clientCol || "Client"}
+                        </TableHead>
                       )}
-                      <TableHead>Fossile recherché</TableHead>
-                      <TableHead>Budget</TableHead>
-                      <TableHead>Statut</TableHead>
-                      <TableHead>Priorité</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead>
+                        {dict?.fossilRequests?.fossilTypeCol ||
+                          "Fossile recherché"}
+                      </TableHead>
+                      <TableHead>
+                        {dict?.fossilRequests?.budgetCol || "Budget"}
+                      </TableHead>
+                      <TableHead>
+                        {dict?.fossilRequests?.statusCol || "Statut"}
+                      </TableHead>
+                      <TableHead>
+                        {dict?.fossilRequests?.priorityCol || "Priorité"}
+                      </TableHead>
+                      <TableHead>
+                        {dict?.fossilRequests?.dateCol || "Date"}
+                      </TableHead>
+                      <TableHead>
+                        {dict?.fossilRequests?.actionsCol || "Actions"}
+                      </TableHead>
                       {/* ✅ Nouvelles colonnes selon le rôle */}
                       {userRole === UserRole.USER && (
-                        <TableHead>Message admin</TableHead>
+                        <TableHead>
+                          {dict?.fossilRequests?.adminMsgCol || "Message admin"}
+                        </TableHead>
                       )}
                       {userRole === UserRole.ADMIN && (
-                        <TableHead>Notes admin</TableHead>
+                        <TableHead>
+                          {dict?.fossilRequests?.adminNotesCol || "Notes admin"}
+                        </TableHead>
                       )}
                       {userRole === UserRole.ADMIN && (
-                        <TableHead>Message client</TableHead>
+                        <TableHead>
+                          {dict?.fossilRequests?.clientMsgCol ||
+                            "Message client"}
+                        </TableHead>
                       )}
                     </TableRow>
                   </TableHeader>
@@ -363,7 +407,8 @@ export default function FossilRequestsList({
                             </span>
                           ) : (
                             <span className="text-muted-foreground">
-                              Non spécifié
+                              {dict?.fossilRequests?.notSpecified ||
+                                "Non spécifié"}
                             </span>
                           )}
                         </TableCell>
@@ -390,7 +435,7 @@ export default function FossilRequestsList({
                             <Button asChild size="sm" variant="outline">
                               <Link href={getDetailUrl(request.id)}>
                                 <Eye className="h-4 w-4 mr-1" />
-                                Voir
+                                {dict?.fossilRequests?.viewAction || "Voir"}
                               </Link>
                             </Button>
 
@@ -410,23 +455,29 @@ export default function FossilRequestsList({
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>
-                                      Confirmer la suppression
+                                      {dict?.fossilRequests?.deleteTitle ||
+                                        "Confirmer la suppression"}
                                     </AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Êtes-vous sûr de vouloir supprimer cette
-                                      demande pour &quot;{request.fossilType}
-                                      &quot; ? Cette action est irréversible.
+                                      {dict?.fossilRequests?.deleteDescription
+                                        ? dict.fossilRequests.deleteDescription.replace(
+                                            "{title}",
+                                            request.fossilType
+                                          )
+                                        : `Êtes-vous sûr de vouloir supprimer cette demande pour "${request.fossilType}" ? Cette action est irréversible.`}
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
                                     <AlertDialogCancel>
-                                      Annuler
+                                      {dict?.fossilRequests?.deleteCancel ||
+                                        "Annuler"}
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                       onClick={() => handleDelete(request.id)}
                                       className="bg-red-600 hover:bg-red-700"
                                     >
-                                      Supprimer
+                                      {dict?.fossilRequests?.deleteConfirm ||
+                                        "Supprimer"}
                                     </AlertDialogAction>
                                   </AlertDialogFooter>
                                 </AlertDialogContent>
@@ -443,7 +494,8 @@ export default function FossilRequestsList({
                                 <div className="flex items-center gap-1 mb-1">
                                   <MessageSquare className="h-3 w-3 text-blue-500" />
                                   <span className="text-xs font-medium text-blue-600">
-                                    Message reçu
+                                    {dict?.fossilRequests?.adminMsgReceived ||
+                                      "Message reçu"}
                                   </span>
                                 </div>
                                 <p className="text-sm text-muted-foreground line-clamp-3">
@@ -452,7 +504,8 @@ export default function FossilRequestsList({
                               </div>
                             ) : (
                               <span className="text-xs text-muted-foreground">
-                                Aucun message
+                                {dict?.fossilRequests?.noAdminMsg ||
+                                  "Aucun message"}
                               </span>
                             )}
                           </TableCell>
@@ -466,7 +519,8 @@ export default function FossilRequestsList({
                                 <div className="flex items-center gap-1 mb-1">
                                   <StickyNote className="h-3 w-3 text-orange-500" />
                                   <span className="text-xs font-medium text-orange-600">
-                                    Notes privées
+                                    {dict?.fossilRequests?.privateNotes ||
+                                      "Notes privées"}
                                   </span>
                                 </div>
                                 <p className="text-sm text-muted-foreground line-clamp-2">
@@ -475,7 +529,8 @@ export default function FossilRequestsList({
                               </div>
                             ) : (
                               <span className="text-xs text-muted-foreground">
-                                Aucune note
+                                {dict?.fossilRequests?.noAdminNotes ||
+                                  "Aucune note"}
                               </span>
                             )}
                           </TableCell>
@@ -489,7 +544,8 @@ export default function FossilRequestsList({
                                 <div className="flex items-center gap-1 mb-1">
                                   <FileText className="h-3 w-3 text-green-500" />
                                   <span className="text-xs font-medium text-green-600">
-                                    Envoyé au client
+                                    {dict?.fossilRequests?.sentToClient ||
+                                      "Envoyé au client"}
                                   </span>
                                 </div>
                                 <p className="text-sm text-muted-foreground line-clamp-2">
@@ -498,7 +554,8 @@ export default function FossilRequestsList({
                               </div>
                             ) : (
                               <span className="text-xs text-muted-foreground">
-                                Pas de réponse
+                                {dict?.fossilRequests?.noClientMsg ||
+                                  "Pas de réponse"}
                               </span>
                             )}
                           </TableCell>
@@ -520,7 +577,7 @@ export default function FossilRequestsList({
                   >
                     <Link href={createPageUrl(currentPage - 1)}>
                       <ChevronLeft className="h-4 w-4" />
-                      Précédent
+                      {dict?.fossilRequests?.prevPage || "Précédent"}
                     </Link>
                   </Button>
 
@@ -546,7 +603,7 @@ export default function FossilRequestsList({
                     disabled={currentPage === totalPages}
                   >
                     <Link href={createPageUrl(currentPage + 1)}>
-                      Suivant
+                      {dict?.fossilRequests?.nextPage || "Suivant"}
                       <ChevronRight className="h-4 w-4" />
                     </Link>
                   </Button>

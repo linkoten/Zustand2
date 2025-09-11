@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import FossilRequestDetail from "@/components/fossilRequests/fossilRequestDetail";
+import { getDictionary } from "@/app/[lang]/dictionaries";
 
 interface UserFossilRequestDetailPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; lang: "en" | "fr" }>;
 }
 
 export default async function UserFossilRequestDetailPage({
@@ -27,8 +28,10 @@ export default async function UserFossilRequestDetailPage({
     redirect("/sign-in");
   }
 
-  const { id } = await params;
+  const { id, lang } = await params;
   const request = await getFossilRequestById(id);
+
+  const dict = await getDictionary(lang);
 
   if (!request) {
     notFound();
@@ -47,13 +50,13 @@ export default async function UserFossilRequestDetailPage({
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Retour à mes demandes
+            {dict.dashboardRequests.backToDashboard || "Back to dashboard"}
           </Link>
         </Button>
       </div>
 
       {/* ✅ Passer seulement la request, sans user */}
-      <FossilRequestDetail request={request} />
+      <FossilRequestDetail request={request} dict={dict} />
     </div>
   );
 }

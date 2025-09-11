@@ -8,8 +8,13 @@ import {
   getUserDashboardData,
   getUserData,
 } from "@/lib/actions/dashboardActions";
+import { getDictionary } from "../dictionaries";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  params,
+}: {
+  params: Promise<{ lang: "en" | "fr" }>;
+}) {
   const { userId } = await auth();
 
   if (!userId) {
@@ -22,12 +27,16 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
+  const { lang } = await params;
+
+  const dict = await getDictionary(lang);
+
   // Charger les données selon le rôle
   if (user.role === UserRole.ADMIN) {
     const adminData = await getAdminDashboardData();
     return <AdminDashboard user={user} data={adminData} />;
   } else {
     const userData = await getUserDashboardData(userId);
-    return <UserDashboard user={user} data={userData} />;
+    return <UserDashboard user={user} data={userData} dict={dict} />;
   }
 }

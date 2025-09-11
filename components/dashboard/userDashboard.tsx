@@ -33,18 +33,25 @@ const priorityColors = {
 interface UserDashboardProps {
   user: DashboardUser;
   data: UserDashboardData;
+  dict: any;
 }
 
-export default function UserDashboard({ user, data }: UserDashboardProps) {
+export default async function UserDashboard({
+  user,
+  data,
+  dict,
+}: UserDashboardProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* En-tête */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">
-          Bonjour {user.name || "Utilisateur"} ! 👋
+          {dict?.dashboard?.greeting || "Bonjour"}{" "}
+          {user.name || dict?.dashboard?.user || "Utilisateur"} ! 👋
         </h1>
         <p className="text-muted-foreground">
-          Voici un aperçu de votre activité sur FossilShop
+          {dict?.dashboard?.intro ||
+            "Voici un aperçu de votre activité sur FossilShop"}
         </p>
       </div>
 
@@ -52,33 +59,39 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Favoris</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {dict?.dashboard?.favorites || "Favoris"}
+            </CardTitle>
             <Heart className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.totalFavorites}</div>
             <p className="text-xs text-muted-foreground">
-              Fossiles sauvegardés
+              {dict?.dashboard?.savedFossils || "Fossiles sauvegardés"}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Demandes</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {dict?.dashboard?.requests || "Demandes"}
+            </CardTitle>
             <Search className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.totalRequests}</div>
             <p className="text-xs text-muted-foreground">
-              Recherches de fossiles
+              {dict?.dashboard?.fossilRequests || "Recherches de fossiles"}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Membre depuis</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {dict?.dashboard?.memberSince || "Membre depuis"}
+            </CardTitle>
             <Calendar className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -89,20 +102,26 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
               })}
             </div>
             <p className="text-xs text-muted-foreground">
-              Date d&apos;inscription
+              {dict?.dashboard?.signupDate || "Date d'inscription"}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Commandes</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {dict?.dashboard?.orders || "Commandes"}
+            </CardTitle>
             <Package className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.orders.length}</div>
-            <p className="text-xs text-muted-foreground">Commandes passées</p>
+            <p className="text-xs text-muted-foreground">
+              {dict?.dashboard?.ordersPlaced || "Commandes passées"}
+            </p>
             <Button asChild className="mt-2 w-full" size="sm">
-              <Link href="/dashboard/orders">Voir</Link>
+              <Link href="/dashboard/orders">
+                {dict?.dashboard?.see || "Voir"}
+              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -113,7 +132,7 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            Actions rapides
+            {dict?.dashboard?.quickActions || "Actions rapides"}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -121,7 +140,7 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
             <Button asChild className="h-12">
               <Link href="/fossiles" className="flex items-center gap-2">
                 <Search className="h-4 w-4" />
-                Parcourir les fossiles
+                {dict?.dashboard?.browseFossils || "Parcourir les fossiles"}
               </Link>
             </Button>
             <Button asChild variant="outline" className="h-12">
@@ -130,7 +149,7 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
                 className="flex items-center gap-2"
               >
                 <AlertCircle className="h-4 w-4" />
-                Nouvelle demande
+                {dict?.dashboard?.newRequest || "Nouvelle demande"}
               </Link>
             </Button>
             <Button asChild variant="outline" className="h-12">
@@ -139,13 +158,13 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
                 className="flex items-center gap-2"
               >
                 <Search className="h-4 w-4" />
-                Mes demandes
+                {dict?.dashboard?.myRequests || "Mes demandes"}
               </Link>
             </Button>
             <Button asChild variant="outline" className="h-12">
               <Link href="/blog" className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                Lire le blog
+                {dict?.dashboard?.readBlog || "Lire le blog"}
               </Link>
             </Button>
           </div>
@@ -159,11 +178,13 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Heart className="h-5 w-5 text-red-500" />
-                Mes favoris récents
+                {dict?.dashboard?.recentFavorites || "Mes favoris récents"}
               </CardTitle>
               {data.totalFavorites > 0 && (
                 <Button asChild variant="outline" size="sm">
-                  <Link href="/dashboard/favorites">Voir tout</Link>
+                  <Link href="/dashboard/favorites">
+                    {dict?.dashboard?.seeAll || "Voir tout"}
+                  </Link>
                 </Button>
               )}
             </div>
@@ -173,10 +194,14 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
               <div className="text-center py-8">
                 <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">
-                  Vous n&apos;avez pas encore de favoris
+                  {dict?.dashboard?.noFavorites ||
+                    "Vous n'avez pas encore de favoris"}
                 </p>
                 <Button asChild>
-                  <Link href="/fossiles">Découvrir des fossiles</Link>
+                  <Link href="/fossiles">
+                    {dict?.dashboard?.discoverFossils ||
+                      "Découvrir des fossiles"}
+                  </Link>
                 </Button>
               </div>
             ) : (
@@ -225,11 +250,13 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Search className="h-5 w-5 text-blue-500" />
-                Mes demandes récentes
+                {dict?.dashboard?.recentRequests || "Mes demandes récentes"}
               </CardTitle>
               {data.totalRequests > 0 && (
                 <Button asChild variant="outline" size="sm">
-                  <Link href="/dashboard/requests/user">Voir tout</Link>
+                  <Link href="/dashboard/requests/user">
+                    {dict?.dashboard?.seeAll || "Voir tout"}
+                  </Link>
                 </Button>
               )}
             </div>
@@ -239,10 +266,12 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
               <div className="text-center py-8">
                 <Search className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">
-                  Aucune demande de recherche
+                  {dict?.dashboard?.noRequests || "Aucune demande de recherche"}
                 </p>
                 <Button asChild>
-                  <Link href="/fossiles/request">Faire une demande</Link>
+                  <Link href="/fossiles/request">
+                    {dict?.dashboard?.makeRequest || "Faire une demande"}
+                  </Link>
                 </Button>
               </div>
             ) : (
@@ -305,7 +334,7 @@ export default function UserDashboard({ user, data }: UserDashboardProps) {
                       <Button asChild size="sm" variant="outline">
                         <Link href={`/dashboard/requests/user/${request.id}`}>
                           <Eye className="h-3 w-3 mr-1" />
-                          Voir
+                          {dict?.dashboard?.see || "Voir"}
                         </Link>
                       </Button>
                     </div>
