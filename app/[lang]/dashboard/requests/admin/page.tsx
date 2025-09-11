@@ -5,9 +5,11 @@ import Link from "next/link";
 import { RequestPriority, RequestStatus } from "@/lib/generated/prisma";
 import { getFossilRequests } from "@/lib/actions/fossilRequestsActions";
 import FossilRequestsList from "@/components/fossilRequests/fossilRequestsList";
+import { getDictionary } from "@/app/[lang]/dictionaries";
 
 export default async function FossilRequestsPage({
   searchParams,
+  params,
 }: {
   searchParams: Promise<{
     page?: string;
@@ -15,9 +17,14 @@ export default async function FossilRequestsPage({
     priority?: string;
     search?: string;
   }>;
+  params: Promise<{ lang: "en" | "fr" }>;
 }) {
   // Vérifier les permissions admin
   await requireAdmin();
+
+  const { lang } = await params;
+
+  const dict = await getDictionary(lang);
 
   const resolvedSearchParams = await searchParams;
   const page = parseInt(resolvedSearchParams.page || "1");
@@ -92,7 +99,7 @@ export default async function FossilRequestsPage({
       </div>
 
       {/* Liste des demandes */}
-      <FossilRequestsList {...requestsData} />
+      <FossilRequestsList {...requestsData} dict={dict} />
     </div>
   );
 }

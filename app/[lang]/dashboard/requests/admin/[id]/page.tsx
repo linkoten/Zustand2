@@ -5,9 +5,10 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { getFossilRequestById } from "@/lib/actions/fossilRequestsActions";
 import FossilRequestDetail from "@/components/fossilRequests/fossilRequestDetail";
+import { getDictionary } from "@/app/[lang]/dictionaries";
 
 interface FossilRequestDetailPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; lang: "en" | "fr" }>;
 }
 
 export default async function FossilRequestDetailPage({
@@ -15,8 +16,10 @@ export default async function FossilRequestDetailPage({
 }: FossilRequestDetailPageProps) {
   await requireAdmin();
 
-  const { id } = await params;
+  const { id, lang } = await params;
   const request = await getFossilRequestById(id);
+
+  const dict = await getDictionary(lang);
 
   if (!request) {
     notFound();
@@ -33,7 +36,7 @@ export default async function FossilRequestDetailPage({
         </Button>
       </div>
 
-      <FossilRequestDetail request={request} />
+      <FossilRequestDetail request={request} dict={dict} />
     </div>
   );
 }
