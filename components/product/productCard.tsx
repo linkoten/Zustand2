@@ -25,7 +25,7 @@ export default function ProductCard({ product, lang, dict }: ProductCardProps) {
 
   return (
     <Card className="group hover:shadow-lg transition-shadow duration-300">
-      <Link href={`/fossiles/${product.id}`}>
+      <Link href={`/${lang}/fossiles/${product.id}`}>
         <CardContent className="p-0">
           {/* Image */}
           <div className="aspect-square relative overflow-hidden rounded-t-lg bg-gray-100">

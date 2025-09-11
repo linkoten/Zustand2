@@ -52,7 +52,7 @@ export default async function FossilesPage({
 
             <div className="flex gap-2">
               <Button asChild variant="outline">
-                <Link href="/fossiles/request">
+                <Link href={`/${lang}/fossiles/request`}>
                   <Search className="mr-2 h-4 w-4" />
                   {dict.fossilRequest.title}
                 </Link>
@@ -60,7 +60,7 @@ export default async function FossilesPage({
 
               {user && user.role === "ADMIN" && (
                 <Button asChild>
-                  <Link href="/fossiles/create">
+                  <Link href={`/${lang}/fossiles/create`}>
                     <Plus className="mr-2 h-4 w-4" />
                     Créer un produit
                   </Link>

@@ -57,7 +57,10 @@ export default async function UserFossilRequestsPage({
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-4">
           <Button asChild variant="ghost" size="sm">
-            <Link href="/dashboard" className="flex items-center gap-2">
+            <Link
+              href={`/${lang}/dashboard`}
+              className="flex items-center gap-2"
+            >
               <ArrowLeft className="h-4 w-4" />
               {dict?.dashboardRequests?.backToDashboard ||
                 "Retour au dashboard"}
@@ -79,7 +82,7 @@ export default async function UserFossilRequestsPage({
 
           <div className="flex gap-2">
             <Button asChild>
-              <Link href="/fossiles/request">
+              <Link href={`/${lang}/fossiles/request`}>
                 <Plus className="mr-2 h-4 w-4" />
                 {dict?.dashboardRequests?.newRequest || "Nouvelle demande"}
               </Link>
@@ -149,7 +152,7 @@ export default async function UserFossilRequestsPage({
                     "Vous cherchez un fossile spécifique ? Notre équipe d'experts peut vous aider à le trouver ! Décrivez ce que vous recherchez et nous ferons de notre mieux pour vous aider."}
                 </p>
                 <Button asChild>
-                  <Link href="/fossiles/request">
+                  <Link href={`/${lang}/fossiles/request`}>
                     <Plus className="mr-2 h-4 w-4" />
                     {dict?.dashboardRequests?.createFirstRequest ||
                       "Créer ma première demande"}
@@ -162,7 +165,7 @@ export default async function UserFossilRequestsPage({
       </div>
 
       {/* Liste des demandes */}
-      <FossilRequestsList {...requestsData} dict={dict} />
+      <FossilRequestsList {...requestsData} dict={dict} lang={lang} />
     </div>
   );
 }

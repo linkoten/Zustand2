@@ -42,7 +42,7 @@ export default function ProductPageClient({
         {/* Breadcrumb */}
         <div className="mb-6">
           <Link
-            href="/fossiles"
+            href={`/${lang}/fossiles`}
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />

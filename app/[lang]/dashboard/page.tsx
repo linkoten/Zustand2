@@ -37,6 +37,8 @@ export default async function DashboardPage({
     return <AdminDashboard user={user} data={adminData} />;
   } else {
     const userData = await getUserDashboardData(userId);
-    return <UserDashboard user={user} data={userData} dict={dict} />;
+    return (
+      <UserDashboard user={user} data={userData} lang={lang} dict={dict} />
+    );
   }
 }

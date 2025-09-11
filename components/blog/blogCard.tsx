@@ -60,7 +60,7 @@ export default async function BlogCard({ article, lang }: BlogCardProps) {
   return (
     <Card className="group hover:shadow-lg transition-shadow duration-200 overflow-hidden">
       {/* ✅ Envelopper tout le header dans un Link */}
-      <Link href={`/blog/${article.slug}`}>
+      <Link href={`/${lang}/blog/${article.slug}`}>
         <CardHeader className="p-0">
           <div className="relative aspect-video bg-gradient-to-br from-stone-200 to-stone-300">
             {article.featuredImage ? (
@@ -96,7 +96,7 @@ export default async function BlogCard({ article, lang }: BlogCardProps) {
       <CardContent className="p-4">
         <div className="mb-3">
           {/* ✅ Lien sur le titre vers l'article complet */}
-          <Link href={`/blog/${article.slug}`}>
+          <Link href={`/${lang}/blog/${article.slug}`}>
             <h3 className="font-semibold text-lg leading-tight mb-2 line-clamp-2 hover:text-blue-600 transition-colors cursor-pointer">
               {article.title}
             </h3>
@@ -113,7 +113,7 @@ export default async function BlogCard({ article, lang }: BlogCardProps) {
         {article.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {article.tags.slice(0, 3).map((tag) => (
-              <Link key={tag.id} href={`/blog?tag=${tag.slug}`}>
+              <Link key={tag.id} href={`/${lang}/blog?tag=${tag.slug}`}>
                 <Badge
                   variant="outline"
                   className="text-xs hover:bg-gray-100 transition-colors"
@@ -166,7 +166,7 @@ export default async function BlogCard({ article, lang }: BlogCardProps) {
           </div>
 
           {/* ✅ Bouton "Lire la suite" avec lien vers l'article */}
-          <Link href={`/blog/${article.slug}`}>
+          <Link href={`/${lang}/blog/${article.slug}`}>
             <span className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium cursor-pointer">
               {dict.blog.blogList.readMore}
             </span>

@@ -76,7 +76,10 @@ export default async function BlogPage({
           {/* Bouton pour créer un nouvel article (si connecté) */}
           {canCreatePost && (
             <Button asChild>
-              <Link href="/blog/create" className="flex items-center gap-2">
+              <Link
+                href={`/${lang}/blog/create`}
+                className="flex items-center gap-2"
+              >
                 <Plus className="h-4 w-4" />
                 {dict.blog.create}
               </Link>
@@ -123,7 +126,7 @@ export default async function BlogPage({
               ].map((cat) => (
                 <Link
                   key={cat.slug}
-                  href={`/blog?category=${cat.slug}`}
+                  href={`/${lang}/blog?category=${cat.slug}`}
                   className="flex items-center gap-2 p-3 bg-white rounded-lg hover:shadow-md transition-all"
                 >
                   <span className="text-xl">{cat.icon}</span>
@@ -141,10 +144,10 @@ export default async function BlogPage({
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg">
-                <Link href="/fossiles">{dict.blog.ctaFossils}</Link>
+                <Link href={`/${lang}/fossiles`}>{dict.blog.ctaFossils}</Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href="/contact">{dict.blog.ctaContact}</Link>
+                <Link href={`/${lang}/contact`}>{dict.blog.ctaContact}</Link>
               </Button>
             </div>
           </div>

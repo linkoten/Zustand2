@@ -157,13 +157,13 @@ export default async function CheckoutReturnPage({
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button asChild className="flex-1">
-                    <Link href="/fossiles">
+                    <Link href={`/${lang}/fossiles`}>
                       {dict.checkoutReturn.continueShopping}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
                   <Button variant="outline" asChild className="flex-1">
-                    <Link href="/commandes">
+                    <Link href={`/${lang}/commandes`}>
                       {dict.checkoutReturn.viewOrders}
                     </Link>
                   </Button>
@@ -195,7 +195,7 @@ export default async function CheckoutReturnPage({
 
               <div className="flex justify-center">
                 <Button asChild>
-                  <Link href="/checkout">
+                  <Link href={`/${lang}/checkout`}>
                     {dict.checkoutReturn.retryPayment}
                   </Link>
                 </Button>

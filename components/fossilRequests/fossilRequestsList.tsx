@@ -91,6 +91,7 @@ interface FossilRequestListProps {
   currentPage: number;
   totalRequests: number;
   userRole: UserRole;
+  lang: "fr" | "en";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any;
 }
@@ -101,6 +102,7 @@ export default function FossilRequestsList({
   currentPage,
   totalRequests,
   userRole, // ✅ Récupérer le rôle utilisateur
+  lang,
   dict,
 }: FossilRequestListProps) {
   const router = useRouter();
@@ -136,15 +138,15 @@ export default function FossilRequestsList({
   // ✅ Fonction pour générer l'URL de détail selon le rôle
   const getDetailUrl = (requestId: string) => {
     return userRole === UserRole.ADMIN
-      ? `/dashboard/requests/admin/${requestId}`
-      : `/dashboard/requests/user/${requestId}`;
+      ? `/${lang}/dashboard/requests/admin/${requestId}`
+      : `/${lang}/dashboard/requests/user/${requestId}`;
   };
 
   // ✅ Fonction pour générer l'URL de base selon le rôle
   const getBaseUrl = () => {
     return userRole === UserRole.ADMIN
-      ? "/dashboard/requests/admin"
-      : "/dashboard/requests/user";
+      ? `/${lang}/dashboard/requests/admin`
+      : `/${lang}/dashboard/requests/user`;
   };
 
   const updateFilters = (newParams: Record<string, string | null>) => {
@@ -319,7 +321,7 @@ export default function FossilRequestsList({
               </p>
               {userRole === UserRole.USER && (
                 <Button asChild className="mt-4">
-                  <Link href="/fossiles/request">
+                  <Link href={`/${lang}/fossiles/request`}>
                     {dict?.fossilRequests?.createFirstRequest ||
                       "Create my first request"}
                   </Link>

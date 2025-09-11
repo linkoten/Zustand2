@@ -56,13 +56,17 @@ export default function Navbar({ lang, dict }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigationLinks = [
-    { href: "/", label: dict.navbar.home },
-    { href: "/fossiles", label: dict.navbar.fossils },
-    { href: "/blog", label: dict.navbar.blog, icon: BookOpen },
+    { href: `/${lang}`, label: dict.navbar.home },
+    { href: `/${lang}/fossiles`, label: dict.navbar.fossils },
+    { href: `/${lang}/blog`, label: dict.navbar.blog, icon: BookOpen },
   ];
 
   const userLinks = [
-    { href: "/dashboard", label: dict.navbar.dashboard, icon: LayoutDashboard },
+    {
+      href: `/${lang}/dashboard`,
+      label: dict.navbar.dashboard,
+      icon: LayoutDashboard,
+    },
   ];
 
   const toggleMobileMenu = () => {
@@ -79,7 +83,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href={`/${lang}`} className="flex items-center space-x-2">
               <span
                 className="font-extrabold text-2xl tracking-tight bg-gradient-to-br from-amber-600 via-amber-400 to-yellow-400 bg-clip-text text-transparent drop-shadow"
                 style={{
@@ -138,13 +142,15 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                   ) : (
                     <div className="flex items-center space-x-2">
                       <Button asChild variant="ghost">
-                        <Link href="/sign-in">
+                        <Link href={`/${lang}/sign-in`}>
                           <User className="mr-2 h-4 w-4" />
                           {dict.navbar.signin}
                         </Link>
                       </Button>
                       <Button asChild>
-                        <Link href="/sign-up">{dict.navbar.signup}</Link>
+                        <Link href={`/${lang}/sign-up`}>
+                          {dict.navbar.signup}
+                        </Link>
                       </Button>
                     </div>
                   )}
@@ -229,7 +235,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                             className="justify-start"
                           >
                             <Link
-                              href="/sign-in"
+                              href={`/${lang}/sign-in`}
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
                               <User className="mr-2 h-4 w-4" />
@@ -238,7 +244,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                           </Button>
                           <Button asChild className="justify-start">
                             <Link
-                              href="/sign-up"
+                              href={`/${lang}/sign-up`}
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
                               S&apos;inscrire

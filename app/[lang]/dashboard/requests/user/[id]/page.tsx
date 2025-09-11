@@ -46,7 +46,7 @@ export default async function UserFossilRequestDetailPage({
       <div className="mb-6">
         <Button asChild variant="ghost" size="sm">
           <Link
-            href="/dashboard/requests/user"
+            href={`/${lang}/dashboard/requests/user`}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />

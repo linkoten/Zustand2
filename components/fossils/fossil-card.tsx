@@ -33,10 +33,11 @@ import { useHandleAddToCart } from "@/hooks/useHandleAddToCart";
 
 interface FossilCardProps {
   fossil: SerializedProduct;
+  lang: "fr" | "en";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
 }
-export function FossilCard({ fossil, dict }: FossilCardProps) {
+export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const router = useRouter();
 
@@ -133,7 +134,7 @@ export function FossilCard({ fossil, dict }: FossilCardProps) {
                   variant="secondary"
                   className="h-8 w-8 p-0"
                 >
-                  <Link href={`/fossiles/${fossil.id}/edit`}>
+                  <Link href={`/${lang}/fossiles/${fossil.id}/edit`}>
                     <Edit className="h-4 w-4" />
                   </Link>
                 </Button>
@@ -242,7 +243,7 @@ export function FossilCard({ fossil, dict }: FossilCardProps) {
 
       <CardFooter className="p-4 pt-0 flex gap-2">
         <Button asChild variant="outline" size="sm" className="flex-1">
-          <Link href={`/fossiles/${fossil.id}`}>
+          <Link href={`/${lang}/fossiles/${fossil.id}`}>
             <Eye className="w-4 h-4 mr-2" />
             {dict?.fossils?.viewDetails || "Voir détails"}
           </Link>

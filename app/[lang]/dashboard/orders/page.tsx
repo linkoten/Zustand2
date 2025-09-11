@@ -58,7 +58,7 @@ export default async function OrdersPage({
                 </div>
               </div>
               <Button asChild>
-                <Link href={`/dashboard/orders/${order.id}`}>
+                <Link href={`/${lang}/dashboard/orders/${order.id}`}>
                   {dict.dashboard?.orderDetailsButton || "Voir le détail"}
                 </Link>
               </Button>

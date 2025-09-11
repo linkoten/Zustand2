@@ -115,7 +115,7 @@ export default async function OrderDetailPage({
         </div>
       </div>
       <Button asChild variant="outline">
-        <Link href="/dashboard/orders">
+        <Link href={`/${lang}/dashboard/orders`}>
           {dict.dashboard?.orderBackToOrders || "Retour à mes commandes"}
         </Link>
       </Button>

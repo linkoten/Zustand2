@@ -24,7 +24,12 @@ export default async function FavoritesPage({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {favorites.map((product) => (
-            <FossilCard key={product.id} fossil={product} dict={dict} />
+            <FossilCard
+              key={product.id}
+              fossil={product}
+              dict={dict}
+              lang={lang}
+            />
           ))}
         </div>
       )}

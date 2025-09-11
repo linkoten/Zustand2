@@ -35,12 +35,14 @@ interface UserDashboardProps {
   data: UserDashboardData;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any;
+  lang: "fr" | "en";
 }
 
 export default async function UserDashboard({
   user,
   data,
   dict,
+  lang,
 }: UserDashboardProps) {
   return (
     <div className="container mx-auto px-4 py-8">
@@ -120,7 +122,7 @@ export default async function UserDashboard({
               {dict?.dashboard?.ordersPlaced || "Commandes passées"}
             </p>
             <Button asChild className="mt-2 w-full" size="sm">
-              <Link href="/dashboard/orders">
+              <Link href={`/${lang}/dashboard/orders`}>
                 {dict?.dashboard?.see || "Voir"}
               </Link>
             </Button>
@@ -139,14 +141,17 @@ export default async function UserDashboard({
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Button asChild className="h-12">
-              <Link href="/fossiles" className="flex items-center gap-2">
+              <Link
+                href={`/${lang}/fossiles`}
+                className="flex items-center gap-2"
+              >
                 <Search className="h-4 w-4" />
                 {dict?.dashboard?.browseFossils || "Parcourir les fossiles"}
               </Link>
             </Button>
             <Button asChild variant="outline" className="h-12">
               <Link
-                href="/fossiles/request"
+                href={`/${lang}/fossiles/request`}
                 className="flex items-center gap-2"
               >
                 <AlertCircle className="h-4 w-4" />
@@ -155,7 +160,7 @@ export default async function UserDashboard({
             </Button>
             <Button asChild variant="outline" className="h-12">
               <Link
-                href="/dashboard/requests/user"
+                href={`/${lang}/dashboard/requests/user`}
                 className="flex items-center gap-2"
               >
                 <Search className="h-4 w-4" />
@@ -163,7 +168,7 @@ export default async function UserDashboard({
               </Link>
             </Button>
             <Button asChild variant="outline" className="h-12">
-              <Link href="/blog" className="flex items-center gap-2">
+              <Link href={`/${lang}/blog`} className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
                 {dict?.dashboard?.readBlog || "Lire le blog"}
               </Link>
@@ -183,7 +188,7 @@ export default async function UserDashboard({
               </CardTitle>
               {data.totalFavorites > 0 && (
                 <Button asChild variant="outline" size="sm">
-                  <Link href="/dashboard/favorites">
+                  <Link href={`/${lang}/dashboard/favorites`}>
                     {dict?.dashboard?.seeAll || "Voir tout"}
                   </Link>
                 </Button>
@@ -199,7 +204,7 @@ export default async function UserDashboard({
                     "Vous n'avez pas encore de favoris"}
                 </p>
                 <Button asChild>
-                  <Link href="/fossiles">
+                  <Link href={`/${lang}/fossiles`}>
                     {dict?.dashboard?.discoverFossils ||
                       "Découvrir des fossiles"}
                   </Link>
@@ -236,7 +241,9 @@ export default async function UserDashboard({
                       </p>
                     </div>
                     <Button asChild size="sm">
-                      <Link href={`/fossiles/${favorite.id}`}>Voir</Link>
+                      <Link href={`/${lang}/fossiles/${favorite.id}`}>
+                        Voir
+                      </Link>
                     </Button>
                   </div>
                 ))}
@@ -255,7 +262,7 @@ export default async function UserDashboard({
               </CardTitle>
               {data.totalRequests > 0 && (
                 <Button asChild variant="outline" size="sm">
-                  <Link href="/dashboard/requests/user">
+                  <Link href={`/${lang}/dashboard/requests/user`}>
                     {dict?.dashboard?.seeAll || "Voir tout"}
                   </Link>
                 </Button>
@@ -270,7 +277,7 @@ export default async function UserDashboard({
                   {dict?.dashboard?.noRequests || "Aucune demande de recherche"}
                 </p>
                 <Button asChild>
-                  <Link href="/fossiles/request">
+                  <Link href={`/${lang}/fossiles/request`}>
                     {dict?.dashboard?.makeRequest || "Faire une demande"}
                   </Link>
                 </Button>
@@ -333,7 +340,9 @@ export default async function UserDashboard({
                       </div>
 
                       <Button asChild size="sm" variant="outline">
-                        <Link href={`/dashboard/requests/user/${request.id}`}>
+                        <Link
+                          href={`/${lang}/dashboard/requests/user/${request.id}`}
+                        >
                           <Eye className="h-3 w-3 mr-1" />
                           {dict?.dashboard?.see || "Voir"}
                         </Link>

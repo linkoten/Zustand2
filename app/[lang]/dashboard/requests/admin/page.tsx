@@ -55,7 +55,7 @@ export default async function FossilRequestsPage({
 
           <div className="flex gap-2">
             <Button asChild variant="outline">
-              <Link href="/dashboard">Retour au dashboard</Link>
+              <Link href={`/${lang}/dashboard`}>Retour au dashboard</Link>
             </Button>
           </div>
         </div>
@@ -99,7 +99,7 @@ export default async function FossilRequestsPage({
       </div>
 
       {/* Liste des demandes */}
-      <FossilRequestsList {...requestsData} dict={dict} />
+      <FossilRequestsList {...requestsData} dict={dict} lang={lang} />
     </div>
   );
 }

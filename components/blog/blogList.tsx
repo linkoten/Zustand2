@@ -180,7 +180,7 @@ export default function BlogList({
           </p>
           {canEditBlog && (
             <Button asChild>
-              <Link href="/blog/create">
+              <Link href={`/${lang}/blog/create`}>
                 {dict.blog.blogList?.createFirstPost ||
                   "Créer le premier article"}
               </Link>
@@ -226,7 +226,7 @@ export default function BlogList({
                         variant="secondary"
                         className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
                       >
-                        <Link href={`/blog/${post.slug}/edit`}>
+                        <Link href={`/${lang}/blog/${post.slug}/edit`}>
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>
@@ -293,7 +293,10 @@ export default function BlogList({
                 {/* Titre et description */}
                 <div>
                   <CardTitle className="text-lg leading-tight mb-2 group-hover:text-primary transition-colors">
-                    <Link href={`/blog/${post.slug}`} className="line-clamp-2">
+                    <Link
+                      href={`/${lang}/blog/${post.slug}`}
+                      className="line-clamp-2"
+                    >
                       {post.title}
                     </Link>
                   </CardTitle>
@@ -311,7 +314,7 @@ export default function BlogList({
                     {post.tags.slice(0, 3).map((tag) => (
                       <Link
                         key={tag.id}
-                        href={`/blog?tag=${tag.slug}`}
+                        href={`/${lang}/blog?tag=${tag.slug}`}
                         className="inline-block"
                       >
                         <Badge
