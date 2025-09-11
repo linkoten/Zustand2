@@ -11,13 +11,18 @@ import { CalendarDays, Clock, Eye, User } from "lucide-react";
 import { BlogCategory } from "@/lib/generated/prisma";
 import { BlogListItem } from "@/types/type";
 
+import { getDictionary } from "@/app/[lang]/dictionaries";
+
 interface BlogCardProps {
   article: BlogListItem;
+  lang: "en" | "fr";
 }
-export default function BlogCard({ article }: BlogCardProps) {
+
+export default async function BlogCard({ article, lang }: BlogCardProps) {
+  const dict = await getDictionary(lang);
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
-    return new Intl.DateTimeFormat("fr-FR", {
+    return new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -39,17 +44,17 @@ export default function BlogCard({ article }: BlogCardProps) {
   };
 
   const getCategoryLabel = (category: BlogCategory) => {
-    const labels = {
-      [BlogCategory.PALEONTOLOGIE]: "Paléontologie",
-      [BlogCategory.DECOUVERTE]: "Découverte",
-      [BlogCategory.GUIDE_COLLECTION]: "Guide Collection",
-      [BlogCategory.HISTOIRE_GEOLOGIQUE]: "Histoire Géologique",
-      [BlogCategory.ACTUALITE]: "Actualité",
-      [BlogCategory.TECHNIQUE]: "Technique",
-      [BlogCategory.EXPOSITION]: "Exposition",
-      [BlogCategory.PORTRAIT]: "Portrait",
+    const map: Record<string, string> = {
+      [BlogCategory.PALEONTOLOGIE]: dict.blog.blogFilters.categoryPaleontology,
+      [BlogCategory.DECOUVERTE]: dict.blog.blogFilters.categoryDiscovery,
+      [BlogCategory.GUIDE_COLLECTION]: dict.blog.blogFilters.categoryGuides,
+      [BlogCategory.HISTOIRE_GEOLOGIQUE]: dict.blog.blogFilters.categoryHistory,
+      [BlogCategory.ACTUALITE]: dict.blog.blogFilters.categoryActualite,
+      [BlogCategory.TECHNIQUE]: dict.blog.blogFilters.categoryTechnique,
+      [BlogCategory.EXPOSITION]: dict.blog.blogFilters.categoryExposition,
+      [BlogCategory.PORTRAIT]: dict.blog.blogFilters.categoryPortrait,
     };
-    return labels[category] || category;
+    return map[category] || category;
   };
 
   return (
@@ -70,7 +75,7 @@ export default function BlogCard({ article }: BlogCardProps) {
                 <div className="text-center text-muted-foreground">
                   <div className="text-4xl mb-2">📖</div>
                   <p className="text-sm font-medium">
-                    Image bientôt disponible
+                    {dict.blog.blogList.imageSoon}
                   </p>
                 </div>
               </div>
@@ -154,13 +159,16 @@ export default function BlogCard({ article }: BlogCardProps) {
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <User className="w-4 h-4" />
-            <span>Par {article.author.name || article.author.email}</span>
+            <span>
+              {dict.blog.blogList.by}{" "}
+              {article.author.name || article.author.email}
+            </span>
           </div>
 
           {/* ✅ Bouton "Lire la suite" avec lien vers l'article */}
           <Link href={`/blog/${article.slug}`}>
             <span className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium cursor-pointer">
-              Lire la suite →
+              {dict.blog.blogList.readMore}
             </span>
           </Link>
         </div>

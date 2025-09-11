@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { getDictionary } from "@/app/[lang]/dictionaries";
 import { fetchClientSecret } from "@/lib/actions/stripe";
 import {
   EmbeddedCheckout,
@@ -17,17 +18,23 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
 );
 
-type CheckoutState = "loading" | "ready" | "error";
-
 interface CheckoutComponentProps {
-  selectedCountry?: string; // ✅ Nouveau prop optionnel
+  selectedCountry?: string;
+  lang?: "en" | "fr";
 }
 
 export default function CheckoutComponent({
   selectedCountry,
+  lang = "fr",
 }: CheckoutComponentProps) {
-  const [state, setState] = useState<CheckoutState>("loading");
+  const [dict, setDict] = useState<any>(null);
+  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [error, setError] = useState<string | null>(null);
+
+  // Charger le dictionnaire à l'initialisation ou au changement de langue
+  useEffect(() => {
+    getDictionary(lang).then(setDict);
+  }, [lang]);
 
   // ✅ Passer le pays sélectionné à fetchClientSecret
   const handleFetchClientSecret = useCallback(async (): Promise<string> => {
@@ -66,7 +73,7 @@ export default function CheckoutComponent({
           <CardHeader>
             <CardTitle className="text-center text-red-600 flex items-center justify-center gap-2">
               <AlertCircle className="w-6 h-6" />
-              Erreur de chargement
+              {dict ? dict.checkout.errorTitle : "Erreur de chargement"}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
@@ -74,11 +81,13 @@ export default function CheckoutComponent({
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button onClick={handleRetry} variant="default">
-                Réessayer
+                {dict ? dict.checkout.retry : "Réessayer"}
               </Button>
 
               <Button asChild variant="outline">
-                <Link href="/fossiles">Retour aux fossiles</Link>
+                <Link href="/fossiles">
+                  {dict ? dict.checkout.backToFossils : "Retour aux fossiles"}
+                </Link>
               </Button>
             </div>
           </CardContent>
@@ -94,7 +103,9 @@ export default function CheckoutComponent({
           <div className="text-center">
             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
             <p className="text-muted-foreground">
-              Chargement du formulaire de paiement...
+              {dict
+                ? dict.checkout.loading
+                : "Chargement du formulaire de paiement..."}
             </p>
           </div>
         </div>

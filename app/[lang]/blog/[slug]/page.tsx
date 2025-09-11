@@ -22,9 +22,10 @@ import {
   getBlogArticleBySlug,
   getBlogArticles,
 } from "@/lib/actions/blogActions";
+import { getDictionary } from "../../dictionaries";
 
 interface BlogArticlePageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; lang: "en" | "fr" }>;
 }
 
 // Générer les métadonnées SEO
@@ -89,18 +90,18 @@ export async function generateStaticParams() {
   }
 }
 
-export default async function BlogArticlePage({
-  params,
-}: BlogArticlePageProps) {
-  const resolvedParams = await params;
-  const article = await getBlogArticleBySlug(resolvedParams.slug);
+export default async function BlogArticlePage(props: BlogArticlePageProps) {
+  const resolvedParams = await props.params;
+  const { lang, slug } = resolvedParams;
+  const dict = await getDictionary(lang);
+  const article = await getBlogArticleBySlug(slug);
 
   if (!article) {
     notFound();
   }
 
   const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat("fr-FR", {
+    return new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -122,17 +123,18 @@ export default async function BlogArticlePage({
   };
 
   const getCategoryLabel = (category: BlogCategory) => {
-    const labels = {
-      [BlogCategory.PALEONTOLOGIE]: "Paléontologie",
-      [BlogCategory.DECOUVERTE]: "Découverte",
-      [BlogCategory.GUIDE_COLLECTION]: "Guide Collection",
-      [BlogCategory.HISTOIRE_GEOLOGIQUE]: "Histoire Géologique",
-      [BlogCategory.ACTUALITE]: "Actualité",
-      [BlogCategory.TECHNIQUE]: "Technique",
-      [BlogCategory.EXPOSITION]: "Exposition",
-      [BlogCategory.PORTRAIT]: "Portrait",
+    // Utilise le dictionnaire pour les labels de catégorie
+    const map: Record<string, string> = {
+      [BlogCategory.PALEONTOLOGIE]: dict.blog.blogFilters.categoryPaleontology,
+      [BlogCategory.DECOUVERTE]: dict.blog.blogFilters.categoryDiscovery,
+      [BlogCategory.GUIDE_COLLECTION]: dict.blog.blogFilters.categoryGuides,
+      [BlogCategory.HISTOIRE_GEOLOGIQUE]: dict.blog.blogFilters.categoryHistory,
+      [BlogCategory.ACTUALITE]: dict.blog.blogFilters.categoryActualite,
+      [BlogCategory.TECHNIQUE]: dict.blog.blogFilters.categoryTechnique,
+      [BlogCategory.EXPOSITION]: dict.blog.blogFilters.categoryExposition,
+      [BlogCategory.PORTRAIT]: dict.blog.blogFilters.categoryPortrait,
     };
-    return labels[category] || category;
+    return map[category] || category;
   };
 
   return (
@@ -141,9 +143,9 @@ export default async function BlogArticlePage({
         {/* Navigation de retour */}
         <div className="mb-6">
           <Button variant="ghost" asChild className="group">
-            <Link href="/blog" className="flex items-center gap-2">
+            <Link href={`/${lang}/blog`} className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Retour au blog
+              {dict.blog.prevLabel} {/* "Retour au blog" ou "Previous" */}
             </Link>
           </Button>
         </div>
@@ -154,7 +156,7 @@ export default async function BlogArticlePage({
           <header className="mb-8">
             {/* Catégorie */}
             <div className="mb-4">
-              <Link href={`/blog?category=${article.category}`}>
+              <Link href={`/${lang}/blog?category=${article.category}`}>
                 <Badge
                   className={`text-sm ${getCategoryColor(article.category)} hover:opacity-80 transition-opacity`}
                 >
@@ -180,7 +182,11 @@ export default async function BlogArticlePage({
             <div className="flex flex-wrap items-center gap-6 text-gray-600 mb-6">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4" />
-                <span>Par {article.author.name || article.author.email}</span>
+                <span>
+                  {lang === "fr"
+                    ? `Par ${article.author.name || article.author.email}`
+                    : `${dict.blog.blogList.publishedOn} ${article.author.name || article.author.email}`}
+                </span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -191,13 +197,18 @@ export default async function BlogArticlePage({
               {article.readTime && (
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  <span>{article.readTime} min de lecture</span>
+                  <span>
+                    {article.readTime} {dict.blog.blogList.min}{" "}
+                    {lang === "fr" ? "de lecture" : "read"}
+                  </span>
                 </div>
               )}
 
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />
-                <span>{article.views} vues</span>
+                <span>
+                  {article.views} {lang === "fr" ? "vues" : "views"}
+                </span>
               </div>
             </div>
 
@@ -205,7 +216,7 @@ export default async function BlogArticlePage({
             {article.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-6">
                 {article.tags.map((tag) => (
-                  <Link key={tag.id} href={`/blog?tag=${tag.slug}`}>
+                  <Link key={tag.id} href={`/${lang}/blog?tag=${tag.slug}`}>
                     <Badge
                       variant="outline"
                       className="hover:bg-gray-100 transition-colors"
@@ -223,10 +234,16 @@ export default async function BlogArticlePage({
 
             {/* Boutons de partage */}
             <div className="flex items-center gap-4 mb-8">
-              <span className="text-sm text-gray-600">Partager :</span>
+              <span className="text-sm text-gray-600">
+                {
+                  dict.blog.ctaContact.split(
+                    " "
+                  )[0] /* "Partager :" ou "Share:" */
+                }
+              </span>
               <ShareButtons
                 title={article.title}
-                url={`${process.env.NEXT_PUBLIC_APP_URL}/blog/${article.slug}`}
+                url={`${process.env.NEXT_PUBLIC_APP_URL}/${lang}/blog/${article.slug}`}
                 description={article.excerpt}
               />
             </div>
@@ -264,18 +281,23 @@ export default async function BlogArticlePage({
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <span className="text-sm text-gray-600">
-                  Publié le {formatDate(article.publishedAt!)}
+                  {lang === "fr"
+                    ? `Publié le ${formatDate(article.publishedAt!)}`
+                    : `${dict.blog.blogList.publishedOn} ${formatDate(article.publishedAt!)}`}
                 </span>
                 {article.updatedAt !== article.createdAt && (
                   <span className="text-sm text-gray-500">
-                    · Mis à jour le {formatDate(article.updatedAt)}
+                    ·{" "}
+                    {lang === "fr"
+                      ? `Mis à jour le ${formatDate(article.updatedAt)}`
+                      : `Updated on ${formatDate(article.updatedAt)}`}
                   </span>
                 )}
               </div>
 
               <Button variant="outline" size="sm">
                 <Share2 className="w-4 h-4 mr-2" />
-                Partager l&apos;article
+                {lang === "fr" ? "Partager l'article" : "Share article"}
               </Button>
             </div>
           </footer>
@@ -287,6 +309,7 @@ export default async function BlogArticlePage({
             currentArticleId={article.id}
             category={article.category}
             tags={article.tags.map((tag) => tag.slug)}
+            lang={lang}
           />
         </div>
       </div>

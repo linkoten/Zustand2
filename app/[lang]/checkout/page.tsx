@@ -5,210 +5,217 @@ import { redirect } from "next/navigation";
 import { getCartAction } from "@/lib/actions/cart-actions";
 import CheckoutComponent from "@/components/checkout/checkout";
 import { CountrySelector } from "@/components/checkout/country-selector";
-import { CartData, CartItemData } from "@/types/type"; // ✅ Importer les types existants
+import { CartData, CartItemData } from "@/types/type";
+import { getDictionary } from "../dictionaries";
 
 // ✅ Données des pays pour l'affichage
+// countryGroups utilise maintenant le nom dynamique depuis le dictionnaire
 const countryGroups = [
   {
     zone: "FRANCE",
-    countries: [{ code: "FR", name: "France", flag: "🇫🇷" }],
+    countries: [{ code: "FR", flag: "🇫🇷" }],
   },
   {
     zone: "UNION EUROPÉENNE",
     countries: [
-      { code: "AT", name: "Autriche", flag: "🇦🇹" },
-      { code: "BE", name: "Belgique", flag: "🇧🇪" },
-      { code: "BG", name: "Bulgarie", flag: "🇧🇬" },
-      { code: "HR", name: "Croatie", flag: "🇭🇷" },
-      { code: "CY", name: "Chypre", flag: "🇨🇾" },
-      { code: "CZ", name: "République tchèque", flag: "🇨🇿" },
-      { code: "DK", name: "Danemark", flag: "🇩🇰" },
-      { code: "EE", name: "Estonie", flag: "🇪🇪" },
-      { code: "FI", name: "Finlande", flag: "🇫🇮" },
-      { code: "DE", name: "Allemagne", flag: "🇩🇪" },
-      { code: "GR", name: "Grèce", flag: "🇬🇷" },
-      { code: "HU", name: "Hongrie", flag: "🇭🇺" },
-      { code: "IE", name: "Irlande", flag: "🇮🇪" },
-      { code: "IT", name: "Italie", flag: "🇮🇹" },
-      { code: "LV", name: "Lettonie", flag: "🇱🇻" },
-      { code: "LT", name: "Lituanie", flag: "🇱🇹" },
-      { code: "LU", name: "Luxembourg", flag: "🇱🇺" },
-      { code: "MT", name: "Malte", flag: "🇲🇹" },
-      { code: "NL", name: "Pays-Bas", flag: "🇳🇱" },
-      { code: "PL", name: "Pologne", flag: "🇵🇱" },
-      { code: "PT", name: "Portugal", flag: "🇵🇹" },
-      { code: "RO", name: "Roumanie", flag: "🇷🇴" },
-      { code: "SK", name: "Slovaquie", flag: "🇸🇰" },
-      { code: "SI", name: "Slovénie", flag: "🇸🇮" },
-      { code: "ES", name: "Espagne", flag: "🇪🇸" },
-      { code: "SE", name: "Suède", flag: "🇸🇪" },
+      { code: "AT", flag: "🇦🇹" },
+      { code: "BE", flag: "🇧🇪" },
+      { code: "BG", flag: "🇧🇬" },
+      { code: "HR", flag: "🇭🇷" },
+      { code: "CY", flag: "🇨🇾" },
+      { code: "CZ", flag: "🇨🇿" },
+      { code: "DK", flag: "🇩🇰" },
+      { code: "EE", flag: "🇪🇪" },
+      { code: "FI", flag: "🇫🇮" },
+      { code: "DE", flag: "🇩🇪" },
+      { code: "GR", flag: "🇬🇷" },
+      { code: "HU", flag: "🇭🇺" },
+      { code: "IE", flag: "🇮🇪" },
+      { code: "IT", flag: "🇮🇹" },
+      { code: "LV", flag: "🇱🇻" },
+      { code: "LT", flag: "🇱🇹" },
+      { code: "LU", flag: "🇱🇺" },
+      { code: "MT", flag: "🇲🇹" },
+      { code: "NL", flag: "🇳🇱" },
+      { code: "PL", flag: "🇵🇱" },
+      { code: "PT", flag: "🇵🇹" },
+      { code: "RO", flag: "🇷🇴" },
+      { code: "SK", flag: "🇸🇰" },
+      { code: "SI", flag: "🇸🇮" },
+      { code: "ES", flag: "🇪🇸" },
+      { code: "SE", flag: "🇸🇪" },
     ],
   },
   {
     zone: "EUROPE ÉLARGIE",
     countries: [
-      { code: "AD", name: "Andorre", flag: "🇦🇩" },
-      { code: "AL", name: "Albanie", flag: "🇦🇱" },
-      { code: "BA", name: "Bosnie-Herzégovine", flag: "🇧🇦" },
-      { code: "BY", name: "Biélorussie", flag: "🇧🇾" },
-      { code: "CH", name: "Suisse", flag: "🇨🇭" },
-      { code: "FO", name: "Îles Féroé", flag: "🇫🇴" },
-      { code: "GB", name: "Royaume-Uni", flag: "🇬🇧" },
-      { code: "GG", name: "Guernesey", flag: "🇬🇬" },
-      { code: "GI", name: "Gibraltar", flag: "🇬🇮" },
-      { code: "GL", name: "Groenland", flag: "🇬🇱" },
-      { code: "IM", name: "Île de Man", flag: "🇮🇲" },
-      { code: "IS", name: "Islande", flag: "🇮🇸" },
-      { code: "JE", name: "Jersey", flag: "🇯🇪" },
-      { code: "LI", name: "Liechtenstein", flag: "🇱🇮" },
-      { code: "MC", name: "Monaco", flag: "🇲🇨" },
-      { code: "MD", name: "Moldavie", flag: "🇲🇩" },
-      { code: "ME", name: "Monténégro", flag: "🇲🇪" },
-      { code: "MK", name: "Macédoine du Nord", flag: "🇲🇰" },
-      { code: "NO", name: "Norvège", flag: "🇳🇴" },
-      { code: "RS", name: "Serbie", flag: "🇷🇸" },
-      { code: "SM", name: "Saint-Marin", flag: "🇸🇲" },
-      { code: "UA", name: "Ukraine", flag: "🇺🇦" },
-      { code: "VA", name: "Vatican", flag: "🇻🇦" },
-      { code: "XK", name: "Kosovo", flag: "🇽🇰" },
+      { code: "AD", flag: "🇦🇩" },
+      { code: "AL", flag: "🇦🇱" },
+      { code: "BA", flag: "🇧🇦" },
+      { code: "BY", flag: "🇧🇾" },
+      { code: "CH", flag: "🇨🇭" },
+      { code: "FO", flag: "🇫🇴" },
+      { code: "GB", flag: "🇬🇧" },
+      { code: "GG", flag: "🇬🇬" },
+      { code: "GI", flag: "🇬🇮" },
+      { code: "GL", flag: "🇬🇱" },
+      { code: "IM", flag: "🇮🇲" },
+      { code: "IS", flag: "🇮🇸" },
+      { code: "JE", flag: "🇯🇪" },
+      { code: "LI", flag: "🇱🇮" },
+      { code: "MC", flag: "🇲🇨" },
+      { code: "MD", flag: "🇲🇩" },
+      { code: "ME", flag: "🇲🇪" },
+      { code: "MK", flag: "🇲🇰" },
+      { code: "NO", flag: "🇳🇴" },
+      { code: "RS", flag: "🇷🇸" },
+      { code: "SM", flag: "🇸🇲" },
+      { code: "UA", flag: "🇺🇦" },
+      { code: "VA", flag: "🇻🇦" },
+      { code: "XK", flag: "🇽🇰" },
     ],
   },
   {
     zone: "MAGHREB & MOYEN-ORIENT",
     countries: [
-      { code: "DZ", name: "Algérie", flag: "🇩🇿" },
-      { code: "MA", name: "Maroc", flag: "🇲🇦" },
-      { code: "TN", name: "Tunisie", flag: "🇹🇳" },
-      { code: "AE", name: "Émirats arabes unis", flag: "🇦🇪" },
-      { code: "BH", name: "Bahreïn", flag: "🇧🇭" },
-      { code: "IL", name: "Israël", flag: "🇮🇱" },
-      { code: "JO", name: "Jordanie", flag: "🇯🇴" },
-      { code: "KW", name: "Koweït", flag: "🇰🇼" },
-      { code: "LB", name: "Liban", flag: "🇱🇧" },
-      { code: "OM", name: "Oman", flag: "🇴🇲" },
-      { code: "QA", name: "Qatar", flag: "🇶🇦" },
-      { code: "SA", name: "Arabie saoudite", flag: "🇸🇦" },
-      { code: "TR", name: "Turquie", flag: "🇹🇷" },
+      { code: "DZ", flag: "🇩🇿" },
+      { code: "MA", flag: "🇲🇦" },
+      { code: "TN", flag: "🇹🇳" },
+      { code: "AE", flag: "🇦🇪" },
+      { code: "BH", flag: "🇧🇭" },
+      { code: "IL", flag: "🇮🇱" },
+      { code: "JO", flag: "🇯🇴" },
+      { code: "KW", flag: "🇰🇼" },
+      { code: "LB", flag: "🇱🇧" },
+      { code: "OM", flag: "🇴🇲" },
+      { code: "QA", flag: "🇶🇦" },
+      { code: "SA", flag: "🇸🇦" },
+      { code: "TR", flag: "🇹🇷" },
     ],
   },
   {
     zone: "AMÉRIQUE DU NORD",
     countries: [
-      { code: "CA", name: "Canada", flag: "🇨🇦" },
-      { code: "MX", name: "Mexique", flag: "🇲🇽" },
-      { code: "US", name: "États-Unis", flag: "🇺🇸" },
+      { code: "CA", flag: "🇨🇦" },
+      { code: "MX", flag: "🇲🇽" },
+      { code: "US", flag: "🇺🇸" },
     ],
   },
   {
     zone: "AMÉRIQUE CENTRALE & CARAÏBES",
     countries: [
-      { code: "AG", name: "Antigua-et-Barbuda", flag: "🇦🇬" },
-      { code: "BB", name: "Barbade", flag: "🇧🇧" },
-      { code: "BZ", name: "Belize", flag: "🇧🇿" },
-      { code: "CR", name: "Costa Rica", flag: "🇨🇷" },
-      { code: "DM", name: "Dominique", flag: "🇩🇲" },
-      { code: "DO", name: "République dominicaine", flag: "🇩🇴" },
-      { code: "GD", name: "Grenade", flag: "🇬🇩" },
-      { code: "GT", name: "Guatemala", flag: "🇬🇹" },
-      { code: "HN", name: "Honduras", flag: "🇭🇳" },
-      { code: "JM", name: "Jamaïque", flag: "🇯🇲" },
-      { code: "KN", name: "Saint-Kitts-et-Nevis", flag: "🇰🇳" },
-      { code: "LC", name: "Sainte-Lucie", flag: "🇱🇨" },
-      { code: "NI", name: "Nicaragua", flag: "🇳🇮" },
-      { code: "PA", name: "Panama", flag: "🇵🇦" },
-      { code: "SV", name: "Salvador", flag: "🇸🇻" },
-      { code: "TT", name: "Trinité-et-Tobago", flag: "🇹🇹" },
-      { code: "VC", name: "Saint-Vincent-et-les-Grenadines", flag: "🇻🇨" },
+      { code: "AG", flag: "🇦🇬" },
+      { code: "BB", flag: "🇧🇧" },
+      { code: "BZ", flag: "🇧🇿" },
+      { code: "CR", flag: "🇨🇷" },
+      { code: "DM", flag: "🇩🇲" },
+      { code: "DO", flag: "🇩🇴" },
+      { code: "GD", flag: "🇬🇩" },
+      { code: "GT", flag: "🇬🇹" },
+      { code: "HN", flag: "🇭🇳" },
+      { code: "JM", flag: "🇯🇲" },
+      { code: "KN", flag: "🇰🇳" },
+      { code: "LC", flag: "🇱🇨" },
+      { code: "NI", flag: "🇳🇮" },
+      { code: "PA", flag: "🇵🇦" },
+      { code: "SV", flag: "🇸🇻" },
+      { code: "TT", flag: "🇹🇹" },
+      { code: "VC", flag: "🇻🇨" },
     ],
   },
   {
     zone: "AMÉRIQUE DU SUD",
     countries: [
-      { code: "AR", name: "Argentine", flag: "🇦🇷" },
-      { code: "BO", name: "Bolivie", flag: "🇧🇴" },
-      { code: "BR", name: "Brésil", flag: "🇧🇷" },
-      { code: "CL", name: "Chili", flag: "🇨🇱" },
-      { code: "CO", name: "Colombie", flag: "🇨🇴" },
-      { code: "EC", name: "Équateur", flag: "🇪🇨" },
-      { code: "GY", name: "Guyana", flag: "🇬🇾" },
-      { code: "PY", name: "Paraguay", flag: "🇵🇾" },
-      { code: "PE", name: "Pérou", flag: "🇵🇪" },
-      { code: "SR", name: "Suriname", flag: "🇸🇷" },
-      { code: "UY", name: "Uruguay", flag: "🇺🇾" },
-      { code: "VE", name: "Venezuela", flag: "🇻🇪" },
+      { code: "AR", flag: "🇦🇷" },
+      { code: "BO", flag: "🇧🇴" },
+      { code: "BR", flag: "🇧🇷" },
+      { code: "CL", flag: "🇨🇱" },
+      { code: "CO", flag: "🇨🇴" },
+      { code: "EC", flag: "🇪🇨" },
+      { code: "GY", flag: "🇬🇾" },
+      { code: "PY", flag: "🇵🇾" },
+      { code: "PE", flag: "🇵🇪" },
+      { code: "SR", flag: "🇸🇷" },
+      { code: "UY", flag: "🇺🇾" },
+      { code: "VE", flag: "🇻🇪" },
     ],
   },
   {
     zone: "ASIE-PACIFIQUE",
     countries: [
-      { code: "AU", name: "Australie", flag: "🇦🇺" },
-      { code: "BD", name: "Bangladesh", flag: "🇧🇩" },
-      { code: "BN", name: "Brunei", flag: "🇧🇳" },
-      { code: "BT", name: "Bhoutan", flag: "🇧🇹" },
-      { code: "CN", name: "Chine", flag: "🇨🇳" },
-      { code: "FJ", name: "Fidji", flag: "🇫🇯" },
-      { code: "HK", name: "Hong Kong", flag: "🇭🇰" },
-      { code: "ID", name: "Indonésie", flag: "🇮🇩" },
-      { code: "IN", name: "Inde", flag: "🇮🇳" },
-      { code: "JP", name: "Japon", flag: "🇯🇵" },
-      { code: "KH", name: "Cambodge", flag: "🇰🇭" },
-      { code: "KR", name: "Corée du Sud", flag: "🇰🇷" },
-      { code: "LA", name: "Laos", flag: "🇱🇦" },
-      { code: "LK", name: "Sri Lanka", flag: "🇱🇰" },
-      { code: "MO", name: "Macao", flag: "🇲🇴" },
-      { code: "MV", name: "Maldives", flag: "🇲🇻" },
-      { code: "MY", name: "Malaisie", flag: "🇲🇾" },
-      { code: "NP", name: "Népal", flag: "🇳🇵" },
-      { code: "NZ", name: "Nouvelle-Zélande", flag: "🇳🇿" },
-      { code: "PH", name: "Philippines", flag: "🇵🇭" },
-      { code: "PK", name: "Pakistan", flag: "🇵🇰" },
-      { code: "SG", name: "Singapour", flag: "🇸🇬" },
-      { code: "TH", name: "Thaïlande", flag: "🇹🇭" },
-      { code: "TW", name: "Taïwan", flag: "🇹🇼" },
-      { code: "VN", name: "Vietnam", flag: "🇻🇳" },
+      { code: "AU", flag: "🇦🇺" },
+      { code: "BD", flag: "🇧🇩" },
+      { code: "BN", flag: "🇧🇳" },
+      { code: "BT", flag: "🇧🇹" },
+      { code: "CN", flag: "🇨🇳" },
+      { code: "FJ", flag: "🇫🇯" },
+      { code: "HK", flag: "🇭🇰" },
+      { code: "ID", flag: "🇮🇩" },
+      { code: "IN", flag: "🇮🇳" },
+      { code: "JP", flag: "🇯🇵" },
+      { code: "KH", flag: "🇰🇭" },
+      { code: "KR", flag: "🇰🇷" },
+      { code: "LA", flag: "🇱🇦" },
+      { code: "LK", flag: "🇱🇰" },
+      { code: "MO", flag: "🇲🇴" },
+      { code: "MV", flag: "🇲🇻" },
+      { code: "MY", flag: "🇲🇾" },
+      { code: "NP", flag: "🇳🇵" },
+      { code: "NZ", flag: "🇳🇿" },
+      { code: "PH", flag: "🇵🇭" },
+      { code: "PK", flag: "🇵🇰" },
+      { code: "SG", flag: "🇸🇬" },
+      { code: "TH", flag: "🇹🇭" },
+      { code: "TW", flag: "🇹🇼" },
+      { code: "VN", flag: "🇻🇳" },
     ],
   },
   {
     zone: "AFRIQUE",
     countries: [
-      { code: "BW", name: "Botswana", flag: "🇧🇼" },
-      { code: "CM", name: "Cameroun", flag: "🇨🇲" },
-      { code: "CI", name: "Côte d'Ivoire", flag: "🇨🇮" },
-      { code: "EG", name: "Égypte", flag: "🇪🇬" },
-      { code: "ET", name: "Éthiopie", flag: "🇪🇹" },
-      { code: "GA", name: "Gabon", flag: "🇬🇦" },
-      { code: "GH", name: "Ghana", flag: "🇬🇭" },
-      { code: "KE", name: "Kenya", flag: "🇰🇪" },
-      { code: "MG", name: "Madagascar", flag: "🇲🇬" },
-      { code: "MU", name: "Maurice", flag: "🇲🇺" },
-      { code: "NG", name: "Nigeria", flag: "🇳🇬" },
-      { code: "RW", name: "Rwanda", flag: "🇷🇼" },
-      { code: "SC", name: "Seychelles", flag: "🇸🇨" },
-      { code: "SN", name: "Sénégal", flag: "🇸🇳" },
-      { code: "TZ", name: "Tanzanie", flag: "🇹🇿" },
-      { code: "UG", name: "Ouganda", flag: "🇺🇬" },
-      { code: "ZA", name: "Afrique du Sud", flag: "🇿🇦" },
-      { code: "ZM", name: "Zambie", flag: "🇿🇲" },
+      { code: "BW", flag: "🇧🇼" },
+      { code: "CM", flag: "🇨🇲" },
+      { code: "CI", flag: "🇨🇮" },
+      { code: "EG", flag: "🇪🇬" },
+      { code: "ET", flag: "🇪🇹" },
+      { code: "GA", flag: "🇬🇦" },
+      { code: "GH", flag: "🇬🇭" },
+      { code: "KE", flag: "🇰🇪" },
+      { code: "MG", flag: "🇲🇬" },
+      { code: "MU", flag: "🇲🇺" },
+      { code: "NG", flag: "🇳🇬" },
+      { code: "RW", flag: "🇷🇼" },
+      { code: "SC", flag: "🇸🇨" },
+      { code: "SN", flag: "🇸🇳" },
+      { code: "TZ", flag: "🇹🇿" },
+      { code: "UG", flag: "🇺🇬" },
+      { code: "ZA", flag: "🇿🇦" },
+      { code: "ZM", flag: "🇿🇲" },
     ],
   },
 ];
 
-export default function CheckoutPage() {
+export default function CheckoutPage({
+  params,
+}: {
+  params: { lang: "en" | "fr" };
+}) {
+  const [dict, setDict] = useState<any>(null);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Charger le panier côté client
   useEffect(() => {
-    const loadCart = async () => {
+    const loadAll = async () => {
+      const dictLoaded = await getDictionary(params.lang);
+      setDict(dictLoaded);
       try {
         const cartData = await getCartAction();
-
         if (!cartData || !cartData.items.length) {
           redirect("/fossiles");
           return;
         }
-
         setCart(cartData);
       } catch (error) {
         console.error("Erreur chargement panier:", error);
@@ -217,15 +224,14 @@ export default function CheckoutPage() {
         setLoading(false);
       }
     };
+    loadAll();
+  }, [params.lang]);
 
-    loadCart();
-  }, []);
-
-  if (loading) {
+  if (loading || !dict) {
     return (
       <div className="container mx-auto py-12 text-center">
         <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p>Chargement...</p>
+        <p>{dict ? dict.checkout.loading : "..."}</p>
       </div>
     );
   }
@@ -258,13 +264,9 @@ export default function CheckoutPage() {
     setSelectedCountry(null);
   };
 
-  // ✅ Fonction pour récupérer le nom du pays
+  // Fonction pour récupérer le nom du pays depuis le dictionnaire
   const getCountryName = (countryCode: string): string => {
-    const country = countryGroups
-      .flatMap((group) => group.countries)
-      .find((country) => country.code === countryCode);
-
-    return country?.name || countryCode;
+    return dict.countries[countryCode] || countryCode;
   };
 
   return (
@@ -285,21 +287,24 @@ export default function CheckoutPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-semibold">
-                    Finaliser votre commande
+                    {params.lang === "fr"
+                      ? "Finaliser votre commande"
+                      : "Complete your order"}
                   </h2>
                   <p className="text-gray-600">
-                    Livraison vers :{" "}
+                    {params.lang === "fr" ? "Livraison vers" : "Shipping to"} :{" "}
                     <strong>{getCountryName(selectedCountry)}</strong>
                   </p>
                   <p className="text-sm text-gray-500 mt-1">
-                    Poids total : <strong>{totalWeight}g</strong>
+                    {params.lang === "fr" ? "Poids total" : "Total weight"} :{" "}
+                    <strong>{totalWeight}g</strong>
                   </p>
                 </div>
                 <button
                   onClick={handleBackToCountrySelection}
                   className="text-blue-600 hover:text-blue-800 underline"
                 >
-                  Changer de pays
+                  {params.lang === "fr" ? "Changer de pays" : "Change country"}
                 </button>
               </div>
             </div>

@@ -140,7 +140,7 @@ export default function BlogFilters({ lang, dict }: BlogFiltersProps) {
               </SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category.value} value={category.value}>
-                  {dict[category.labelKey] || category.labelKey}
+                  {dict[category.value] || category.value}
                 </SelectItem>
               ))}
             </SelectContent>
