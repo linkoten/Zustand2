@@ -251,7 +251,7 @@ export default function EditProductForm({
         <Label htmlFor="description2">Description Anglais</Label>
         <Textarea
           id="description2"
-          value={formData.description}
+          value={formData.description2}
           onChange={(e) => handleInputChange("description2", e.target.value)}
           rows={4}
         />

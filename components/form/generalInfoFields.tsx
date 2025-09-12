@@ -152,7 +152,7 @@ export default function GeneralInfoFields({
               <FormLabel>Description Anglais</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Description détaillée du fossile..."
+                  placeholder="Description détaillée du fossile en anglais..."
                   className="min-h-[100px]"
                   {...field}
                 />
