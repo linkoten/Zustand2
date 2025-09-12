@@ -104,6 +104,7 @@ export interface SerializedProduct {
   geologicalPeriod: string;
   geologicalStage: string;
   description?: string;
+  description2?: string; // ✅ Description anglaise
   stripePriceId?: string | null;
   weight: number; // ✅ Nouveau champ obligatoire en grammes
 

@@ -41,6 +41,8 @@ const productSchema = z.object({
   ]),
   geologicalStage: z.string().min(1, "L'étage géologique est requis"),
   description: z.string().optional().or(z.literal("")),
+  description2: z.string().optional().or(z.literal("")),
+
   weight: z.number().min(1, "Le poids doit être supérieur à 0 gramme"), // ✅ Nouveau champ
   images: z
     .array(
@@ -80,6 +82,7 @@ export default function CreateProductForm({
       geologicalPeriod: "JURASSIQUE",
       geologicalStage: "",
       description: "",
+      description2: "",
       weight: 0, // ✅ Valeur par défaut pour le poids
       images: [{ url: "", altText: "" }],
     },
@@ -104,6 +107,10 @@ export default function CreateProductForm({
       const cleanData = {
         ...data,
         description:
+          data.description && data.description.trim()
+            ? data.description.trim()
+            : undefined,
+        description2:
           data.description && data.description.trim()
             ? data.description.trim()
             : undefined,

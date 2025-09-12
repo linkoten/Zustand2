@@ -180,7 +180,8 @@ export default function ProductPageClient({
             </Card>
 
             {/* Description */}
-            {product.description && (
+            {((lang === "fr" && product.description) ||
+              (lang === "en" && product.description2)) && (
               <Card>
                 <CardContent className="p-6">
                   <h3 className="font-semibold mb-4">
@@ -188,7 +189,7 @@ export default function ProductPageClient({
                       (lang === "en" ? "Description" : "Description")}
                   </h3>
                   <p className="text-sm leading-relaxed">
-                    {product.description}
+                    {lang === "en" ? product.description2 : product.description}
                   </p>
                 </CardContent>
               </Card>

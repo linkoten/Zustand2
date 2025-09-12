@@ -11,6 +11,8 @@ export interface CreateProductData {
   geologicalPeriod: string;
   geologicalStage: string;
   description?: string;
+  description2?: string;
+
   weight: number; // ✅ Nouveau champ obligatoire
   images: Array<{
     url: string;

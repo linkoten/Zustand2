@@ -51,6 +51,7 @@ model Product {
   geologicalPeriod GeologicalPeriod
   geologicalStage  String
   description      String?
+  description2     String?          @db.Text
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   weight           Int // ✅ Nouveau champ obligatoire en grammes

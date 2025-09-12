@@ -143,6 +143,24 @@ export default function GeneralInfoFields({
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="description2"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description Anglais</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Description détaillée du fossile..."
+                  className="min-h-[100px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </CardContent>
     </Card>
   );

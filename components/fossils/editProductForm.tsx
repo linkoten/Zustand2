@@ -40,6 +40,8 @@ export default function EditProductForm({
   const [formData, setFormData] = useState({
     title: product.title,
     description: product.description || "",
+    description2: product.description || "",
+
     price: product.price.toString(),
     category: product.category,
     countryOfOrigin: product.countryOfOrigin,
@@ -62,6 +64,8 @@ export default function EditProductForm({
           id: product.id,
           title: formData.title,
           description: formData.description,
+          description2: formData.description2,
+
           price: parseFloat(formData.price),
           category: formData.category as Category,
           countryOfOrigin: formData.countryOfOrigin,
@@ -240,6 +244,15 @@ export default function EditProductForm({
           id="description"
           value={formData.description}
           onChange={(e) => handleInputChange("description", e.target.value)}
+          rows={4}
+        />
+      </div>
+      <div>
+        <Label htmlFor="description2">Description Anglais</Label>
+        <Textarea
+          id="description2"
+          value={formData.description}
+          onChange={(e) => handleInputChange("description2", e.target.value)}
           rows={4}
         />
       </div>

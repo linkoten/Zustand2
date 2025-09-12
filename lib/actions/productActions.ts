@@ -89,6 +89,8 @@ export async function createProductAction(data: CreateProductData) {
       geologicalPeriod: data.geologicalPeriod as GeologicalPeriod,
       geologicalStage: data.geologicalStage,
       description: data.description || null,
+      description2: data.description2 || null,
+
       weight: data.weight,
       stripeProductId: stripeProduct.id,
       stripePriceId: stripePrice.id,
@@ -158,6 +160,8 @@ export async function createProductAction(data: CreateProductData) {
         stripePriceId: stripePrice.id,
         imagesCount: savedImages.length,
         description: product.description,
+        description2: product.description2,
+
         weight: product.weight,
         isUpdate: !!existingProduct,
       },
@@ -179,6 +183,7 @@ export async function updateProductAction({
   id,
   title,
   description,
+  description2,
   price,
   category,
   countryOfOrigin,
@@ -191,6 +196,7 @@ export async function updateProductAction({
   id: number;
   title: string;
   description?: string;
+  description2?: string;
   price: number | string;
   category: Category;
   countryOfOrigin: string;
@@ -229,6 +235,8 @@ export async function updateProductAction({
     data: {
       title,
       description: description || null,
+      description2: description2 || null,
+
       price: typeof price === "string" ? parseFloat(price) : price,
       category,
       countryOfOrigin,
@@ -310,6 +318,7 @@ export async function getFossils(
         ...fossil,
         price: fossil.price.toNumber(),
         description: fossil.description || undefined,
+        description2: fossil.description2 || undefined, // ✅ Ajouter description2
         weight: fossil.weight,
         // ✅ Vérifier si CE produit est dans les favoris de CET utilisateur
         isFavorite: userId ? fossil.userFavorites.length > 0 : false,
@@ -389,6 +398,7 @@ export async function getProduct(
       ...product,
       price: product.price.toNumber(),
       description: product.description || undefined,
+      description2: product.description2 || undefined, // ✅ Ajouter description2
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
       locality: product.locality,
@@ -457,6 +467,7 @@ export async function getSimilarProducts(
         ...product,
         price: product.price.toNumber(),
         description: product.description || undefined,
+        description2: product.description2 || undefined, // ✅ Ajouter description2
         createdAt: product.createdAt.toISOString(),
         updatedAt: product.updatedAt.toISOString(),
         images: product.images.map((image) => ({
