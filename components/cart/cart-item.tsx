@@ -4,6 +4,7 @@ import { useCartStore } from "@/stores/cart-store";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { removeCartItemAction } from "@/lib/actions/cart-actions";
+import { syncCartWithDatabase } from "@/lib/cart-sync";
 import { toast } from "sonner";
 
 interface CartItemProps {
@@ -27,23 +28,31 @@ interface CartItemProps {
 
 export function CartItem({ item, dict }: CartItemProps) {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
-  const removeItem = useCartStore((state) => state.removeItem);
 
   const handleRemove = async () => {
-    const result = await removeCartItemAction(item.id); // 👈 item.id = cartItemId
-    if (result.success) {
-      removeItem(item.productId);
-      toast.success(
-        dict.cartItem.removedSuccess
-          ? dict.cartItem.removedSuccess.replace("{title}", item.title)
-          : `${item.title} retiré du panier`
-      );
-    } else {
-      toast.error(
-        result.error ||
-          dict.cartItem.removedError ||
-          "Erreur lors de la suppression"
-      );
+    try {
+      // 1. Supprimer de la base de données
+      const result = await removeCartItemAction(item.id);
+
+      if (result.success) {
+        // 2. Synchroniser le store avec la BDD
+        await syncCartWithDatabase();
+
+        toast.success(
+          dict.cartItem.removedSuccess
+            ? dict.cartItem.removedSuccess.replace("{title}", item.title)
+            : `${item.title} retiré du panier`
+        );
+      } else {
+        toast.error(
+          result.error ||
+            dict.cartItem.removedError ||
+            "Erreur lors de la suppression"
+        );
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression:", error);
+      toast.error("Erreur lors de la suppression");
     }
   };
 

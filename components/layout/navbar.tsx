@@ -132,7 +132,6 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 <NotificationButton userId={user.id} dict={dict} />
               )}
               <CartIconButton onClick={toggleCart} />
-              <LanguageSwitcher lang={lang} />
               {isLoaded && (
                 <>
                   {user ? (
@@ -156,6 +155,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                   )}
                 </>
               )}
+              <LanguageSwitcher lang={lang} />
             </div>
 
             {/* Menu mobile button */}
