@@ -40,7 +40,7 @@ export default function EditProductForm({
   const [formData, setFormData] = useState({
     title: product.title,
     description: product.description || "",
-    description2: product.description || "",
+    description2: product.description2 || "",
 
     price: product.price.toString(),
     category: product.category,

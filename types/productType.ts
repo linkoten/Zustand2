@@ -33,6 +33,7 @@ export interface EditableProduct {
   id: number;
   title: string;
   description?: string;
+  description2?: string;
   price: number; // ✅ number au lieu de Decimal
   category: string;
   countryOfOrigin: string;
