@@ -13,6 +13,10 @@ import {
   ArrowLeft,
   Share2,
   BookOpen,
+  Sparkles,
+  MessageCircle,
+  Heart,
+  Bookmark,
 } from "lucide-react";
 import { BlogCategory } from "@/lib/generated/prisma";
 import ShareButtons from "@/components/blog/shareButtons";
@@ -110,20 +114,19 @@ export default async function BlogArticlePage(props: BlogArticlePageProps) {
 
   const getCategoryColor = (category: BlogCategory) => {
     const colors = {
-      [BlogCategory.PALEONTOLOGIE]: "bg-blue-100 text-blue-800",
-      [BlogCategory.DECOUVERTE]: "bg-green-100 text-green-800",
-      [BlogCategory.GUIDE_COLLECTION]: "bg-purple-100 text-purple-800",
-      [BlogCategory.HISTOIRE_GEOLOGIQUE]: "bg-amber-100 text-amber-800",
-      [BlogCategory.ACTUALITE]: "bg-red-100 text-red-800",
-      [BlogCategory.TECHNIQUE]: "bg-gray-100 text-gray-800",
-      [BlogCategory.EXPOSITION]: "bg-pink-100 text-pink-800",
-      [BlogCategory.PORTRAIT]: "bg-indigo-100 text-indigo-800",
+      [BlogCategory.PALEONTOLOGIE]: "from-blue-500 to-cyan-600",
+      [BlogCategory.DECOUVERTE]: "from-green-500 to-emerald-600",
+      [BlogCategory.GUIDE_COLLECTION]: "from-purple-500 to-violet-600",
+      [BlogCategory.HISTOIRE_GEOLOGIQUE]: "from-amber-500 to-orange-600",
+      [BlogCategory.ACTUALITE]: "from-red-500 to-pink-600",
+      [BlogCategory.TECHNIQUE]: "from-gray-500 to-slate-600",
+      [BlogCategory.EXPOSITION]: "from-pink-500 to-rose-600",
+      [BlogCategory.PORTRAIT]: "from-indigo-500 to-blue-600",
     };
-    return colors[category] || "bg-gray-100 text-gray-800";
+    return colors[category] || "from-gray-500 to-slate-600";
   };
 
   const getCategoryLabel = (category: BlogCategory) => {
-    // Utilise le dictionnaire pour les labels de catégorie
     const map: Record<string, string> = {
       [BlogCategory.PALEONTOLOGIE]: dict.blog.blogFilters.categoryPaleontology,
       [BlogCategory.DECOUVERTE]: dict.blog.blogFilters.categoryDiscovery,
@@ -138,178 +141,286 @@ export default async function BlogArticlePage(props: BlogArticlePageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       <div className="container mx-auto px-4 py-8">
-        {/* Navigation de retour */}
-        <div className="mb-6">
-          <Button variant="ghost" asChild className="group">
-            <Link href={`/${lang}/blog`} className="flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              {dict.blog.prevLabel} {/* "Retour au blog" ou "Previous" */}
+        {/* Navigation de retour ultra moderne */}
+        <div className="mb-8">
+          <Button
+            variant="ghost"
+            asChild
+            className="group bg-white/80 backdrop-blur-sm border border-slate-200 hover:bg-white hover:shadow-lg transition-all duration-300 rounded-xl px-6 py-3"
+          >
+            <Link href={`/${lang}/blog`} className="flex items-center gap-3">
+              <div className="p-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                <ArrowLeft className="w-4 h-4 text-white group-hover:-translate-x-1 transition-transform duration-300" />
+              </div>
+              <span className="font-semibold">
+                {dict.blog.article?.backToBlog ||
+                  dict.blog.prevLabel ||
+                  "Retour au blog"}
+              </span>
             </Link>
           </Button>
         </div>
 
-        {/* Article principal */}
+        {/* Article principal avec design premium */}
         <article className="max-w-4xl mx-auto">
-          {/* En-tête de l'article */}
-          <header className="mb-8">
-            {/* Catégorie */}
-            <div className="mb-4">
+          {/* En-tête de l'article redesigné */}
+          <header className="mb-12">
+            {/* Catégorie premium */}
+            <div className="mb-6">
               <Link href={`/${lang}/blog?category=${article.category}`}>
-                <Badge
-                  className={`text-sm ${getCategoryColor(article.category)} hover:opacity-80 transition-opacity`}
-                >
-                  <BookOpen className="w-3 h-3 mr-1" />
-                  {getCategoryLabel(article.category)}
+                <Badge className="relative overflow-hidden border-0 px-4 py-2 text-sm font-semibold text-white hover:scale-105 transition-transform duration-300">
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-r ${getCategoryColor(article.category)}`}
+                  />
+                  <div className="relative flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    {getCategoryLabel(article.category)}
+                  </div>
                 </Badge>
               </Link>
             </div>
 
-            {/* Titre */}
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
-              {article.title}
+            {/* Titre spectaculaire */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-8">
+              <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-600 bg-clip-text text-transparent">
+                {article.title}
+              </span>
             </h1>
 
-            {/* Excerpt */}
+            {/* Excerpt redesigné */}
             {article.excerpt && (
-              <p className="text-xl text-gray-600 leading-relaxed mb-6">
-                {article.excerpt}
-              </p>
-            )}
-
-            {/* Métadonnées de l'article */}
-            <div className="flex flex-wrap items-center gap-6 text-gray-600 mb-6">
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                <span>
-                  {lang === "fr"
-                    ? `Par ${article.author.name || article.author.email}`
-                    : `${dict.blog.blogList.publishedOn} ${article.author.name || article.author.email}`}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <CalendarDays className="w-4 h-4" />
-                <span>{formatDate(article.publishedAt!)}</span>
-              </div>
-
-              {article.readTime && (
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  <span>
-                    {article.readTime} {dict.blog.blogList.min}{" "}
-                    {lang === "fr" ? "de lecture" : "read"}
-                  </span>
+              <div className="relative mb-8">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-purple-50/50 rounded-2xl" />
+                <div className="relative p-6">
+                  <p className="text-xl md:text-2xl text-slate-700 leading-relaxed font-medium">
+                    {article.excerpt}
+                  </p>
                 </div>
-              )}
-
-              <div className="flex items-center gap-2">
-                <Eye className="w-4 h-4" />
-                <span>
-                  {article.views} {lang === "fr" ? "vues" : "views"}
-                </span>
-              </div>
-            </div>
-
-            {/* Tags */}
-            {article.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-6">
-                {article.tags.map((tag) => (
-                  <Link key={tag.id} href={`/${lang}/blog?tag=${tag.slug}`}>
-                    <Badge
-                      variant="outline"
-                      className="hover:bg-gray-100 transition-colors"
-                      style={{
-                        borderColor: tag.color || undefined,
-                        color: tag.color || undefined,
-                      }}
-                    >
-                      #{tag.name}
-                    </Badge>
-                  </Link>
-                ))}
               </div>
             )}
 
-            {/* Boutons de partage */}
-            <div className="flex items-center gap-4 mb-8">
-              <span className="text-sm text-gray-600">
-                {
-                  dict.blog.ctaContact.split(
-                    " "
-                  )[0] /* "Partager :" ou "Share:" */
-                }
-              </span>
-              <ShareButtons
-                title={article.title}
-                url={`${process.env.NEXT_PUBLIC_APP_URL}/${lang}/blog/${article.slug}`}
-                description={article.excerpt}
-              />
+            {/* Métadonnées premium */}
+            <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl p-6 mb-8 shadow-lg">
+              <div className="flex flex-wrap items-center gap-6 text-slate-600">
+                {/* Auteur */}
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl shadow-lg">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase tracking-wide">
+                      {dict.blog.article?.authorLabel ||
+                        dict.blog.blogList?.by ||
+                        "Par"}
+                    </p>
+                    <p className="font-semibold text-slate-800">
+                      {article.author.name ||
+                        dict.blog.blogList?.unknownAuthor ||
+                        "Auteur inconnu"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Date */}
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-lg">
+                    <CalendarDays className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase tracking-wide">
+                      {dict.blog.article?.publishedLabel ||
+                        dict.blog.blogList?.publishedOn ||
+                        "Publié le"}
+                    </p>
+                    <p className="font-semibold text-slate-800">
+                      {formatDate(article.publishedAt!)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Temps de lecture */}
+                {article.readTime && (
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl shadow-lg">
+                      <Clock className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 uppercase tracking-wide">
+                        {dict.blog.article?.readTimeLabel || "Lecture"}
+                      </p>
+                      <p className="font-semibold text-slate-800">
+                        {article.readTime} {dict.blog.blogList?.min || "min"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Vues */}
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl shadow-lg">
+                    <Eye className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase tracking-wide">
+                      {dict.blog.article?.viewsLabel || "Vues"}
+                    </p>
+                    <p className="font-semibold text-slate-800">
+                      {article.views.toLocaleString(
+                        lang === "fr" ? "fr-FR" : "en-US"
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <Separator />
+            {/* Tags redesignés */}
+            {article.tags.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-sm font-semibold text-slate-600 mb-4 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  {dict.blog.article?.tagsLabel || "Tags"}
+                </h3>
+                <div className="flex flex-wrap gap-3">
+                  {article.tags.map((tag) => (
+                    <Link key={tag.id} href={`/${lang}/blog?tag=${tag.slug}`}>
+                      <Badge
+                        variant="outline"
+                        className="relative overflow-hidden bg-white/80 backdrop-blur-sm border-slate-200 hover:bg-white hover:shadow-lg hover:scale-105 transition-all duration-300 px-4 py-2 rounded-xl"
+                        style={{
+                          borderColor: tag.color || undefined,
+                        }}
+                      >
+                        <span
+                          className="font-semibold"
+                          style={{ color: tag.color || undefined }}
+                        >
+                          #{tag.name}
+                        </span>
+                      </Badge>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Boutons d'actions premium */}
+            <div className="flex flex-wrap items-center gap-4 mb-8">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-slate-600">
+                  {dict.blog.article?.shareLabel || "Partager"}
+                </span>
+                <ShareButtons
+                  title={article.title}
+                  url={`${process.env.NEXT_PUBLIC_APP_URL}/${lang}/blog/${article.slug}`}
+                  description={article.excerpt}
+                />
+              </div>
+
+              <div className="flex gap-3 ml-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl hover:bg-slate-50"
+                >
+                  <Heart className="w-4 h-4 mr-2" />
+                  {dict.blog.article?.likeButton || "J'aime"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl hover:bg-slate-50"
+                >
+                  <Bookmark className="w-4 h-4 mr-2" />
+                  {dict.blog.article?.saveButton || "Sauvegarder"}
+                </Button>
+              </div>
+            </div>
+
+            <Separator className="bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
           </header>
 
-          {/* Image mise en avant */}
+          {/* Image mise en avant redesignée */}
           {article.featuredImage && (
-            <div className="mb-8">
-              <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-200">
+            <div className="mb-12">
+              <div className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 shadow-2xl">
                 <Image
                   src={article.featuredImage}
                   alt={article.imageAlt || article.title}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-700 hover:scale-105"
                   priority
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
               </div>
               {article.imageAlt && (
-                <p className="text-sm text-gray-500 mt-2 text-center italic">
+                <p className="text-sm text-slate-500 mt-4 text-center italic bg-slate-50 px-4 py-2 rounded-xl mx-auto w-fit">
                   {article.imageAlt}
                 </p>
               )}
             </div>
           )}
 
-          {/* Contenu de l'article */}
-          <div className="prose prose-lg max-w-none mb-12">
-            <BlogContent content={article.content} />
+          {/* Contenu de l'article avec design premium */}
+          <div className="relative mb-16">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-transparent rounded-3xl" />
+            <div className="relative prose prose-lg prose-slate max-w-none">
+              <BlogContent content={article.content} />
+            </div>
           </div>
 
-          {/* Footer de l'article */}
-          <footer className="border-t pt-8">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">
-                  {lang === "fr"
-                    ? `Publié le ${formatDate(article.publishedAt!)}`
-                    : `${dict.blog.blogList.publishedOn} ${formatDate(article.publishedAt!)}`}
-                </span>
-                {article.updatedAt !== article.createdAt && (
-                  <span className="text-sm text-gray-500">
-                    ·{" "}
-                    {lang === "fr"
-                      ? `Mis à jour le ${formatDate(article.updatedAt)}`
-                      : `Updated on ${formatDate(article.updatedAt)}`}
-                  </span>
-                )}
-              </div>
+          {/* Footer de l'article redesigné */}
+          <footer className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-50 via-white to-slate-50 rounded-3xl" />
+            <div className="relative p-8">
+              <div className="flex flex-wrap items-center justify-between gap-6">
+                <div className="space-y-2">
+                  <p className="text-sm text-slate-600">
+                    {dict.blog.article?.publishedOn || "Publié le"}{" "}
+                    {formatDate(article.publishedAt!)}
+                  </p>
+                  {article.updatedAt !== article.createdAt && (
+                    <p className="text-sm text-slate-500">
+                      {dict.blog.article?.updatedOn || "Mis à jour le"}{" "}
+                      {formatDate(article.updatedAt)}
+                    </p>
+                  )}
+                </div>
 
-              <Button variant="outline" size="sm">
-                <Share2 className="w-4 h-4 mr-2" />
-                {lang === "fr" ? "Partager l'article" : "Share article"}
-              </Button>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl hover:bg-slate-50"
+                  >
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    {dict.blog.article?.commentButton || "Commenter"}
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl hover:bg-slate-50"
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    {dict.blog.article?.shareButton || "Partager"}
+                  </Button>
+                </div>
+              </div>
             </div>
           </footer>
         </article>
 
-        {/* Articles connexes */}
-        <div className="max-w-4xl mx-auto mt-16">
+        {/* Articles connexes avec espacement premium */}
+        <div className="max-w-4xl mx-auto mt-20">
           <RelatedArticles
             currentArticleId={article.id}
             category={article.category}
             tags={article.tags.map((tag) => tag.slug)}
             lang={lang}
+            dict={dict}
           />
         </div>
       </div>

@@ -186,6 +186,28 @@
     "averageRating": "Average rating"
   },
   "blog": {
+    "article": {
+      "backToBlog": "Back to blog",
+      "authorLabel": "Author",
+      "publishedLabel": "Published",
+      "readTimeLabel": "Reading time",
+      "viewsLabel": "Views",
+      "tagsLabel": "Tags",
+      "shareLabel": "Share:",
+      "likeButton": "Like",
+      "saveButton": "Save",
+      "publishedOn": "Published on",
+      "updatedOn": "Updated on",
+      "commentButton": "Comment",
+      "shareButton": "Share article",
+      "readingTime": "min read",
+      "author": "By",
+      "views": "views",
+      "share": "Share",
+      "like": "Like",
+      "save": "Save",
+      "comment": "Comment"
+    },
     "blogSection": {
       "loading": "Loading articles...",
       "loadingText": "Fetching the latest articles...",
@@ -226,7 +248,13 @@
     },
     "relatedArticles": {
       "title": "Related articles",
-      "subtitle": "Discover other articles you might be interested in"
+      "subtitle": "Discover other articles you might be interested in",
+      "recommendedLabel": "Recommended",
+      "articlesLabel": "articles",
+      "categoryMatch": "Same category", 
+      "exploreMore": "Explore more articles",
+      "discoverMore": "Discover all our articles on paleontology",
+      "seeAllButton": "See all articles"
     },
     "blogFilters": {
       "activeFilters": "Active filters:",
@@ -242,7 +270,10 @@
       "categoryActualite": "News",
       "categoryTechnique": "Technical",
       "categoryExposition": "Exhibition",
-      "categoryPortrait": "Portrait"
+      "categoryPortrait": "Portrait",
+      "filtersTitle": "Advanced filters",
+      "filtersSubtitle": "Refine your search",
+      "activeLabel": "Active"
     },
     "blogList": {
       "unknownAuthor": "Unknown author",
@@ -266,7 +297,13 @@
       "categoryActualite": "News",
       "categoryTechnique": "Technical",
       "categoryExposition": "Exhibition",
-      "categoryPortrait": "Portrait"
+      "categoryPortrait": "Portrait",
+      "articlesTitle": "Blog articles",
+      "articlesTotal": "articles available", 
+      "articleTotal": "article available",
+      "displayedLabel": "Displayed",
+      "deleteSuccess": "Article deleted successfully",
+      "deleteError": "Error deleting article"
     },
     "title": "FossilShop Blog",
     "subtitle": "Discover our articles on paleontology and the world of fossils",

@@ -186,6 +186,28 @@
     "averageRating": "Note moyenne"
   },
   "blog": {
+    "article": {
+      "backToBlog": "Retour au blog",
+      "authorLabel": "Auteur",
+      "publishedLabel": "Publié",
+      "readTimeLabel": "Temps de lecture",
+      "viewsLabel": "Vues",
+      "tagsLabel": "Tags",
+      "shareLabel": "Partager :",
+      "likeButton": "J'aime",
+      "saveButton": "Sauvegarder",
+      "publishedOn": "Publié le",
+      "updatedOn": "Mis à jour le",
+      "commentButton": "Commenter",
+      "shareButton": "Partager l'article",
+      "readingTime": "min de lecture",
+      "author": "Par",
+      "views": "vues",
+      "share": "Partager",
+      "like": "J'aime",
+      "save": "Sauvegarder",
+      "comment": "Commenter"
+    },
     "blogSection": {
       "loading": "Chargement des articles...",
       "loadingText": "Récupération des derniers articles...",
@@ -226,7 +248,13 @@
     },
     "relatedArticles": {
       "title": "Articles connexes",
-      "subtitle": "Découvrez d'autres articles qui pourraient vous intéresser"
+      "subtitle": "Découvrez d'autres articles qui pourraient vous intéresser",
+      "recommendedLabel": "Recommandés",
+      "articlesLabel": "articles",
+      "categoryMatch": "Même catégorie",
+      "exploreMore": "Explorez plus d'articles", 
+      "discoverMore": "Découvrez tous nos articles sur la paléontologie",
+      "seeAllButton": "Voir tous les articles"
     },
     "blogFilters": {
       "activeFilters": "Filtres actifs :",
@@ -242,7 +270,10 @@
       "categoryActualite": "Actualité",
       "categoryTechnique": "Technique",
       "categoryExposition": "Exposition",
-      "categoryPortrait": "Portrait"
+      "categoryPortrait": "Portrait",
+      "filtersTitle": "Filtres avancés",
+      "filtersSubtitle": "Affinez votre recherche", 
+      "activeLabel": "Actifs"
     },
     "blogList": {
       "unknownAuthor": "Auteur inconnu",
@@ -266,7 +297,13 @@
       "categoryActualite": "Actualité",
       "categoryTechnique": "Technique",
       "categoryExposition": "Exposition",
-      "categoryPortrait": "Portrait"
+      "categoryPortrait": "Portrait",
+      "articlesTitle": "Articles du blog",
+      "articlesTotal": "articles disponibles",
+      "articleTotal": "article disponible", 
+      "displayedLabel": "Affichés",
+      "deleteSuccess": "Article supprimé avec succès",
+      "deleteError": "Erreur lors de la suppression de l'article"
     },
     "title": "Blog FossilShop",
     "subtitle": "Découvrez nos articles sur la paléontologie et l'univers des fossiles",
