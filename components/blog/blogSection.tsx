@@ -206,7 +206,7 @@ export default function BlogSection({
                             >
                               <filter.icon className="w-3 h-3" />
                               <span className="text-xs font-medium">
-                                {filter.label} "{filter.value}"
+                                {filter.label} &quot;{filter.value}&quot;
                               </span>
                             </Badge>
                           ) : null
