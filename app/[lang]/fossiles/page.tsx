@@ -79,6 +79,13 @@ export default async function FossilesPage({
               </div>
             </div>
           </div>
+
+          <FossilesClient
+            fossilsData={fossilsData}
+            filterOptions={filterOptions}
+            lang={lang}
+            dict={dict}
+          />
         </div>
       </div>
     </UserProvider>
