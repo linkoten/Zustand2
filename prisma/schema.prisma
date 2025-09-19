@@ -1,0 +1,373 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Stripe
+  stripeCustomerId String? @unique
+
+  // Relations
+  cart        Cart?
+  Payment     Payment[]
+  ArticleBlog ArticleBlog[]
+
+  // 🆕 Relations produits possédés et commandes
+  productsOwned Product[] @relation("UserProductsOwned")
+  orders        Order[]   @relation("UserOrders")
+
+  Notification Notification[]
+}
+
+model Product {
+  id               Int              @id @default(autoincrement())
+  title            String
+  category         Category
+  genre            String
+  species          String
+  price            Decimal          @db.Decimal(10, 2)
+  countryOfOrigin  String
+  localityId       Int
+  locality         Locality         @relation(fields: [localityId], references: [id])
+  geologicalPeriod GeologicalPeriod
+  geologicalStage  String
+  description      String?
+  description2     String?          @db.Text
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  weight           Int // ✅ Nouveau champ obligatoire en grammes
+  ratings          Rating[]
+  // Stripe
+  stripeProductId  String?          @unique
+  stripePriceId    String?          @unique
+  favorite         Boolean          @default(false)
+
+  // Statut du produit
+  status ProductStatus @default(AVAILABLE)
+
+  // Pas de relation user car les produits sont indépendants
+
+  // Relations futures pour le panier
+  cartItems     CartItem[]
+  Payment       Payment[]
+  images        ProductImage[] // ✅ Nouvelle relation pour les images
+  userFavorites UserFavorite[] // ✅ Relation avec les favoris
+
+  // 🆕 Propriétaire du produit (optionnel)
+  ownerId String?
+  owner   User?   @relation("UserProductsOwned", fields: [ownerId], references: [id])
+
+  OrderItem OrderItem[]
+}
+
+model UserFavorite {
+  id        String   @id @default(cuid())
+  userId    String // ID Clerk de l'utilisateur
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId]) // Un utilisateur ne peut favoriser qu'une fois le même produit
+  @@map("user_favorites")
+}
+
+// ✅ Nouveau modèle pour les images
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId Int
+  imageUrl  String
+  altText   String?
+  order     Int      @default(0) // Pour définir l'ordre d'affichage
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String // ID Clerk de l'utilisateur à notifier
+  type      String // Type de notification (ex: "ORDER", "MESSAGE", "ADMIN", etc.)
+  title     String // Titre court
+  message   String // Message détaillé
+  isRead    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+  link      String? // URL vers la ressource concernée (optionnel)
+
+  user User @relation(fields: [userId], references: [clerkId])
+}
+
+// Modèle pour le panier (à venir)
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String   @unique // Un panier par utilisateur
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id])
+  items CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  productId Int
+  quantity  Int      @default(1)
+  addedAt   DateTime @default(now())
+
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId]) // Un produit une seule fois par panier
+}
+
+model Locality {
+  id                Int                @id @default(autoincrement())
+  name              String             @unique
+  latitude          Float
+  longitude         Float
+  geologicalPeriods GeologicalPeriod[] // Plusieurs périodes possibles
+  geologicalStages  String[] // Plusieurs étages possibles (en string, ou crée un enum si tu veux)
+  products          Product[] // Relation inverse
+
+  // Ajoute d'autres champs si besoin (description, pays, etc)
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  userId    String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  total     Decimal     @db.Decimal(10, 2)
+  status    String      @default("COMPLETED")
+  items     OrderItem[]
+
+  user User @relation("UserOrders", fields: [userId], references: [id])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId Int
+  quantity  Int     @default(1)
+  price     Decimal @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+// Nouveau modèle pour les transactions
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  stripePaymentId String        @unique
+  amount          Decimal       @db.Decimal(10, 2)
+  currency        String        @default("eur")
+  status          PaymentStatus
+  productId       Int?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user    User     @relation(fields: [userId], references: [clerkId])
+  product Product? @relation(fields: [productId], references: [id])
+}
+
+// ✅ Modèle pour les articles de blog avec auteur
+model ArticleBlog {
+  id             String       @id @default(cuid())
+  title          String
+  slug           String       @unique // Pour les URLs SEO-friendly
+  excerpt        String? // Résumé pour la liste des articles
+  content        String // Contenu riche au format JSON ou HTML
+  featuredImage  String? // Image mise en avant
+  imageAlt       String? // Texte alternatif pour l'image
+  category       BlogCategory
+  status         BlogStatus   @default(DRAFT)
+  publishedAt    DateTime? // Date de publication
+  readTime       Int? // Temps de lecture estimé en minutes
+  views          Int          @default(0) // Nombre de vues
+  seoTitle       String? // Titre SEO personnalisé
+  seoDescription String? // Description SEO
+  tags           BlogTag[] // Tags associés
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  ratings        Rating[]
+
+  // ✅ Relation avec l'auteur
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  @@index([status, publishedAt])
+  @@index([category])
+  @@index([slug])
+  @@index([authorId])
+}
+
+// ✅ Modèle pour les tags des articles
+model BlogTag {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  color       String? // Couleur hexadécimale pour l'affichage
+  createdAt   DateTime @default(now())
+
+  articles ArticleBlog[]
+}
+
+model FossilRequest {
+  id String @id @default(cuid())
+
+  // Informations utilisateur
+  name  String
+  email String
+  phone String?
+
+  // Détails de la demande
+  fossilType       String // Type de fossile recherché
+  description      String            @db.Text
+  maxBudget        Decimal?          @db.Decimal(10, 2)
+  geologicalPeriod GeologicalPeriod?
+  category         Category?
+  countryOfOrigin  String?
+  locality         String?
+
+  // Statut de la demande
+  status   RequestStatus   @default(PENDING)
+  priority RequestPriority @default(NORMAL)
+
+  // Suivi
+  adminNotes      String?   @db.Text
+  responseMessage String?   @db.Text
+  respondedAt     DateTime?
+  respondedBy     String? // ID de l'admin qui a répondu
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  clerkUserId String? // ✅ Ce champ doit exister
+
+  @@map("fossil_requests")
+}
+
+// ✅ MODÈLE Rating avec contraintes optionnelles plus flexibles
+model Rating {
+  id        String   @id @default(cuid())
+  userId    String // ID Clerk de l'utilisateur
+  rating    Int // Note de 1 à 5
+  comment   String? // Commentaire optionnel
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ✅ Relations optionnelles - un rating peut être pour un produit OU un article OU rien
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  articleId String?
+  article   ArticleBlog? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  // ✅ Contraintes optionnelles : un utilisateur ne peut noter qu'une fois par produit/article
+  @@unique([userId, productId])
+  @@unique([userId, articleId])
+  // ✅ Index pour optimiser les requêtes
+  @@index([productId])
+  @@index([articleId])
+  @@index([userId])
+  @@index([rating]) // ✅ Index pour filtrer par note
+  @@map("ratings")
+}
+
+enum RequestStatus {
+  PENDING // En attente
+  IN_PROGRESS // En cours de traitement
+  COMPLETED // Terminée
+  REJECTED // Rejetée
+  CANCELLED // Annulée
+}
+
+enum RequestPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum Category {
+  TRILOBITE
+  AMMONITE
+  DENT
+  COQUILLAGE
+}
+
+enum GeologicalPeriod {
+  CAMBRIEN
+  ORDOVICIEN
+  SILURIEN
+  DEVONIEN
+  CARBONIFERE
+  PERMIEN
+  TRIAS
+  JURASSIQUE
+  CRETACE
+  PALEOGENE
+  NEOGENE
+  QUATERNAIRE
+}
+
+enum ProductStatus {
+  AVAILABLE
+  SOLD
+  INACTIVE
+  RESERVED
+}
+
+// ✅ Nouveaux enums pour le blog
+enum BlogCategory {
+  PALEONTOLOGIE // Articles sur la paléontologie en général
+  DECOUVERTE // Nouvelles découvertes
+  GUIDE_COLLECTION // Guides pour collectionneurs
+  HISTOIRE_GEOLOGIQUE // Histoire de la Terre
+  ACTUALITE // Actualités du domaine
+  TECHNIQUE // Techniques de fouille, préparation
+  EXPOSITION // Expositions et événements
+  PORTRAIT // Portraits de paléontologues
+}
+
+enum BlogStatus {
+  DRAFT // Brouillon
+  PUBLISHED // Publié
+  ARCHIVED // Archivé
+  SCHEDULED // Programmé pour publication
+}
