@@ -27,8 +27,6 @@ export async function createProductAction(data: CreateProductData) {
       };
     }
 
-    console.log("📝 Données reçues:", data);
-
     // ✅ Filtrer les images valides
     const validImages = data.images.filter((img) => img.url && img.url.trim());
 
@@ -61,16 +59,12 @@ export async function createProductAction(data: CreateProductData) {
       },
     });
 
-    console.log("✅ Produit créé dans Stripe:", stripeProduct.id);
-
     // ✅ 2. Créer le prix dans Stripe
     const stripePrice = await stripe.prices.create({
       product: stripeProduct.id,
       unit_amount: Math.round(data.price * 100),
       currency: "eur",
     });
-
-    console.log("✅ Prix créé dans Stripe:", stripePrice.id);
 
     // ✅ 3. Vérifier si le produit existe déjà dans la BDD
     const existingProduct = await prisma.product.findUnique({
@@ -102,8 +96,6 @@ export async function createProductAction(data: CreateProductData) {
     };
 
     if (existingProduct) {
-      console.log("⚠️ Produit existant trouvé, mise à jour...");
-
       // Mettre à jour le produit existant
       product = await prisma.product.update({
         where: { stripeProductId: stripeProduct.id },
@@ -121,9 +113,6 @@ export async function createProductAction(data: CreateProductData) {
       });
     }
 
-    console.log("✅ Produit sauvegardé dans la BDD:", product.id);
-    console.log("📏 Poids sauvegardé:", product.weight, "grammes");
-
     // ✅ 4. Ajouter les images
     for (let i = 0; i < validImages.length; i++) {
       const image = validImages[i];
@@ -137,8 +126,6 @@ export async function createProductAction(data: CreateProductData) {
             order: i,
           },
         });
-
-        console.log(`✅ Image ${i + 1} ajoutée:`, productImage.id);
       } catch (imageError) {
         console.error(`❌ Erreur ajout image ${i + 1}:`, imageError);
       }
@@ -149,8 +136,6 @@ export async function createProductAction(data: CreateProductData) {
       where: { productId: product.id },
       orderBy: { order: "asc" },
     });
-
-    console.log(`✅ ${savedImages.length} image(s) sauvegardée(s) en BDD`);
 
     // ✅ 6. Revalider les caches
     revalidatePath("/fossiles");
