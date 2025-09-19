@@ -106,7 +106,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             {/* Logo amélioré - Position plus à gauche */}
-            <div className="flex-shrink-0 -ml-6">
+            <div className="flex-shrink-0 ">
               <Link
                 href={`/${lang}`}
                 className="flex items-center space-x-3 group"

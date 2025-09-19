@@ -186,10 +186,21 @@
     "averageRating": "Note moyenne"
   },
   "blog": {
-  "blogSection": {
+    "blogSection": {
       "loading": "Chargement des articles...",
+      "loadingText": "Récupération des derniers articles...",
+      "filtersTitle": "Filtres et recherche",
+      "resultsTitle": "Résultats de recherche",
+      "searchFor": "Recherche pour",
+      "categoryIn": "Dans la catégorie",
+      "tagWith": "Avec le tag",
       "results": "résultat",
       "resultsPlural": "résultats",
+      "resultsSingle": "article trouvé",
+      "totalSingle": "article au total",
+      "totalPlural": "articles au total",
+      "noResults": "Aucun résultat trouvé",
+      "noResultsText": "Essayez de modifier vos critères de recherche ou explorez d'autres catégories.",
       "found": "trouvé",
       "foundPlural": "trouvés",
       "for": "pour",
@@ -197,6 +208,21 @@
       "with": "avec",
       "tag": "#",
       "total": "au total"
+    },
+    "blogStats": {
+      "statsTotalPosts": "Articles publiés",
+      "statsCurrentPagePosts": "Cette page",
+      "statsTotalPages": "Pages",
+      "statsCurrentPage": "Page actuelle",
+      "statsTitle": "Statistiques du blog",
+      "statsSubtitle": "Aperçu en temps réel de l'activité et du contenu du blog",
+      "realTimeData": "Données en temps réel",
+      "lastUpdate": "Dernière mise à jour"
+    },
+    "pagination": {
+      "pageLabel": "Page",
+      "ofLabel": "sur",
+      "totalLabel": "Total"
     },
     "relatedArticles": {
       "title": "Articles connexes",
@@ -218,11 +244,11 @@
       "categoryExposition": "Exposition",
       "categoryPortrait": "Portrait"
     },
-  "blogList": {
-  "unknownAuthor": "Auteur inconnu",
-  "readMore": "Lire la suite →",
-  "by": "Par",
-  "imageSoon": "Image bientôt disponible",
+    "blogList": {
+      "unknownAuthor": "Auteur inconnu",
+      "readMore": "Lire la suite →",
+      "by": "Par",
+      "imageSoon": "Image bientôt disponible",
       "min": "min",
       "publishedOn": "Publié le",
       "deleteTitle": "Confirmer la suppression",
@@ -230,29 +256,34 @@
       "deleteCancel": "Annuler",
       "deleteConfirm": "Supprimer",
       "noPostsFound": "Aucun article trouvé",
-    "tryChangingFilters": "Essayez de modifier vos critères de recherche.",
-    "noPostsYet": "Aucun article n'a encore été publié.",
-    "createFirstPost": "Créer le premier article",
-
+      "tryChangingFilters": "Essayez de modifier vos critères de recherche.",
+      "noPostsYet": "Aucun article n'a encore été publié.",
+      "createFirstPost": "Créer le premier article",
       "categoryPaleontology": "Paléontologie",
-    "categoryDiscovery": "Découvertes",
-    "categoryGuides": "Guides",
-    "categoryHistory": "Histoire",
-    "categoryActualite": "Actualité",
-    "categoryTechnique": "Technique",
-    "categoryExposition": "Exposition",
-    "categoryPortrait": "Portrait"
-    },
-    "blogStats": {
-      "statsTotalPosts": "Articles publiés",
-      "statsCurrentPagePosts": "Cette page",
-      "statsTotalPages": "Pages",
-      "statsCurrentPage": "Page actuelle"
+      "categoryDiscovery": "Découvertes",
+      "categoryGuides": "Guides",
+      "categoryHistory": "Histoire",
+      "categoryActualite": "Actualité",
+      "categoryTechnique": "Technique",
+      "categoryExposition": "Exposition",
+      "categoryPortrait": "Portrait"
     },
     "title": "Blog FossilShop",
     "subtitle": "Découvrez nos articles sur la paléontologie et l'univers des fossiles",
     "create": "Nouvel article",
     "exploreCategories": "Explorez nos catégories",
+    "heroSubtitle": "Découvrez nos articles sur la paléontologie et l'univers fascinant des fossiles",
+    "communityActive": "Communauté active",
+    "newDiscoveries": "Nouvelles découvertes",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "favoriteArticles": "Articles favoris",
+    "favoriteArticlesDesc": "Sauvegardez vos articles préférés pour les relire plus tard",
+    "comments": "Commentaires",
+    "commentsDesc": "Participez aux discussions avec notre communauté passionnée",
+    "notifications": "Notifications",
+    "notificationsDesc": "Restez informé des nouveaux articles et découvertes",
+    "explorer": "Explorer",
     "ctaTitle": "Vous êtes passionné de paléontologie ?",
     "ctaText": "Rejoignez notre communauté et découvrez notre collection exceptionnelle de fossiles authentiques.",
     "ctaFossils": "Voir les fossiles",
