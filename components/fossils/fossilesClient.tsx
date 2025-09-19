@@ -48,6 +48,7 @@ function AnimatedFossilCard({
 }: {
   fossil: SerializedProduct;
   index: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any;
   lang: "en" | "fr";
 }) {
