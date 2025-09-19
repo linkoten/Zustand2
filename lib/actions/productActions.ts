@@ -367,7 +367,7 @@ export async function getFossils(
   filters: SearchParams & { search?: string } = {},
   userId?: string | null,
   page: number = 1,
-  limit: number = 20
+  limit: number = 18
 ): Promise<{
   fossils: SerializedProduct[];
   totalCount: number;
