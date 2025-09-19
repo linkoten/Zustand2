@@ -55,7 +55,7 @@ export default async function FossilesPage({
         <div className="container mx-auto px-4 py-8">
           {/* Header moderne */}
           <div className="mb-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-end gap-6 mb-8">
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   asChild
@@ -79,13 +79,6 @@ export default async function FossilesPage({
               </div>
             </div>
           </div>
-
-          <FossilesClient
-            fossilsData={fossilsData}
-            filterOptions={filterOptions}
-            lang={lang}
-            dict={dict}
-          />
         </div>
       </div>
     </UserProvider>
