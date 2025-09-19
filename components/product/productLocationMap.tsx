@@ -25,7 +25,7 @@ interface ProductLocationMapProps {
 export default function ProductLocationMap({
   locality,
   className = "",
-  height = 200,
+  height = 300,
   showAllLocalities = true,
 }: ProductLocationMapProps) {
   const [isClient, setIsClient] = useState(false);

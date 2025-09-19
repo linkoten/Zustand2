@@ -1,5 +1,21 @@
 
 {
+  "map": {
+    "localityTitle": "Locality",
+    "productLocalityBadge": "PRODUCT",
+    "geologicalPeriods": "Geological periods",
+    "geologicalStages": "Geological stages",
+    "coordinates": "Coordinates",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "fullscreen": "Fullscreen",
+    "layers": "Layers",
+    "satellite": "Satellite",
+    "terrain": "Terrain",
+    "street": "Street"
+  },
    "cartItem": {
     "removedSuccess": "{title} removed from cart",
     "removedError": "Error removing item from cart",
