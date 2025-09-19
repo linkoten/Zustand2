@@ -97,10 +97,10 @@ export default function FossilesFilters({
   };
 
   return (
-    <Card className="max-h-[calc(100vh-3rem)] shadow-xl border-0 bg-gradient-to-br from-white to-slate-50/50 backdrop-blur-sm flex flex-col">
-      {/* Header fixe avec hauteur minimale */}
-      <CardHeader className="pb-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-t-lg flex-shrink-0 min-h-[100px]">
-        <div className="flex items-center justify-between">
+    <Card className="h-[calc(100vh-3rem)] shadow-xl border-0 bg-gradient-to-br from-white to-slate-50/50 backdrop-blur-sm flex flex-col">
+      {/* Header fixe - hauteur définie */}
+      <CardHeader className="pb-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-t-lg flex-shrink-0 h-24">
+        <div className="flex items-center justify-between h-full">
           <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent flex items-center gap-2">
             <div className="relative">
               <Filter className="w-5 h-5 text-amber-600" />
@@ -116,7 +116,7 @@ export default function FossilesFilters({
         </div>
       </CardHeader>
 
-      {/* Contenu scrollable avec hauteur calculée */}
+      {/* Contenu scrollable - prend l'espace restant */}
       <div className="flex-1 min-h-0">
         <ScrollArea className="h-full">
           <CardContent className="space-y-6 p-6">
@@ -333,8 +333,8 @@ export default function FossilesFilters({
         </ScrollArea>
       </div>
 
-      {/* Footer fixe avec hauteur minimale */}
-      <CardFooter className="flex flex-col gap-3 p-6 border-t bg-gradient-to-r from-white to-slate-50 flex-shrink-0 min-h-[140px]">
+      {/* Footer fixe - hauteur définie */}
+      <CardFooter className="flex flex-col gap-3 p-6 border-t bg-gradient-to-r from-white to-slate-50 flex-shrink-0 h-36">
         <Button
           onClick={applyFilters}
           className="w-full bg-gradient-to-r from-amber-600 via-amber-700 to-orange-600 hover:from-amber-700 hover:via-amber-800 hover:to-orange-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 border-0"
