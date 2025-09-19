@@ -120,6 +120,29 @@
   overflow: hidden;
 }
 
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Animation fadeInUp personnalisée */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s ease-out both;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -129,61 +152,138 @@
   }
 }
 
-/* Styles pour le contenu des articles de blog */
+/* Styles pour le contenu des articles de blog - Version premium */
 .blog-content {
-  @apply text-gray-800 leading-relaxed;
+  @apply text-slate-700 leading-relaxed;
 }
 
 .blog-content h1 {
-  @apply text-3xl font-bold mt-8 mb-4 text-gray-900;
+  @apply text-4xl font-black mt-8 mb-8 tracking-tight;
+  background: linear-gradient(135deg, #0f172a 0%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .blog-content h2 {
-  @apply text-2xl font-semibold mt-6 mb-3 text-gray-900;
+  @apply text-3xl font-bold mt-12 mb-6 text-slate-800 tracking-tight;
 }
 
 .blog-content h3 {
-  @apply text-xl font-medium mt-4 mb-2 text-gray-900;
+  @apply text-2xl font-semibold mt-8 mb-4 text-slate-700;
 }
 
 .blog-content p {
-  @apply mb-4;
+  @apply mb-6 text-lg leading-relaxed text-slate-700;
 }
 
 .blog-content ul {
-  @apply list-disc list-inside mb-4 space-y-1;
+  @apply mb-6 space-y-2;
+  list-style: none;
+  padding-left: 0;
+}
+
+.blog-content ul li {
+  @apply text-slate-700 relative pl-8 mb-3;
+}
+
+.blog-content ul li::before {
+  content: "→";
+  @apply absolute left-0 text-amber-500 font-bold text-lg;
 }
 
 .blog-content ol {
-  @apply list-decimal list-inside mb-4 space-y-1;
+  @apply list-decimal ml-6 mb-6 space-y-2;
 }
 
-.blog-content li {
-  @apply text-gray-700;
+.blog-content ol li {
+  @apply text-slate-700 pl-2 mb-3;
 }
 
 .blog-content strong {
-  @apply font-semibold text-gray-900;
+  @apply font-bold text-slate-900;
 }
 
 .blog-content em {
-  @apply italic;
+  @apply italic text-slate-600;
 }
 
 .blog-content blockquote {
-  @apply border-l-4 border-blue-500 pl-4 italic text-gray-700 my-4;
+  @apply border-l-4 border-amber-500 bg-amber-50 rounded-r-xl p-6 my-8 text-amber-800 font-medium italic relative;
+}
+
+.blog-content blockquote::before {
+  content: "";
+  @apply absolute left-4 top-2 text-6xl text-amber-500 leading-none;
+}
+
+.blog-content blockquote p {
+  @apply mb-0 relative z-10;
 }
 
 .blog-content code {
-  @apply bg-gray-100 px-2 py-1 rounded text-sm font-mono;
+  @apply bg-slate-100 text-slate-800 px-2 py-1 rounded-lg text-sm font-mono;
 }
 
 .blog-content pre {
-  @apply bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4;
+  @apply bg-slate-900 text-slate-100 rounded-2xl p-6 my-8 overflow-x-auto;
 }
 
 .blog-content pre code {
-  @apply bg-transparent p-0;
+  @apply bg-transparent text-slate-100 p-0;
+}
+
+.blog-content img {
+  @apply rounded-2xl shadow-xl my-12 mx-auto max-w-full h-auto;
+}
+
+.blog-content a {
+  @apply text-blue-600 font-semibold no-underline hover:text-blue-700 hover:underline transition-all duration-300;
+}
+
+.blog-content a[href^="http"]::after {
+  content: "↗";
+  @apply inline-block ml-1 text-sm opacity-70 hover:opacity-100 transition-opacity duration-200;
+}
+
+.blog-content table {
+  @apply rounded-xl overflow-hidden shadow-lg my-8 w-full;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: white;
+}
+
+.blog-content th {
+  @apply bg-slate-100 text-slate-800 font-bold p-4;
+}
+
+.blog-content td {
+  @apply p-4 border-slate-200;
+  border-top: 1px solid #e2e8f0;
+}
+
+.blog-content thead tr:first-child th:first-child {
+  border-top-left-radius: 0.75rem;
+}
+
+.blog-content thead tr:first-child th:last-child {
+  border-top-right-radius: 0.75rem;
+}
+
+.blog-content tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 0.75rem;
+}
+
+.blog-content tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 0.75rem;
+}
+
+.blog-content figure {
+  @apply my-12 text-center;
+}
+
+.blog-content figcaption {
+  @apply mt-4 text-sm text-slate-500 italic bg-slate-50 px-6 py-3 rounded-xl inline-block;
 }
 
 /* Styles pour l'éditeur TipTap */
@@ -324,4 +424,27 @@
   border: 1px solid #d1d5db !important;
   border-radius: 0.375rem !important;
   background-color: #f9fafb !important;
+}
+
+/* Responsive design pour le blog content */
+@media (max-width: 768px) {
+  .blog-content {
+    @apply p-6;
+  }
+  
+  .blog-content h1 {
+    @apply text-2xl;
+  }
+  
+  .blog-content h2 {
+    @apply text-xl;
+  }
+  
+  .blog-content h3 {
+    @apply text-lg;
+  }
+  
+  .blog-content p {
+    @apply text-base;
+  }
 }

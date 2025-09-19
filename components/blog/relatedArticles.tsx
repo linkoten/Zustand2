@@ -1,5 +1,3 @@
-"use client";
-
 import { getBlogArticles } from "@/lib/actions/blogActions";
 import BlogCard from "./blogCard";
 import { BlogCategory } from "@/lib/generated/prisma";
@@ -126,10 +124,9 @@ export default async function RelatedArticles({
           {relatedArticles.map((article, index) => (
             <div
               key={article.id}
-              className="group transform transition-all duration-500 hover:scale-[1.02]"
+              className="group transform transition-all duration-500 hover:scale-[1.02] animate-fadeInUp"
               style={{
                 animationDelay: `${index * 150}ms`,
-                animation: "fadeInUp 0.8s ease-out both",
               }}
             >
               <BlogCard article={article} lang={lang} dict={dict} />
@@ -166,20 +163,6 @@ export default async function RelatedArticles({
           </div>
         </div>
       </div>
-
-      {/* Animations CSS */}
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </section>
   );
 }
