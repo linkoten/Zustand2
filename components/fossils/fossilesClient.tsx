@@ -136,7 +136,7 @@ export default function FossilesClient({
     <div className="flex gap-8 min-h-screen py-6">
       {/* Sidebar de filtres FIXE */}
       <div className="w-80 flex-shrink-0">
-        <div className="fixed top-6 w-80">
+        <div className="fixed top-6 w-80 pt-8">
           <FossilesFilters
             filterOptions={filterOptions}
             lang={lang}
