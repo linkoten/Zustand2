@@ -56,15 +56,6 @@ export default async function FossilesPage({
           {/* Header moderne */}
           <div className="mb-8">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
-              <div className="space-y-2">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                  {dict.home.shopTitle}
-                </h1>
-                <p className="text-lg text-slate-600 max-w-2xl">
-                  {dict.home.shopDesc}
-                </p>
-              </div>
-
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   asChild

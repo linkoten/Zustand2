@@ -147,6 +147,16 @@ export default function FossilesClient({
 
       {/* Contenu principal */}
       <div className="flex-1 space-y-6">
+        <div className="bg-gradient-to-r from-white via-slate-50 to-white rounded-xl border-0 p-8 shadow-xl backdrop-blur-sm">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+              {dict.home.shopTitle}
+            </h1>
+            <p className="text-lg text-slate-600 max-w-2xl">
+              {dict.home.shopDesc}
+            </p>
+          </div>
+        </div>
         {/* En-tête avec statistiques amélioré */}
         <div className="bg-gradient-to-r from-white via-slate-50 to-white rounded-xl border-0 p-8 shadow-xl backdrop-blur-sm">
           <div className="flex items-center justify-between">
