@@ -227,6 +227,7 @@ interface ProductMapProps {
   zoom?: number;
   highlightedLocalityId?: number;
   lang?: "en" | "fr";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
   height?: number;
   showLegend?: boolean;
@@ -314,6 +315,10 @@ export default function ProductMap({
     }
   }, [isClient]);
 
+  const handleMapTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setMapType(event.target.value as "street" | "satellite" | "terrain");
+  };
+
   // Si pas encore chargé côté client, afficher un skeleton
   if (!isClient || !mapLoaded) {
     return (
@@ -396,7 +401,7 @@ export default function ProductMap({
             <Globe className="w-4 h-4 text-gray-600" />
             <select
               value={mapType}
-              onChange={(e) => setMapType(e.target.value as any)}
+              onChange={handleMapTypeChange}
               className="text-xs border rounded px-2 py-1 bg-white shadow-sm"
             >
               <option value="street">{mapDict.street}</option>
@@ -520,6 +525,7 @@ export default function ProductMap({
               })}
               onEachFeature={(
                 feature: Feature<Geometry, LocalityFeatureProperties>,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 layer: any
               ) => {
                 if (feature.properties) {
@@ -532,7 +538,10 @@ export default function ProductMap({
                   } = feature.properties;
 
                   layer.on({
-                    mouseover: (e: any) => {
+                    mouseover: (
+                      e: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      any
+                    ) => {
                       const layer = e.target;
                       layer.setStyle({
                         weight: 3,
@@ -540,7 +549,10 @@ export default function ProductMap({
                         opacity: 1,
                       });
                     },
-                    mouseout: (e: any) => {
+                    mouseout: (
+                      e: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      any
+                    ) => {
                       const layer = e.target;
                       layer.setStyle({
                         weight: 2,
@@ -548,7 +560,10 @@ export default function ProductMap({
                         opacity: 0.8,
                       });
                     },
-                    click: (e: any) => {
+                    click: (
+                      e: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      any
+                    ) => {
                       const map = e.target._map;
                       if (map) {
                         const currentZoom = map.getZoom();
