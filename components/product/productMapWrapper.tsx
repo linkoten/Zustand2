@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Locality } from "@/lib/generated/prisma";
 
 // Import dynamique du composant carte pour éviter l'erreur SSR
 const ProductMapDynamic = dynamic(() => import("./productMap"), {
@@ -23,12 +24,13 @@ const ProductMapDynamic = dynamic(() => import("./productMap"), {
 });
 
 interface ProductMapWrapperProps {
-  localities: any[];
+  localities: Locality[];
   centerLat?: number;
   centerLon?: number;
   zoom?: number;
   highlightedLocalityId?: number;
   lang?: "en" | "fr";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
   height?: number;
   showLegend?: boolean;

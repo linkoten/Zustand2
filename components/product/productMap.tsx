@@ -8,11 +8,17 @@ import type { FeatureCollection, Feature, Geometry } from "geojson";
 import { GeologicalPeriod } from "@/lib/generated/prisma";
 
 // Import dynamique des modules Leaflet
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let MapContainer: any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let TileLayer: any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let Marker: any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let Popup: any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let GeoJSON: any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let L: any;
 
 // Styles CSS pour les markers et la carte (inclut les styles Leaflet)
