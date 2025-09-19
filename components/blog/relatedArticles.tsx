@@ -1,7 +1,8 @@
+"use client";
+
 import { getBlogArticles } from "@/lib/actions/blogActions";
 import BlogCard from "./blogCard";
 import { BlogCategory } from "@/lib/generated/prisma";
-import { getDictionary } from "@/app/[lang]/dictionaries";
 import {
   BookOpen,
   Sparkles,
