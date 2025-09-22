@@ -55,6 +55,7 @@ const statusIcons = {
 interface AdminDashboardProps {
   user: DashboardUser;
   data: AdminDashboardData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any;
   lang: "fr" | "en";
 }

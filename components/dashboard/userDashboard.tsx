@@ -45,6 +45,7 @@ const priorityColors = {
 interface UserDashboardProps {
   user: DashboardUser;
   data: UserDashboardData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any;
   lang: "fr" | "en";
 }
