@@ -28,17 +28,22 @@ export default async function DashboardPage({
   }
 
   const { lang } = await params;
-
   const dict = await getDictionary(lang);
 
   // Charger les données selon le rôle
   if (user.role === UserRole.ADMIN) {
     const adminData = await getAdminDashboardData();
-    return <AdminDashboard user={user} data={adminData} />;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+        <AdminDashboard user={user} data={adminData} dict={dict} lang={lang} />
+      </div>
+    );
   } else {
     const userData = await getUserDashboardData(userId);
     return (
-      <UserDashboard user={user} data={userData} lang={lang} dict={dict} />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50/20">
+        <UserDashboard user={user} data={userData} lang={lang} dict={dict} />
+      </div>
     );
   }
 }
