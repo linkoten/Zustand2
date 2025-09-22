@@ -338,7 +338,7 @@ export default function CheckoutPage() {
                 </h1>
                 <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
                   Sélectionnez votre pays de livraison pour calculer les frais
-                  d'expédition
+                  d&apos;expédition
                 </p>
               </div>
 
@@ -429,7 +429,7 @@ export default function CheckoutPage() {
                   Finaliser votre commande 💳
                 </h1>
                 <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                  Dernière étape avant de recevoir vos fossiles d'exception
+                  Dernière étape avant de recevoir vos fossiles d&apos;exception
                 </p>
               </div>
             </div>
@@ -462,7 +462,7 @@ export default function CheckoutPage() {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     <div className="text-right">
                       <div className="text-sm text-slate-600 mb-1">
-                        Poids de l'envoi
+                        Poids de l&apos;envoi
                       </div>
                       <Badge className="bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 border-amber-200 px-4 py-2">
                         <Weight className="h-4 w-4 mr-2" />
