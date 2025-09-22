@@ -5,7 +5,19 @@ import { getUserData } from "@/lib/actions/dashboardActions";
 import { RequestStatus, RequestPriority } from "@/lib/generated/prisma";
 import FossilRequestsList from "@/components/fossilRequests/fossilRequestsList";
 import { Button } from "@/components/ui/button";
-import { FileText, Plus, ArrowLeft } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  FileText,
+  Plus,
+  ArrowLeft,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Search,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 import Link from "next/link";
 import { getDictionary } from "@/app/[lang]/dictionaries";
 
@@ -34,7 +46,6 @@ export default async function UserFossilRequestsPage({
   }
 
   const { lang } = await params;
-
   const dict = await getDictionary(lang);
 
   const resolvedSearchParams = await searchParams;
@@ -43,20 +54,41 @@ export default async function UserFossilRequestsPage({
   const priority = resolvedSearchParams.priority;
   const search = resolvedSearchParams.search;
 
-  // ✅ Force le filtrage par utilisateur (userOnly: true)
   const requestsData = await getFossilRequests(page, {
     status: status as RequestStatus,
     priority: priority as RequestPriority,
     search,
-    userOnly: true, // Force l'affichage uniquement des demandes de l'utilisateur
+    userOnly: true,
   });
 
+  const pendingCount = requestsData.requests.filter(
+    (r) => r.status === "PENDING"
+  ).length;
+  const inProgressCount = requestsData.requests.filter(
+    (r) => r.status === "IN_PROGRESS"
+  ).length;
+  const completedCount = requestsData.requests.filter(
+    (r) => r.status === "COMPLETED"
+  ).length;
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* En-tête */}
-      <div className="mb-8">
-        <div className="flex items-center gap-4 mb-4">
-          <Button asChild variant="ghost" size="sm">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+      {/* Background décoratif */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-48 h-48 bg-indigo-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-purple-200/20 rounded-full blur-2xl animate-pulse delay-2000"></div>
+      </div>
+
+      <div className="container mx-auto px-4 py-12 relative z-10">
+        {/* Navigation */}
+        <div className="mb-8">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="mb-6 hover:bg-white/80 backdrop-blur-sm"
+          >
             <Link
               href={`/${lang}/dashboard`}
               className="flex items-center gap-2"
@@ -66,106 +98,235 @@ export default async function UserFossilRequestsPage({
                 "Retour au dashboard"}
             </Link>
           </Button>
-        </div>
 
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-              <FileText className="h-8 w-8 text-primary" />
-              {dict?.dashboardRequests?.title || "Mes demandes de fossiles"}
+          {/* En-tête avec animation */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg border border-white/20 mb-6">
+              <Sparkles className="w-5 h-5 text-blue-500 animate-pulse" />
+              <span className="text-sm font-semibold text-slate-700">
+                {dict?.dashboardRequests?.myRequestsHub ||
+                  "Centre de mes demandes"}
+              </span>
+            </div>
+
+            <h1 className="text-5xl font-black mb-4 bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 bg-clip-text text-transparent">
+              {dict?.dashboardRequests?.title || "Mes demandes de fossiles"} 🦖
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
               {dict?.dashboardRequests?.subtitle ||
                 "Suivez l'état de vos demandes de recherche de fossiles"}
             </p>
+
+            {/* Action principale */}
+            <div className="mt-8">
+              <Button
+                asChild
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+              >
+                <Link href={`/${lang}/fossiles/request`}>
+                  <Plus className="mr-2 h-5 w-5" />
+                  {dict?.dashboardRequests?.newRequest || "Nouvelle demande"}
+                </Link>
+              </Button>
+            </div>
           </div>
 
-          <div className="flex gap-2">
-            <Button asChild>
-              <Link href={`/${lang}/fossiles/request`}>
-                <Plus className="mr-2 h-4 w-4" />
-                {dict?.dashboardRequests?.newRequest || "Nouvelle demande"}
-              </Link>
-            </Button>
-          </div>
-        </div>
-
-        {/* Statistiques rapides - Version utilisateur */}
-        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
-            <div className="text-2xl font-bold text-blue-600">
-              {requestsData.totalRequests}
-            </div>
-            <div className="text-sm text-blue-600/80">
-              {dict?.dashboardRequests?.myRequests || "Mes demandes"}
-            </div>
-          </div>
-          <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-4">
-            <div className="text-2xl font-bold text-yellow-600">
-              {
-                requestsData.requests.filter((r) => r.status === "PENDING")
-                  .length
-              }
-            </div>
-            <div className="text-sm text-yellow-600/80">
-              {dict?.dashboardRequests?.pending || "En attente"}
-            </div>
-          </div>
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
-            <div className="text-2xl font-bold text-blue-600">
-              {
-                requestsData.requests.filter((r) => r.status === "IN_PROGRESS")
-                  .length
-              }
-            </div>
-            <div className="text-sm text-blue-600/80">
-              {dict?.dashboardRequests?.inProgress || "En cours"}
-            </div>
-          </div>
-          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4">
-            <div className="text-2xl font-bold text-green-600">
-              {
-                requestsData.requests.filter((r) => r.status === "COMPLETED")
-                  .length
-              }
-            </div>
-            <div className="text-sm text-green-600/80">
-              {dict?.dashboardRequests?.completed || "Terminées"}
-            </div>
-          </div>
-        </div>
-
-        {/* Message d'aide pour les utilisateurs */}
-        {requestsData.totalRequests === 0 && (
-          <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <FileText className="h-8 w-8 text-blue-500" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                  {dict?.dashboardRequests?.noRequestsTitle ||
-                    "Vous n'avez pas encore de demandes"}
-                </h3>
-                <p className="text-blue-700 mb-4">
-                  {dict?.dashboardRequests?.noRequestsDesc ||
-                    "Vous cherchez un fossile spécifique ? Notre équipe d'experts peut vous aider à le trouver ! Décrivez ce que vous recherchez et nous ferons de notre mieux pour vous aider."}
+          {/* Statistiques avec design premium */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 hover:scale-105 transform">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10 rounded-t-lg"></div>
+                <CardTitle className="text-sm font-semibold text-slate-700 relative z-10">
+                  {dict?.dashboardRequests?.myRequests || "Mes demandes"}
+                </CardTitle>
+                <div className="relative z-10">
+                  <div className="p-2 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl shadow-lg">
+                    <FileText className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="relative z-10">
+                <div className="text-3xl font-black mb-1 bg-gradient-to-br from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                  {requestsData.totalRequests}
+                </div>
+                <p className="text-xs text-slate-600 font-medium">
+                  {dict?.dashboardRequests?.totalRequests || "Total demandes"}
                 </p>
-                <Button asChild>
-                  <Link href={`/${lang}/fossiles/request`}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    {dict?.dashboardRequests?.createFirstRequest ||
-                      "Créer ma première demande"}
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+              </CardContent>
+            </Card>
 
-      {/* Liste des demandes */}
-      <FossilRequestsList {...requestsData} dict={dict} lang={lang} />
+            <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-amber-50/50 to-amber-100/30 hover:scale-105 transform">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-amber-600/10 rounded-t-lg"></div>
+                <CardTitle className="text-sm font-semibold text-slate-700 relative z-10">
+                  {dict?.dashboardRequests?.pending || "En attente"}
+                </CardTitle>
+                <div className="relative z-10">
+                  <div className="p-2 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl shadow-lg">
+                    <Clock className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="relative z-10">
+                <div className="text-3xl font-black mb-1 bg-gradient-to-br from-amber-600 to-amber-800 bg-clip-text text-transparent">
+                  {pendingCount}
+                </div>
+                <p className="text-xs text-slate-600 font-medium">
+                  {dict?.dashboardRequests?.awaitingResponse ||
+                    "En attente de réponse"}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-indigo-50/50 to-indigo-100/30 hover:scale-105 transform">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-indigo-600/10 rounded-t-lg"></div>
+                <CardTitle className="text-sm font-semibold text-slate-700 relative z-10">
+                  {dict?.dashboardRequests?.inProgress || "En cours"}
+                </CardTitle>
+                <div className="relative z-10">
+                  <div className="p-2 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-xl shadow-lg">
+                    <Search className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="relative z-10">
+                <div className="text-3xl font-black mb-1 bg-gradient-to-br from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
+                  {inProgressCount}
+                </div>
+                <p className="text-xs text-slate-600 font-medium">
+                  {dict?.dashboardRequests?.beingProcessed ||
+                    "En cours de traitement"}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-emerald-50/50 to-emerald-100/30 hover:scale-105 transform">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-emerald-600/10 rounded-t-lg"></div>
+                <CardTitle className="text-sm font-semibold text-slate-700 relative z-10">
+                  {dict?.dashboardRequests?.completed || "Terminées"}
+                </CardTitle>
+                <div className="relative z-10">
+                  <div className="p-2 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl shadow-lg">
+                    <CheckCircle className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="relative z-10">
+                <div className="text-3xl font-black mb-1 bg-gradient-to-br from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
+                  {completedCount}
+                </div>
+                <p className="text-xs text-slate-600 font-medium">
+                  {dict?.dashboardRequests?.successfullyCompleted ||
+                    "Traitées avec succès"}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Message d'aide pour les nouveaux utilisateurs */}
+          {requestsData.totalRequests === 0 && (
+            <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-2xl mb-12">
+              <CardContent className="p-8">
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <FileText className="h-12 w-12 text-blue-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-800 mb-4">
+                    {dict?.dashboardRequests?.noRequestsTitle ||
+                      "Aucune demande pour le moment"}
+                  </h3>
+                  <p className="text-slate-600 max-w-md mx-auto mb-8 leading-relaxed">
+                    {dict?.dashboardRequests?.noRequestsDesc ||
+                      "Vous cherchez un fossile spécifique ? Notre équipe d'experts peut vous aider à le trouver ! Décrivez ce que vous recherchez et nous ferons de notre mieux pour vous aider."}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button
+                      asChild
+                      className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg"
+                    >
+                      <Link href={`/${lang}/fossiles/request`}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        {dict?.dashboardRequests?.createFirstRequest ||
+                          "Créer ma première demande"}
+                      </Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                    >
+                      <Link href={`/${lang}/fossiles`}>
+                        <Search className="mr-2 h-4 w-4" />
+                        {dict?.dashboardRequests?.browseFossils ||
+                          "Explorer les fossiles"}
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Conseils et aide */}
+          {requestsData.totalRequests > 0 && (
+            <Card className="border-0 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-xl mb-12">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-blue-900">
+                  <TrendingUp className="h-5 w-5" />
+                  {dict?.dashboardRequests?.tipsTitle ||
+                    "Conseils pour vos demandes"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <AlertCircle className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <h4 className="font-semibold text-blue-900 mb-2">
+                      {dict?.dashboardRequests?.tip1Title || "Soyez précis"}
+                    </h4>
+                    <p className="text-sm text-blue-700">
+                      {dict?.dashboardRequests?.tip1Desc ||
+                        "Plus votre description est détaillée, mieux nous pourrons vous aider"}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Clock className="h-6 w-6 text-indigo-600" />
+                    </div>
+                    <h4 className="font-semibold text-indigo-900 mb-2">
+                      {dict?.dashboardRequests?.tip2Title || "Délai de réponse"}
+                    </h4>
+                    <p className="text-sm text-indigo-700">
+                      {dict?.dashboardRequests?.tip2Desc ||
+                        "Nous répondons généralement sous 24-48h ouvrées"}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <CheckCircle className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <h4 className="font-semibold text-purple-900 mb-2">
+                      {dict?.dashboardRequests?.tip3Title ||
+                        "Suivi en temps réel"}
+                    </h4>
+                    <p className="text-sm text-purple-700">
+                      {dict?.dashboardRequests?.tip3Desc ||
+                        "Vous recevrez des notifications pour chaque mise à jour"}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Liste des demandes */}
+        <FossilRequestsList {...requestsData} dict={dict} lang={lang} />
+      </div>
     </div>
   );
 }

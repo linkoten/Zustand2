@@ -50,6 +50,15 @@ import {
   MessageSquare,
   FileText,
   StickyNote,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
+  Euro,
+  Calendar,
+  User,
+  Sparkles,
+  Plus,
 } from "lucide-react";
 import Link from "next/link";
 import { FossilRequest } from "@/types/fossilRequestType";
@@ -65,11 +74,24 @@ const statusLabels: Record<RequestStatus, string> = {
 };
 
 const statusColors: Record<RequestStatus, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800",
-  IN_PROGRESS: "bg-blue-100 text-blue-800",
-  COMPLETED: "bg-green-100 text-green-800",
-  CANCELLED: "bg-red-100 text-red-800",
-  REJECTED: "bg-gray-100 text-gray-800",
+  PENDING:
+    "bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border-amber-200",
+  IN_PROGRESS:
+    "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200",
+  COMPLETED:
+    "bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-800 border-emerald-200",
+  CANCELLED:
+    "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border-red-200",
+  REJECTED:
+    "bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-gray-200",
+};
+
+const statusIcons = {
+  PENDING: Clock,
+  IN_PROGRESS: Search,
+  COMPLETED: CheckCircle,
+  CANCELLED: XCircle,
+  REJECTED: XCircle,
 };
 
 const priorityLabels = {
@@ -80,11 +102,14 @@ const priorityLabels = {
 };
 
 const priorityColors = {
-  LOW: "bg-gray-100 text-gray-800",
-  NORMAL: "bg-blue-100 text-blue-800",
-  HIGH: "bg-orange-100 text-orange-800",
-  URGENT: "bg-red-100 text-red-800",
+  LOW: "bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-gray-200",
+  NORMAL:
+    "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border-blue-200",
+  HIGH: "bg-gradient-to-r from-orange-100 to-amber-100 text-orange-800 border-orange-200",
+  URGENT:
+    "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border-red-200",
 };
+
 interface FossilRequestListProps {
   requests: FossilRequest[];
   totalPages: number;
@@ -101,7 +126,7 @@ export default function FossilRequestsList({
   totalPages,
   currentPage,
   totalRequests,
-  userRole, // ✅ Récupérer le rôle utilisateur
+  userRole,
   lang,
   dict,
 }: FossilRequestListProps) {
@@ -115,7 +140,6 @@ export default function FossilRequestsList({
   const currentStatus = searchParams.get("status");
   const currentPriority = searchParams.get("priority");
 
-  // ✅ Fonction pour supprimer une demande (utilisateur uniquement)
   const handleDelete = async (requestId: string) => {
     setDeletingId(requestId);
     try {
@@ -135,14 +159,12 @@ export default function FossilRequestsList({
     }
   };
 
-  // ✅ Fonction pour générer l'URL de détail selon le rôle
   const getDetailUrl = (requestId: string) => {
     return userRole === UserRole.ADMIN
       ? `/${lang}/dashboard/requests/admin/${requestId}`
       : `/${lang}/dashboard/requests/user/${requestId}`;
   };
 
-  // ✅ Fonction pour générer l'URL de base selon le rôle
   const getBaseUrl = () => {
     return userRole === UserRole.ADMIN
       ? `/${lang}/dashboard/requests/admin`
@@ -184,24 +206,33 @@ export default function FossilRequestsList({
     currentStatus || currentPriority || searchParams.get("search");
 
   return (
-    <div className="space-y-6">
-      {/* Filtres */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            {dict?.fossilRequests?.filtersTitle || "Filtres"}
+    <div className="space-y-8">
+      {/* Filtres avec design premium */}
+      <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
+        <CardHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-gray-100">
+          <CardTitle className="flex items-center gap-3 text-xl font-bold text-slate-800">
+            <div className="p-2 bg-gradient-to-br from-slate-400 to-slate-600 rounded-xl shadow-lg">
+              <Filter className="h-5 w-5 text-white" />
+            </div>
+            {dict?.fossilRequests?.filtersTitle || "Filtres de recherche"}
           </CardTitle>
+          <CardDescription>
+            {dict?.fossilRequests?.filtersDesc ||
+              "Affinez votre recherche avec nos filtres avancés"}
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
             {/* Recherche */}
-            <form onSubmit={handleSearch} className="space-y-2">
-              <Label htmlFor="search">
+            <form onSubmit={handleSearch} className="space-y-3">
+              <Label
+                htmlFor="search"
+                className="text-sm font-semibold text-slate-700"
+              >
                 {dict?.fossilRequests?.searchLabel || "Rechercher"}
               </Label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                 <Input
                   id="search"
                   placeholder={
@@ -210,21 +241,23 @@ export default function FossilRequestsList({
                   }
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 border-slate-200 focus:border-blue-300 focus:ring-blue-300"
                 />
               </div>
             </form>
 
             {/* Statut */}
-            <div className="space-y-2">
-              <Label>{dict?.fossilRequests?.statusLabel || "Statut"}</Label>
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-slate-700">
+                {dict?.fossilRequests?.statusLabel || "Statut"}
+              </Label>
               <Select
                 value={currentStatus || undefined}
                 onValueChange={(value) =>
                   updateFilters({ status: value === "all" ? null : value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="border-slate-200 focus:border-blue-300">
                   <SelectValue
                     placeholder={
                       dict?.fossilRequests?.allStatuses || "Tous les statuts"
@@ -232,26 +265,40 @@ export default function FossilRequestsList({
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  {Object.entries(statusLabels).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="all">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-slate-400" />
+                      Tous les statuts
+                    </div>
+                  </SelectItem>
+                  {Object.entries(statusLabels).map(([value, label]) => {
+                    const StatusIcon =
+                      statusIcons[value as keyof typeof statusIcons];
+                    return (
+                      <SelectItem key={value} value={value}>
+                        <div className="flex items-center gap-2">
+                          <StatusIcon className="h-4 w-4" />
+                          {label}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
 
             {/* Priorité */}
-            <div className="space-y-2">
-              <Label>{dict?.fossilRequests?.priorityLabel || "Priorité"}</Label>
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-slate-700">
+                {dict?.fossilRequests?.priorityLabel || "Priorité"}
+              </Label>
               <Select
                 value={currentPriority || undefined}
                 onValueChange={(value) =>
                   updateFilters({ priority: value === "all" ? null : value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="border-slate-200 focus:border-blue-300">
                   <SelectValue
                     placeholder={
                       dict?.fossilRequests?.allPriorities ||
@@ -261,11 +308,28 @@ export default function FossilRequestsList({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
-                    {dict?.fossilRequests?.allPriorities}
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-slate-400" />
+                      {dict?.fossilRequests?.allPriorities ||
+                        "Toutes les priorités"}
+                    </div>
                   </SelectItem>
                   {Object.entries(priorityLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
-                      {label}
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`w-3 h-3 rounded-full ${
+                            value === "URGENT"
+                              ? "bg-red-500"
+                              : value === "HIGH"
+                                ? "bg-orange-500"
+                                : value === "NORMAL"
+                                  ? "bg-blue-500"
+                                  : "bg-gray-500"
+                          }`}
+                        />
+                        {label}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -273,13 +337,21 @@ export default function FossilRequestsList({
             </div>
 
             {/* Actions */}
-            <div className="flex gap-2">
-              <Button type="submit" onClick={handleSearch}>
+            <div className="flex gap-3">
+              <Button
+                type="submit"
+                onClick={handleSearch}
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg"
+              >
                 <Search className="h-4 w-4 mr-2" />
                 {dict?.fossilRequests?.searchButton || "Rechercher"}
               </Button>
               {hasActiveFilters && (
-                <Button variant="outline" onClick={clearFilters}>
+                <Button
+                  variant="outline"
+                  onClick={clearFilters}
+                  className="border-slate-300 hover:bg-slate-50"
+                >
                   {dict?.fossilRequests?.clearButton || "Effacer"}
                 </Button>
               )}
@@ -289,170 +361,146 @@ export default function FossilRequestsList({
       </Card>
 
       {/* Résultats */}
-      <Card>
-        <CardHeader>
+      <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>
+              <CardTitle className="text-2xl font-bold text-slate-800">
                 {userRole === UserRole.ADMIN
-                  ? dict?.fossilRequests?.adminTitle || "Fossil requests"
-                  : dict?.fossilRequests?.userTitle || "My requests"}
+                  ? dict?.fossilRequests?.adminTitle ||
+                    "Toutes les demandes de fossiles"
+                  : dict?.fossilRequests?.userTitle || "Mes demandes"}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-slate-600 mt-1">
                 {userRole === UserRole.ADMIN
-                  ? `${totalRequests} ${dict?.fossilRequests?.adminTotalLabel || "requests in total"}`
-                  : `${totalRequests} ${dict?.fossilRequests?.userTotalLabel || "requests in total"}`}
+                  ? `${totalRequests} ${dict?.fossilRequests?.adminTotalLabel || "demandes au total"}`
+                  : `${totalRequests} ${dict?.fossilRequests?.userTotalLabel || "demandes au total"}`}
               </CardDescription>
             </div>
-            <div className="text-sm text-muted-foreground">
-              {dict?.fossilRequests?.pageLabel || "Page"} {currentPage}{" "}
-              {dict?.fossilRequests?.ofLabel || "of"} {totalPages}
+            <div className="flex items-center gap-2">
+              <Badge
+                variant="outline"
+                className="bg-blue-50 border-blue-200 text-blue-700"
+              >
+                {dict?.fossilRequests?.pageLabel || "Page"} {currentPage}{" "}
+                {dict?.fossilRequests?.ofLabel || "sur"} {totalPages}
+              </Badge>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {requests.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">
+            <div className="text-center py-16">
+              <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Search className="h-12 w-12 text-slate-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-800 mb-3">
                 {userRole === UserRole.ADMIN
-                  ? dict?.fossilRequests?.emptyTitle || "No requests found"
+                  ? dict?.fossilRequests?.emptyTitle || "Aucune demande trouvée"
                   : dict?.fossilRequests?.emptyDesc ||
-                    "You have not made any fossil requests yet."}
+                    "Vous n'avez pas encore fait de demande"}
+              </h3>
+              <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                {userRole === UserRole.USER &&
+                  (dict?.fossilRequests?.emptyHint ||
+                    "Commencez par créer votre première demande de fossile")}
               </p>
               {userRole === UserRole.USER && (
-                <Button asChild className="mt-4">
+                <Button
+                  asChild
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg"
+                >
                   <Link href={`/${lang}/fossiles/request`}>
+                    <Plus className="mr-2 h-4 w-4" />
                     {dict?.fossilRequests?.createFirstRequest ||
-                      "Create my first request"}
+                      "Créer ma première demande"}
                   </Link>
                 </Button>
               )}
             </div>
           ) : (
-            <div className="space-y-4">
-              {/* Table responsive */}
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      {/* ✅ Afficher la colonne Client seulement pour les admins */}
-                      {userRole === UserRole.ADMIN && (
-                        <TableHead>
-                          {dict?.fossilRequests?.clientCol || "Client"}
-                        </TableHead>
-                      )}
-                      <TableHead>
-                        {dict?.fossilRequests?.fossilTypeCol ||
-                          "Fossile recherché"}
-                      </TableHead>
-                      <TableHead>
-                        {dict?.fossilRequests?.budgetCol || "Budget"}
-                      </TableHead>
-                      <TableHead>
-                        {dict?.fossilRequests?.statusCol || "Statut"}
-                      </TableHead>
-                      <TableHead>
-                        {dict?.fossilRequests?.priorityCol || "Priorité"}
-                      </TableHead>
-                      <TableHead>
-                        {dict?.fossilRequests?.dateCol || "Date"}
-                      </TableHead>
-                      <TableHead>
-                        {dict?.fossilRequests?.actionsCol || "Actions"}
-                      </TableHead>
-                      {/* ✅ Nouvelles colonnes selon le rôle */}
-                      {userRole === UserRole.USER && (
-                        <TableHead>
-                          {dict?.fossilRequests?.adminMsgCol || "Message admin"}
-                        </TableHead>
-                      )}
-                      {userRole === UserRole.ADMIN && (
-                        <TableHead>
-                          {dict?.fossilRequests?.adminNotesCol || "Notes admin"}
-                        </TableHead>
-                      )}
-                      {userRole === UserRole.ADMIN && (
-                        <TableHead>
-                          {dict?.fossilRequests?.clientMsgCol ||
-                            "Message client"}
-                        </TableHead>
-                      )}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {requests.map((request) => (
-                      <TableRow key={request.id}>
-                        {/* ✅ Afficher les infos client seulement pour les admins */}
-                        {userRole === UserRole.ADMIN && (
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{request.name}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {request.email}
-                              </div>
-                            </div>
-                          </TableCell>
-                        )}
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">
+            <div className="space-y-0">
+              {/* Version mobile - Cards */}
+              <div className="block lg:hidden space-y-4 p-6">
+                {requests.map((request, index) => {
+                  const StatusIcon =
+                    statusIcons[request.status as keyof typeof statusIcons];
+                  return (
+                    <Card
+                      key={request.id}
+                      className="group hover:shadow-lg transition-all duration-300 border border-slate-200 hover:border-blue-200"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg text-slate-800 mb-1">
                               {request.fossilType}
-                            </div>
-                            <div className="text-sm text-muted-foreground line-clamp-2">
+                            </h3>
+                            {userRole === UserRole.ADMIN && (
+                              <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
+                                <User className="h-4 w-4" />
+                                <span>{request.name}</span>
+                                <span className="text-slate-400">•</span>
+                                <span>{request.email}</span>
+                              </div>
+                            )}
+                            <p className="text-sm text-slate-600 line-clamp-2 mb-3">
                               {request.description}
-                            </div>
+                            </p>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          {request.maxBudget ? (
-                            <span className="font-medium">
-                              {request.maxBudget.toLocaleString("fr-FR")} €
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">
-                              {dict?.fossilRequests?.notSpecified ||
-                                "Non spécifié"}
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={statusColors[request.status]}>
-                            {statusLabels[request.status]}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={priorityColors[request.priority]}>
-                            {priorityLabels[request.priority]}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            {new Date(request.createdAt).toLocaleDateString(
-                              "fr-FR"
+                          <div className="flex flex-col items-end gap-2">
+                            <Badge
+                              className={`${statusColors[request.status]} border text-xs`}
+                            >
+                              <StatusIcon className="h-3 w-3 mr-1" />
+                              {statusLabels[request.status]}
+                            </Badge>
+                            <Badge
+                              className={`${priorityColors[request.priority]} border text-xs`}
+                            >
+                              {priorityLabels[request.priority]}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                          <div className="flex items-center gap-4 text-xs text-slate-500">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(request.createdAt).toLocaleDateString(
+                                "fr-FR"
+                              )}
+                            </div>
+                            {request.maxBudget && (
+                              <div className="flex items-center gap-1">
+                                <Euro className="h-3 w-3" />
+                                {request.maxBudget.toLocaleString("fr-FR")} €
+                              </div>
                             )}
                           </div>
-                        </TableCell>
-                        <TableCell>
                           <div className="flex gap-2">
-                            {/* ✅ URL dynamique selon le rôle */}
-                            <Button asChild size="sm" variant="outline">
+                            <Button
+                              asChild
+                              size="sm"
+                              variant="outline"
+                              className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                            >
                               <Link href={getDetailUrl(request.id)}>
-                                <Eye className="h-4 w-4 mr-1" />
-                                {dict?.fossilRequests?.viewAction || "Voir"}
+                                <Eye className="h-3 w-3 mr-1" />
+                                Voir
                               </Link>
                             </Button>
-
-                            {/* ✅ Bouton delete pour les utilisateurs */}
                             {userRole === UserRole.USER && (
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="text-red-600 hover:text-red-700"
+                                    className="text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
                                     disabled={deletingId === request.id}
                                   >
-                                    <Trash2 className="h-4 w-4" />
+                                    <Trash2 className="h-3 w-3" />
                                   </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -487,127 +535,327 @@ export default function FossilRequestsList({
                               </AlertDialog>
                             )}
                           </div>
-                        </TableCell>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
 
-                        {/* ✅ Message admin pour les utilisateurs */}
-                        {userRole === UserRole.USER && (
-                          <TableCell>
-                            {request.responseMessage ? (
-                              <div className="max-w-xs">
-                                <div className="flex items-center gap-1 mb-1">
-                                  <MessageSquare className="h-3 w-3 text-blue-500" />
-                                  <span className="text-xs font-medium text-blue-600">
-                                    {dict?.fossilRequests?.adminMsgReceived ||
-                                      "Message reçu"}
-                                  </span>
+              {/* Version desktop - Table */}
+              <div className="hidden lg:block overflow-x-auto">
+                <Table>
+                  <TableHeader className="bg-slate-50">
+                    <TableRow className="border-b border-slate-200">
+                      {userRole === UserRole.ADMIN && (
+                        <TableHead className="font-semibold text-slate-700">
+                          {dict?.fossilRequests?.clientCol || "Client"}
+                        </TableHead>
+                      )}
+                      <TableHead className="font-semibold text-slate-700">
+                        {dict?.fossilRequests?.fossilTypeCol ||
+                          "Fossile recherché"}
+                      </TableHead>
+                      <TableHead className="font-semibold text-slate-700">
+                        {dict?.fossilRequests?.budgetCol || "Budget"}
+                      </TableHead>
+                      <TableHead className="font-semibold text-slate-700">
+                        {dict?.fossilRequests?.statusCol || "Statut"}
+                      </TableHead>
+                      <TableHead className="font-semibold text-slate-700">
+                        {dict?.fossilRequests?.priorityCol || "Priorité"}
+                      </TableHead>
+                      <TableHead className="font-semibold text-slate-700">
+                        {dict?.fossilRequests?.dateCol || "Date"}
+                      </TableHead>
+                      <TableHead className="font-semibold text-slate-700">
+                        {dict?.fossilRequests?.actionsCol || "Actions"}
+                      </TableHead>
+                      {userRole === UserRole.USER && (
+                        <TableHead className="font-semibold text-slate-700">
+                          {dict?.fossilRequests?.adminMsgCol || "Message admin"}
+                        </TableHead>
+                      )}
+                      {userRole === UserRole.ADMIN && (
+                        <>
+                          <TableHead className="font-semibold text-slate-700">
+                            {dict?.fossilRequests?.adminNotesCol ||
+                              "Notes admin"}
+                          </TableHead>
+                          <TableHead className="font-semibold text-slate-700">
+                            {dict?.fossilRequests?.clientMsgCol ||
+                              "Message client"}
+                          </TableHead>
+                        </>
+                      )}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {requests.map((request, index) => {
+                      const StatusIcon =
+                        statusIcons[request.status as keyof typeof statusIcons];
+                      return (
+                        <TableRow
+                          key={request.id}
+                          className="hover:bg-slate-50/50 transition-colors border-b border-slate-100"
+                          style={{ animationDelay: `${index * 50}ms` }}
+                        >
+                          {userRole === UserRole.ADMIN && (
+                            <TableCell>
+                              <div>
+                                <div className="font-medium text-slate-800">
+                                  {request.name}
                                 </div>
-                                <p className="text-sm text-muted-foreground line-clamp-3">
-                                  {request.responseMessage}
-                                </p>
+                                <div className="text-sm text-slate-500">
+                                  {request.email}
+                                </div>
+                              </div>
+                            </TableCell>
+                          )}
+                          <TableCell>
+                            <div>
+                              <div className="font-medium text-slate-800">
+                                {request.fossilType}
+                              </div>
+                              <div className="text-sm text-slate-600 line-clamp-2 max-w-xs">
+                                {request.description}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {request.maxBudget ? (
+                              <div className="flex items-center gap-1">
+                                <Euro className="h-4 w-4 text-emerald-600" />
+                                <span className="font-medium text-emerald-600">
+                                  {request.maxBudget.toLocaleString("fr-FR")} €
+                                </span>
                               </div>
                             ) : (
-                              <span className="text-xs text-muted-foreground">
-                                {dict?.fossilRequests?.noAdminMsg ||
-                                  "Aucun message"}
+                              <span className="text-slate-400 text-sm">
+                                {dict?.fossilRequests?.notSpecified ||
+                                  "Non spécifié"}
                               </span>
                             )}
                           </TableCell>
-                        )}
-
-                        {/* ✅ Notes admin pour les admins */}
-                        {userRole === UserRole.ADMIN && (
                           <TableCell>
-                            {request.adminNotes ? (
-                              <div className="max-w-xs">
-                                <div className="flex items-center gap-1 mb-1">
-                                  <StickyNote className="h-3 w-3 text-orange-500" />
-                                  <span className="text-xs font-medium text-orange-600">
-                                    {dict?.fossilRequests?.privateNotes ||
-                                      "Notes privées"}
-                                  </span>
-                                </div>
-                                <p className="text-sm text-muted-foreground line-clamp-2">
-                                  {request.adminNotes}
-                                </p>
-                              </div>
-                            ) : (
-                              <span className="text-xs text-muted-foreground">
-                                {dict?.fossilRequests?.noAdminNotes ||
-                                  "Aucune note"}
-                              </span>
-                            )}
+                            <Badge
+                              className={`${statusColors[request.status]} border`}
+                            >
+                              <StatusIcon className="h-3 w-3 mr-1" />
+                              {statusLabels[request.status]}
+                            </Badge>
                           </TableCell>
-                        )}
-
-                        {/* ✅ Message client pour les admins */}
-                        {userRole === UserRole.ADMIN && (
                           <TableCell>
-                            {request.responseMessage ? (
-                              <div className="max-w-xs">
-                                <div className="flex items-center gap-1 mb-1">
-                                  <FileText className="h-3 w-3 text-green-500" />
-                                  <span className="text-xs font-medium text-green-600">
-                                    {dict?.fossilRequests?.sentToClient ||
-                                      "Envoyé au client"}
-                                  </span>
-                                </div>
-                                <p className="text-sm text-muted-foreground line-clamp-2">
-                                  {request.responseMessage}
-                                </p>
-                              </div>
-                            ) : (
-                              <span className="text-xs text-muted-foreground">
-                                {dict?.fossilRequests?.noClientMsg ||
-                                  "Pas de réponse"}
-                              </span>
-                            )}
+                            <Badge
+                              className={`${priorityColors[request.priority]} border`}
+                            >
+                              {priorityLabels[request.priority]}
+                            </Badge>
                           </TableCell>
-                        )}
-                      </TableRow>
-                    ))}
+                          <TableCell>
+                            <div className="flex items-center gap-1 text-sm text-slate-600">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(request.createdAt).toLocaleDateString(
+                                "fr-FR"
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                asChild
+                                size="sm"
+                                variant="outline"
+                                className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                              >
+                                <Link href={getDetailUrl(request.id)}>
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  {dict?.fossilRequests?.viewAction || "Voir"}
+                                </Link>
+                              </Button>
+
+                              {userRole === UserRole.USER && (
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
+                                      disabled={deletingId === request.id}
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>
+                                        {dict?.fossilRequests?.deleteTitle ||
+                                          "Confirmer la suppression"}
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        {dict?.fossilRequests?.deleteDescription
+                                          ? dict.fossilRequests.deleteDescription.replace(
+                                              "{title}",
+                                              request.fossilType
+                                            )
+                                          : `Êtes-vous sûr de vouloir supprimer cette demande pour "${request.fossilType}" ? Cette action est irréversible.`}
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>
+                                        {dict?.fossilRequests?.deleteCancel ||
+                                          "Annuler"}
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => handleDelete(request.id)}
+                                        className="bg-red-600 hover:bg-red-700"
+                                      >
+                                        {dict?.fossilRequests?.deleteConfirm ||
+                                          "Supprimer"}
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              )}
+                            </div>
+                          </TableCell>
+
+                          {userRole === UserRole.USER && (
+                            <TableCell>
+                              {request.responseMessage ? (
+                                <div className="max-w-xs">
+                                  <div className="flex items-center gap-1 mb-1">
+                                    <MessageSquare className="h-3 w-3 text-blue-500" />
+                                    <span className="text-xs font-medium text-blue-600">
+                                      {dict?.fossilRequests?.adminMsgReceived ||
+                                        "Message reçu"}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-slate-600 line-clamp-3">
+                                    {request.responseMessage}
+                                  </p>
+                                </div>
+                              ) : (
+                                <span className="text-xs text-slate-400">
+                                  {dict?.fossilRequests?.noAdminMsg ||
+                                    "Aucun message"}
+                                </span>
+                              )}
+                            </TableCell>
+                          )}
+
+                          {userRole === UserRole.ADMIN && (
+                            <>
+                              <TableCell>
+                                {request.adminNotes ? (
+                                  <div className="max-w-xs">
+                                    <div className="flex items-center gap-1 mb-1">
+                                      <StickyNote className="h-3 w-3 text-orange-500" />
+                                      <span className="text-xs font-medium text-orange-600">
+                                        {dict?.fossilRequests?.privateNotes ||
+                                          "Notes privées"}
+                                      </span>
+                                    </div>
+                                    <p className="text-sm text-slate-600 line-clamp-2">
+                                      {request.adminNotes}
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-slate-400">
+                                    {dict?.fossilRequests?.noAdminNotes ||
+                                      "Aucune note"}
+                                  </span>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {request.responseMessage ? (
+                                  <div className="max-w-xs">
+                                    <div className="flex items-center gap-1 mb-1">
+                                      <FileText className="h-3 w-3 text-green-500" />
+                                      <span className="text-xs font-medium text-green-600">
+                                        {dict?.fossilRequests?.sentToClient ||
+                                          "Envoyé au client"}
+                                      </span>
+                                    </div>
+                                    <p className="text-sm text-slate-600 line-clamp-2">
+                                      {request.responseMessage}
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-slate-400">
+                                    {dict?.fossilRequests?.noClientMsg ||
+                                      "Pas de réponse"}
+                                  </span>
+                                )}
+                              </TableCell>
+                            </>
+                          )}
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
 
-              {/* Pagination */}
+              {/* Pagination modernisée */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center justify-center gap-3 p-6 bg-slate-50/50 border-t border-slate-200">
                   <Button
                     variant="outline"
                     size="sm"
                     asChild
                     disabled={currentPage === 1}
+                    className="disabled:opacity-50"
                   >
                     <Link href={createPageUrl(currentPage - 1)}>
-                      <ChevronLeft className="h-4 w-4" />
+                      <ChevronLeft className="h-4 w-4 mr-1" />
                       {dict?.fossilRequests?.prevPage || "Précédent"}
                     </Link>
                   </Button>
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (pageNum) => (
-                      <Button
-                        key={pageNum}
-                        variant={
-                          pageNum === currentPage ? "default" : "outline"
-                        }
-                        size="sm"
-                        asChild
-                      >
-                        <Link href={createPageUrl(pageNum)}>{pageNum}</Link>
-                      </Button>
-                    )
-                  )}
+                  <div className="flex gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={
+                            pageNum === currentPage ? "default" : "outline"
+                          }
+                          size="sm"
+                          asChild
+                          className={
+                            pageNum === currentPage
+                              ? "bg-blue-600 hover:bg-blue-700"
+                              : ""
+                          }
+                        >
+                          <Link href={createPageUrl(pageNum)}>{pageNum}</Link>
+                        </Button>
+                      );
+                    })}
+                  </div>
 
                   <Button
                     variant="outline"
                     size="sm"
                     asChild
                     disabled={currentPage === totalPages}
+                    className="disabled:opacity-50"
                   >
                     <Link href={createPageUrl(currentPage + 1)}>
                       {dict?.fossilRequests?.nextPage || "Suivant"}
-                      <ChevronRight className="h-4 w-4" />
+                      <ChevronRight className="h-4 w-4 ml-1" />
                     </Link>
                   </Button>
                 </div>
