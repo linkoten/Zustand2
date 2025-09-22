@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { calculateShippingByWeight } from "@/lib/config/shipping-zones";
+import { Globe, MapPin, Truck, Check } from "lucide-react";
 
 interface CountrySelectorProps {
   subtotal: number;
@@ -212,88 +215,138 @@ export function CountrySelector({
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6 text-center">
-        Sélectionnez votre pays de livraison
-      </h2>
-
-      <div className="text-center mb-8 text-gray-600">
-        <p>Choisissez votre pays pour calculer les frais de livraison exacts</p>
-      </div>
-
+    <div className="space-y-8">
       {countryGroups.map((group) => (
-        <div key={group.zone} className="mb-10">
-          <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b-2 border-gray-200 pb-2">
-            {group.zone}
-          </h3>
+        <Card
+          key={group.zone}
+          className="border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500"
+        >
+          <CardContent className="p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-gradient-to-br from-slate-400 to-slate-600 rounded-xl shadow-lg">
+                <Globe className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800">
+                {group.zone}
+              </h3>
+            </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {group.countries.map((country) => {
-              const shippingCost = getShippingCost(country.code);
-              const isSelected = selectedCountry === country.code;
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {group.countries.map((country) => {
+                const shippingCost = getShippingCost(country.code);
+                const isSelected = selectedCountry === country.code;
 
-              return (
-                <button
-                  key={country.code}
-                  onClick={() => setSelectedCountry(country.code)}
-                  className={`p-3 border-2 rounded-lg text-left transition-all hover:shadow-md ${
-                    isSelected
-                      ? "border-blue-500 bg-blue-50 shadow-lg"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <div className="flex flex-col space-y-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">{country.flag}</span>
-                      <span className="font-medium text-sm">
+                return (
+                  <button
+                    key={country.code}
+                    onClick={() => setSelectedCountry(country.code)}
+                    className={`group relative p-4 border-2 rounded-xl text-left transition-all duration-300 hover:shadow-lg transform hover:scale-105 ${
+                      isSelected
+                        ? "border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-xl scale-105"
+                        : "border-gray-200 hover:border-gray-300 bg-white"
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                        <Check className="h-3 w-3 text-white" />
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-2xl group-hover:scale-110 transition-transform">
+                        {country.flag}
+                      </span>
+                      <span
+                        className={`font-semibold transition-colors ${
+                          isSelected
+                            ? "text-blue-800"
+                            : "text-slate-800 group-hover:text-slate-900"
+                        }`}
+                      >
                         {country.name}
                       </span>
                     </div>
-                    <div className="text-xs">
-                      <span className="font-semibold text-green-600">
+
+                    <div className="flex items-center gap-2">
+                      <Truck
+                        className={`h-4 w-4 ${
+                          isSelected ? "text-blue-600" : "text-emerald-600"
+                        }`}
+                      />
+                      <Badge
+                        className={`${
+                          shippingCost === 0
+                            ? "bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-800 border-emerald-200"
+                            : "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200"
+                        } px-3 py-1 font-bold`}
+                      >
                         {shippingCost === 0
                           ? "GRATUIT"
                           : `${shippingCost.toFixed(2)}€`}
-                      </span>
+                      </Badge>
                     </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       ))}
 
       {selectedCountry && (
-        <div className="sticky bottom-0 mt-12 p-6 bg-green-50 border-2 border-green-200 rounded-lg shadow-lg">
-          <div className="max-w-2xl mx-auto text-center">
-            <p className="text-green-800 mb-4 text-lg">
-              ✅ Pays sélectionné :{" "}
-              <strong>
-                {
-                  countryGroups
-                    .flatMap((g) => g.countries)
-                    .find((c) => c.code === selectedCountry)?.name
-                }
-              </strong>
-            </p>
-            <p className="text-green-700 text-sm mb-4">
-              Frais de livraison :{" "}
-              <strong>
-                {getShippingCost(selectedCountry) === 0
-                  ? "GRATUIT"
-                  : `${getShippingCost(selectedCountry).toFixed(2)}€`}
-              </strong>
-            </p>
-            <Button
-              onClick={() => onCountrySelected(selectedCountry)}
-              className="w-full max-w-md bg-green-600 hover:bg-green-700"
-              size="lg"
-            >
-              Continuer vers le paiement
-            </Button>
-          </div>
-        </div>
+        <Card className="sticky bottom-4 border-0 bg-gradient-to-r from-emerald-50 to-green-50 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-[1.02]">
+          <CardContent className="p-8">
+            <div className="text-center space-y-6">
+              <div className="flex items-center justify-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
+                  <Check className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-emerald-900">
+                    Destination confirmée !
+                  </h3>
+                  <p className="text-emerald-700">
+                    <span className="text-2xl mr-2">
+                      {
+                        countryGroups
+                          .flatMap((g) => g.countries)
+                          .find((c) => c.code === selectedCountry)?.flag
+                      }
+                    </span>
+                    <strong>
+                      {
+                        countryGroups
+                          .flatMap((g) => g.countries)
+                          .find((c) => c.code === selectedCountry)?.name
+                      }
+                    </strong>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center gap-2 text-emerald-800">
+                <MapPin className="h-5 w-5" />
+                <span className="text-lg">
+                  Frais de livraison :{" "}
+                  <strong className="text-xl">
+                    {getShippingCost(selectedCountry) === 0
+                      ? "GRATUIT"
+                      : `${getShippingCost(selectedCountry).toFixed(2)}€`}
+                  </strong>
+                </span>
+              </div>
+
+              <Button
+                onClick={() => onCountrySelected(selectedCountry)}
+                className="w-full max-w-md bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                size="lg"
+              >
+                <Truck className="mr-2 h-5 w-5" />
+                Continuer vers le paiement
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
