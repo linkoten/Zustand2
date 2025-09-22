@@ -100,7 +100,7 @@ export default async function FossilRequestsPage({
             <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg border border-white/20 mb-6">
               <Sparkles className="w-5 h-5 text-blue-500 animate-pulse" />
               <span className="text-sm font-semibold text-slate-700">
-                Centre d'administration
+                Centre d&apos;administration
               </span>
             </div>
 
@@ -254,7 +254,7 @@ export default async function FossilRequestsPage({
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-blue-900">
                   <TrendingUp className="h-5 w-5" />
-                  Conseils d'administration
+                  Conseils d&apos;administration
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -291,8 +291,8 @@ export default async function FossilRequestsPage({
                         Notes administratives
                       </h4>
                       <p className="text-sm text-blue-700">
-                        Utilisez les notes privées pour coordonner l'équipe et
-                        suivre les recherches.
+                        Utilisez les notes privées pour coordonner l&apos;équipe
+                        et suivre les recherches.
                       </p>
                     </div>
                   </div>
