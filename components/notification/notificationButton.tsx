@@ -211,9 +211,7 @@ export function NotificationButton({
     isMobile?: boolean;
   }) => (
     // ✅ Largeur adaptative réduite pour accommoder les polices plus petites
-    <div
-      className={`${isMobile ? "w-full" : "w-72 sm:w-80 lg:w-[360px] xl:w-[400px]"}`}
-    >
+    <div className={`${isMobile ? "w-full" : "lg:w-[360px] xl:w-[500px]"}`}>
       {/* Header */}
       <div className="sticky top-0 bg-white border-b border-slate-200 p-3 sm:p-4">
         <div className="flex items-center justify-between">
