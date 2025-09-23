@@ -110,7 +110,7 @@ export default async function FavoritesPage({
 
           {/* Statistiques avec design premium */}
           {totalFavorites > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="grid grid-cols-1  lg:grid-cols-2 gap-6 mb-12">
               {/* Total favoris */}
               <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-red-50/50 to-red-100/30 hover:scale-105 transform">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
@@ -273,29 +273,6 @@ export default async function FavoritesPage({
                   {dict.dashboard?.favoriteTips || "Conseils pour vos favoris"}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-red-900">
-                      {dict.dashboard?.watchPrices || "Surveillez les prix"}
-                    </h4>
-                    <p className="text-sm text-red-700">
-                      {dict.dashboard?.watchPricesDesc ||
-                        "Les prix des fossiles peuvent varier. Vos favoris vous permettent de suivre les évolutions tarifaires."}
-                    </p>
-                  </div>
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-red-900">
-                      {dict.dashboard?.shareCollection ||
-                        "Partagez votre collection"}
-                    </h4>
-                    <p className="text-sm text-red-700">
-                      {dict.dashboard?.shareCollectionDesc ||
-                        "Montrez vos fossiles favoris à d'autres passionnés de paléontologie et échangez vos découvertes."}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
             </Card>
           </>
         )}
