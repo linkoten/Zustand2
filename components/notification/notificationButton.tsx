@@ -339,7 +339,7 @@ export function NotificationButton({
             sideOffset={8}
             avoidCollisions={true}
             collisionPadding={20}
-            style={{ minWidth: "400px" }}
+            style={{ minWidth: "600px" }}
           >
             <NotificationContent />
           </PopoverContent>
