@@ -80,25 +80,25 @@ export default function ProductPageClient({
 
       {/* Layout principal responsive - STACK SUR MOBILE */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 xl:gap-16">
-        {/* Section Images avec Lens ultra améliorée - RESPONSIVE */}
+        {/* Section Images avec Lens ultra améliorée - RESPONSIVE OPTIMISÉE */}
         <div className="space-y-4 sm:space-y-6 order-1">
-          {/* Image principale avec lens - RESPONSIVE */}
+          {/* Image principale avec lens - DIMENSIONS MOBILES OPTIMISÉES */}
           <Card className="border-0 shadow-xl lg:shadow-2xl bg-gradient-to-br from-white via-slate-50/50 to-amber-50/20 backdrop-blur-sm overflow-hidden group hover:shadow-2xl lg:hover:shadow-3xl transition-all duration-500">
             <CardContent className="p-3 sm:p-4 lg:p-6">
               <div className="relative mb-3 sm:mb-4">
-                {/* Image responsive avec lens conditionnel */}
-                <div className="aspect-square w-full max-w-md mx-auto lg:max-w-full">
+                {/* Container d'image avec ratio optimisé mobile */}
+                <div className="aspect-square w-full max-w-xs mx-auto sm:max-w-sm md:max-w-md lg:max-w-full">
                   <ImageLens
                     src={
                       product.images[selectedImageIndex]?.imageUrl ||
                       "/placeholder.jpg"
                     }
                     alt={`${product.title} - ${dict?.fossils?.viewDetails || "Vue"} ${selectedImageIndex + 1}`}
-                    width={500}
-                    height={500}
+                    width={400}
+                    height={400}
                     className="w-full h-full rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-xl lg:group-hover:shadow-2xl transition-all duration-300 object-cover"
-                    lensSize={100}
-                    zoomLevel={2.5}
+                    lensSize={80}
+                    zoomLevel={2.0}
                   />
                 </div>
 
@@ -127,14 +127,14 @@ export default function ProductPageClient({
                 </Badge>
               </div>
 
-              {/* Miniatures - RESPONSIVE */}
+              {/* Miniatures - RESPONSIVE OPTIMISÉES */}
               {product.images.length > 1 && (
-                <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-3 scrollbar-thin scrollbar-thumb-amber-300 scrollbar-track-slate-100">
+                <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-3 scrollbar-thin scrollbar-thumb-amber-300 scrollbar-track-slate-100 justify-center lg:justify-start">
                   {product.images.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-lg lg:rounded-2xl overflow-hidden border-2 lg:border-3 transition-all duration-300 transform hover:scale-110 hover:rotate-1 ${
+                      className={`flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 rounded-lg lg:rounded-2xl overflow-hidden border-2 lg:border-3 transition-all duration-300 transform hover:scale-110 hover:rotate-1 ${
                         selectedImageIndex === index
                           ? "border-amber-500 ring-2 lg:ring-4 ring-amber-200 shadow-lg lg:shadow-xl scale-105"
                           : "border-slate-200 hover:border-amber-300 hover:shadow-md lg:hover:shadow-lg"
@@ -143,8 +143,8 @@ export default function ProductPageClient({
                       <Image
                         src={image.imageUrl}
                         alt={`${product.title} - ${dict?.fossils?.viewDetails || "Miniature"} ${index + 1}`}
-                        width={96}
-                        height={96}
+                        width={80}
+                        height={80}
                         className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                       />
                     </button>
@@ -154,14 +154,14 @@ export default function ProductPageClient({
             </CardContent>
           </Card>
 
-          {/* Carte de localisation ultra améliorée - RESPONSIVE */}
+          {/* Carte de localisation ultra améliorée - RESPONSIVE COMPACTE */}
           <Card className="border-0 shadow-xl lg:shadow-2xl bg-gradient-to-br from-white via-blue-50/40 to-cyan-50/30 backdrop-blur-sm hover:shadow-2xl lg:hover:shadow-3xl transition-all duration-500 group">
             <CardHeader className="pb-3 sm:pb-4">
-              <CardTitle className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2 sm:gap-3">
+              <CardTitle className="text-base sm:text-lg lg:text-xl font-bold text-slate-800 flex items-center gap-2 sm:gap-3">
                 <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl lg:rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow duration-300 flex-shrink-0">
-                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                  <MapPin className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6 text-white" />
                 </div>
-                <span className="truncate">
+                <span className="truncate text-sm sm:text-base lg:text-lg">
                   {dict?.fossils?.origin || "Origine du fossile"}
                 </span>
               </CardTitle>
@@ -169,9 +169,9 @@ export default function ProductPageClient({
             <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
               <ProductLocationMap
                 locality={product.locality}
-                height={360}
+                height={280}
                 showAllLocalities={true}
-                className="rounded-2xl shadow-inner border border-slate-200"
+                className="rounded-xl lg:rounded-2xl shadow-inner border border-slate-200"
               />
             </CardContent>
           </Card>
@@ -183,9 +183,9 @@ export default function ProductPageClient({
           <Card className="border-0 shadow-xl lg:shadow-2xl bg-gradient-to-br from-white via-amber-50/40 to-orange-50/30 backdrop-blur-sm hover:shadow-2xl lg:hover:shadow-3xl transition-shadow duration-500">
             <CardContent className="p-4 sm:p-6 lg:p-8 xl:p-10">
               {/* En-tête avec titre et prix - RESPONSIVE STACK */}
-              <div className="flex flex-col gap-4 sm:gap-6 mb-6 sm:mb-8">
-                <div className="space-y-3 sm:space-y-4">
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-amber-700 bg-clip-text text-transparent leading-tight">
+              <div className="flex flex-col gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
+                <div className="space-y-2 sm:space-y-3 lg:space-y-4">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-amber-700 bg-clip-text text-transparent leading-tight">
                     {product.title}
                   </h1>
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -201,12 +201,12 @@ export default function ProductPageClient({
 
                 {/* Prix et badge - RESPONSIVE */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                  <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                     {formatPrice(product.price)}
                   </div>
                   <Badge
                     variant="outline"
-                    className="border-amber-300 text-amber-700 bg-amber-50 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold self-start sm:self-auto"
+                    className="border-amber-300 text-amber-700 bg-amber-50 px-2 py-1 sm:px-3 sm:py-1.5 lg:px-4 lg:py-2 text-xs sm:text-sm font-semibold self-start sm:self-auto"
                   >
                     {dict?.products?.fixedPrice || "Prix fixe"}
                   </Badge>
@@ -214,7 +214,7 @@ export default function ProductPageClient({
               </div>
 
               {/* Genre et Espèce - RESPONSIVE */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6 lg:mb-8">
                 <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-200 text-center">
                   <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
                     {dict?.fossils?.genus || "Genre"}
@@ -236,7 +236,7 @@ export default function ProductPageClient({
               </div>
 
               {/* Rating avec design premium - RESPONSIVE */}
-              <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-r from-slate-50 via-white to-amber-50 rounded-xl lg:rounded-2xl border border-slate-200 shadow-inner">
+              <div className="mb-4 sm:mb-6 lg:mb-8 p-3 sm:p-4 lg:p-6 bg-gradient-to-r from-slate-50 via-white to-amber-50 rounded-xl lg:rounded-2xl border border-slate-200 shadow-inner">
                 <RatingDisplay
                   productId={product.id}
                   stats={ratingStats}
@@ -246,14 +246,14 @@ export default function ProductPageClient({
                 />
               </div>
 
-              <Separator className="my-6 sm:my-8 bg-gradient-to-r from-transparent via-slate-300 to-transparent h-px" />
+              <Separator className="my-4 sm:my-6 lg:my-8 bg-gradient-to-r from-transparent via-slate-300 to-transparent h-px" />
 
               {/* Boutons d'action ultra premium - RESPONSIVE */}
-              <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 lg:mb-8">
                 <Button
                   onClick={() => handleAddToCart(product)}
                   disabled={isAdding}
-                  className="w-full bg-gradient-to-r from-amber-600 via-amber-700 to-orange-600 hover:from-amber-700 hover:via-amber-800 hover:to-orange-700 text-white font-bold py-3 sm:py-4 rounded-xl lg:rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group text-sm sm:text-base h-12 sm:h-14"
+                  className="w-full bg-gradient-to-r from-amber-600 via-amber-700 to-orange-600 hover:from-amber-700 hover:via-amber-800 hover:to-orange-700 text-white font-bold py-3 sm:py-4 rounded-xl lg:rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group text-sm sm:text-base h-11 sm:h-12 lg:h-14"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                   <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
@@ -265,41 +265,41 @@ export default function ProductPageClient({
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <Button
                     variant="outline"
-                    className="h-12 sm:h-14 border-2 border-amber-200 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 hover:border-amber-400 transition-all duration-300 transform hover:scale-105 hover:shadow-lg lg:hover:shadow-xl group text-xs sm:text-sm"
+                    className="h-11 sm:h-12 lg:h-14 border-2 border-amber-200 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 hover:border-amber-400 transition-all duration-300 transform hover:scale-105 hover:shadow-lg lg:hover:shadow-xl group text-xs sm:text-sm"
                   >
-                    <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 group-hover:text-red-500 transition-colors duration-300" />
+                    <Heart className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1 sm:mr-2 group-hover:text-red-500 transition-colors duration-300" />
                     <span className="font-semibold hidden sm:inline">
                       {dict?.products?.addToFavorites || "Favoris"}
                     </span>
-                    <span className="font-semibold sm:hidden">Favoris</span>
+                    <span className="font-semibold sm:hidden">♥</span>
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-12 sm:h-14 border-2 border-blue-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 hover:border-blue-400 transition-all duration-300 transform hover:scale-105 hover:shadow-lg lg:hover:shadow-xl group text-xs sm:text-sm"
+                    className="h-11 sm:h-12 lg:h-14 border-2 border-blue-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 hover:border-blue-400 transition-all duration-300 transform hover:scale-105 hover:shadow-lg lg:hover:shadow-xl group text-xs sm:text-sm"
                   >
-                    <Share2 className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 group-hover:text-blue-600 transition-colors duration-300" />
+                    <Share2 className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1 sm:mr-2 group-hover:text-blue-600 transition-colors duration-300" />
                     <span className="font-semibold hidden sm:inline">
                       {dict?.products?.share || "Partager"}
                     </span>
-                    <span className="font-semibold sm:hidden">Partager</span>
+                    <span className="font-semibold sm:hidden">↗</span>
                   </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Informations détaillées - RESPONSIVE */}
+          {/* Informations détaillées - RESPONSIVE COMPACTES */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Pays d'origine */}
-            <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 rounded-xl lg:rounded-2xl border-2 border-orange-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
-              <div className="p-2 sm:p-4 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
-                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 rounded-xl lg:rounded-2xl border-2 border-orange-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
+              <div className="p-2 sm:p-3 lg:p-4 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 text-white" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
                   {dict?.fossils?.countryLabel || "Origine"}
                 </p>
-                <p className="font-bold text-slate-800 text-sm sm:text-base lg:text-xl truncate">
+                <p className="font-bold text-slate-800 text-xs sm:text-sm lg:text-base xl:text-lg truncate">
                   {dict?.countries?.[product.countryOfOrigin] ||
                     product.countryOfOrigin}
                 </p>
@@ -307,15 +307,15 @@ export default function ProductPageClient({
             </div>
 
             {/* Étage géologique */}
-            <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-gradient-to-br from-purple-50 via-violet-50 to-indigo-50 rounded-xl lg:rounded-2xl border-2 border-purple-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
-              <div className="p-2 sm:p-4 bg-gradient-to-br from-purple-500 to-violet-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
-                <Mountain className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-purple-50 via-violet-50 to-indigo-50 rounded-xl lg:rounded-2xl border-2 border-purple-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
+              <div className="p-2 sm:p-3 lg:p-4 bg-gradient-to-br from-purple-500 to-violet-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
+                <Mountain className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 text-white" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
                   {dict?.fossils?.stageLabel || "Étage géologique"}
                 </p>
-                <p className="font-bold text-slate-800 text-sm sm:text-base lg:text-xl truncate">
+                <p className="font-bold text-slate-800 text-xs sm:text-sm lg:text-base xl:text-lg truncate">
                   {product.geologicalStage ||
                     dict?.fossilRequests?.notSpecified ||
                     "Non spécifié"}
@@ -324,15 +324,15 @@ export default function ProductPageClient({
             </div>
 
             {/* Localité */}
-            <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-xl lg:rounded-2xl border-2 border-green-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
-              <div className="p-2 sm:p-4 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
-                <Star className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-xl lg:rounded-2xl border-2 border-green-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
+              <div className="p-2 sm:p-3 lg:p-4 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
+                <Star className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 text-white" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
                   {dict?.fossils?.localityLabel || "Localité"}
                 </p>
-                <p className="font-bold text-slate-800 text-sm sm:text-base lg:text-xl truncate">
+                <p className="font-bold text-slate-800 text-xs sm:text-sm lg:text-base xl:text-lg truncate">
                   {product.locality?.name ||
                     dict?.fossilRequests?.notSpecified ||
                     "Non spécifié"}
@@ -341,15 +341,15 @@ export default function ProductPageClient({
             </div>
 
             {/* Période géologique */}
-            <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-gradient-to-br from-blue-50 via-cyan-50 to-sky-50 rounded-xl lg:rounded-2xl border-2 border-blue-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
-              <div className="p-2 sm:p-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
-                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-blue-50 via-cyan-50 to-sky-50 rounded-xl lg:rounded-2xl border-2 border-blue-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
+              <div className="p-2 sm:p-3 lg:p-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 text-white" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
                   {dict?.fossils?.periodLabel || "Période"}
                 </p>
-                <p className="font-bold text-slate-800 text-sm sm:text-base lg:text-xl truncate">
+                <p className="font-bold text-slate-800 text-xs sm:text-sm lg:text-base xl:text-lg truncate">
                   {product.geologicalPeriod}
                 </p>
               </div>
@@ -360,18 +360,18 @@ export default function ProductPageClient({
           {(product.description || product.description2) && (
             <Card className="border-0 shadow-xl lg:shadow-2xl bg-gradient-to-br from-white via-green-50/30 to-emerald-50/20 backdrop-blur-sm hover:shadow-2xl lg:hover:shadow-3xl transition-shadow duration-500">
               <CardHeader className="pb-3 sm:pb-4">
-                <CardTitle className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2 sm:gap-3">
+                <CardTitle className="text-base sm:text-lg lg:text-xl font-bold text-slate-800 flex items-center gap-2 sm:gap-3">
                   <div className="p-2 sm:p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl lg:rounded-2xl shadow-lg flex-shrink-0">
-                    <Info className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                    <Info className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6 text-white" />
                   </div>
-                  <span className="truncate">
+                  <span className="truncate text-sm sm:text-base lg:text-lg">
                     {dict?.products?.description || "Description"}
                   </span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4 sm:p-6">
+              <CardContent className="p-3 sm:p-4 lg:p-6">
                 <div className="prose prose-slate max-w-none">
-                  <p className="text-slate-700 leading-relaxed text-sm sm:text-base lg:text-lg font-medium bg-gradient-to-r from-slate-50 to-white p-4 sm:p-6 rounded-xl border border-slate-200">
+                  <p className="text-slate-700 leading-relaxed text-sm sm:text-base lg:text-lg font-medium bg-gradient-to-r from-slate-50 to-white p-3 sm:p-4 lg:p-6 rounded-xl border border-slate-200">
                     {lang === "en" ? product.description2 : product.description}
                   </p>
                 </div>
@@ -383,10 +383,10 @@ export default function ProductPageClient({
 
       {/* Produits similaires avec animations premium - RESPONSIVE */}
       {similarProducts.length > 0 && (
-        <div className="mt-12 sm:mt-16 lg:mt-24">
-          <Separator className="mb-8 sm:mb-12 lg:mb-16 bg-gradient-to-r from-transparent via-slate-300 to-transparent h-px" />
-          <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-amber-700 bg-clip-text text-transparent mb-4 sm:mb-6">
+        <div className="mt-8 sm:mt-12 lg:mt-16 xl:mt-24">
+          <Separator className="mb-6 sm:mb-8 lg:mb-12 xl:mb-16 bg-gradient-to-r from-transparent via-slate-300 to-transparent h-px" />
+          <div className="text-center mb-6 sm:mb-8 lg:mb-12 xl:mb-16">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-amber-700 bg-clip-text text-transparent mb-3 sm:mb-4 lg:mb-6">
               {dict?.products?.similarProducts || "Produits similaires"}
             </h2>
             <p className="text-slate-600 max-w-3xl mx-auto text-sm sm:text-base lg:text-lg leading-relaxed px-4">

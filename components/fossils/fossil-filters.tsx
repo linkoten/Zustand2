@@ -108,7 +108,9 @@ export default function FossilesFilters({
 
   // Composant de contenu des filtres (réutilisé pour desktop et mobile)
   const FiltersContent = ({ isMobile = false }: { isMobile?: boolean }) => (
-    <div className={`${isMobile ? "h-full flex flex-col" : ""}`}>
+    <div
+      className={`${isMobile ? "h-full flex flex-col" : "h-[calc(100vh-3rem)] flex flex-col"}`}
+    >
       {/* Header */}
       <div
         className={`${isMobile ? "pb-4 border-b border-slate-200 flex-shrink-0" : "pb-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-t-lg flex-shrink-0 h-16"}`}
@@ -134,7 +136,7 @@ export default function FossilesFilters({
       </div>
 
       {/* Contenu scrollable */}
-      <div className={`${isMobile ? "flex-1 min-h-0" : "flex-1 min-h-0"}`}>
+      <div className="flex-1 min-h-0">
         <ScrollArea className="h-full">
           <div className={`space-y-6 ${isMobile ? "p-4" : "p-6"}`}>
             {/* Recherche améliorée */}
@@ -379,7 +381,7 @@ export default function FossilesFilters({
     <>
       {/* VERSION DESKTOP - Sidebar fixe (masquée sur mobile) */}
       <div className="hidden lg:block">
-        <Card className="h-[calc(100vh-3rem)] shadow-xl border-0 bg-gradient-to-br from-white to-slate-50/50 backdrop-blur-sm flex flex-col">
+        <Card className="shadow-xl border-0 bg-gradient-to-br from-white to-slate-50/50 backdrop-blur-sm">
           <FiltersContent />
         </Card>
       </div>
