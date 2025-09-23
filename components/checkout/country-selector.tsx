@@ -358,7 +358,8 @@ export function CountrySelector({
               Aucun pays trouvé
             </h3>
             <p className="text-slate-600 mb-4 sm:mb-6 max-w-md mx-auto">
-              Aucun pays ne correspond à votre recherche "{searchTerm}".
+              Aucun pays ne correspond à votre recherche &quot;{searchTerm}
+              &quot;.
               <br className="hidden sm:block" />
               Essayez avec un autre terme.
             </p>
