@@ -3,14 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Search,
-  Filter,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  SlidersHorizontal,
-} from "lucide-react";
+import { Search, Filter, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { FossilCard } from "./fossil-card";
 import { SerializedProduct } from "@/types/type";
 import { FilterOptions } from "@/types/productType";

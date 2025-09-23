@@ -29,6 +29,7 @@ import ProductLocationMap from "./productLocationMap";
 import { SerializedProduct } from "@/types/type";
 import { RatingStats, UserRating } from "@/types/ratingType";
 import { useHandleAddToCart } from "@/hooks/useHandleAddToCart";
+import { FavoriteButton } from "./favoriteButton"; // ✅ Import du composant FavoriteButton
 import Image from "next/image";
 
 interface ProductPageClientProps {
@@ -82,24 +83,43 @@ export default function ProductPageClient({
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 xl:gap-16">
         {/* Section Images avec Lens ultra améliorée - RESPONSIVE OPTIMISÉE */}
         <div className="space-y-4 sm:space-y-6 order-1">
-          {/* Image principale avec lens - DIMENSIONS MOBILES OPTIMISÉES */}
+          {/* Image principale avec lens - DIMENSIONS DIFFÉRENTES SELON DEVICE */}
           <Card className="border-0 shadow-xl lg:shadow-2xl bg-gradient-to-br from-white via-slate-50/50 to-amber-50/20 backdrop-blur-sm overflow-hidden group hover:shadow-2xl lg:hover:shadow-3xl transition-all duration-500">
             <CardContent className="p-3 sm:p-4 lg:p-6">
               <div className="relative mb-3 sm:mb-4">
-                {/* Container d'image avec ratio optimisé mobile */}
+                {/* ✅ Container d'image avec tailles différenciées */}
                 <div className="aspect-square w-full max-w-xs mx-auto sm:max-w-sm md:max-w-md lg:max-w-full">
-                  <ImageLens
-                    src={
-                      product.images[selectedImageIndex]?.imageUrl ||
-                      "/placeholder.jpg"
-                    }
-                    alt={`${product.title} - ${dict?.fossils?.viewDetails || "Vue"} ${selectedImageIndex + 1}`}
-                    width={400}
-                    height={400}
-                    className="w-full h-full rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-xl lg:group-hover:shadow-2xl transition-all duration-300 object-cover"
-                    lensSize={80}
-                    zoomLevel={2.0}
-                  />
+                  {/* Mobile et Tablet : Image centrée et réduite */}
+                  <div className="lg:hidden">
+                    <ImageLens
+                      src={
+                        product.images[selectedImageIndex]?.imageUrl ||
+                        "/placeholder.jpg"
+                      }
+                      alt={`${product.title} - ${dict?.fossils?.viewDetails || "Vue"} ${selectedImageIndex + 1}`}
+                      width={400}
+                      height={400}
+                      className="w-full h-full rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 object-cover"
+                      lensSize={60}
+                      zoomLevel={1.8}
+                    />
+                  </div>
+
+                  {/* Desktop : Image pleine taille comme avant */}
+                  <div className="hidden lg:block">
+                    <ImageLens
+                      src={
+                        product.images[selectedImageIndex]?.imageUrl ||
+                        "/placeholder.jpg"
+                      }
+                      alt={`${product.title} - ${dict?.fossils?.viewDetails || "Vue"} ${selectedImageIndex + 1}`}
+                      width={600}
+                      height={600}
+                      className="w-full h-full rounded-2xl shadow-xl group-hover:shadow-2xl transition-all duration-300 object-cover"
+                      lensSize={150}
+                      zoomLevel={3.5}
+                    />
+                  </div>
                 </div>
 
                 {/* Badges premium améliorés - RESPONSIVE */}
@@ -117,14 +137,26 @@ export default function ProductPageClient({
                   </Badge>
                 </div>
 
-                {/* Status badge animé premium - RESPONSIVE */}
-                <Badge
-                  variant="default"
-                  className="absolute top-2 sm:top-3 lg:top-4 right-2 sm:right-3 lg:right-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 shadow-lg lg:shadow-xl animate-pulse px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm"
-                >
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full mr-1 sm:mr-2 animate-ping"></div>
-                  {dict?.products?.available || "Disponible"}
-                </Badge>
+                {/* ✅ Bouton favori en overlay - RESPONSIVE */}
+                <div className="absolute top-2 sm:top-3 lg:top-4 right-2 sm:right-3 lg:right-4 flex flex-col gap-2">
+                  {/* Status badge animé premium */}
+                  <Badge
+                    variant="default"
+                    className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 shadow-lg lg:shadow-xl animate-pulse px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm"
+                  >
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full mr-1 sm:mr-2 animate-ping"></div>
+                    {dict?.products?.available || "Disponible"}
+                  </Badge>
+
+                  {/* Bouton favori avec design overlay */}
+                  <FavoriteButton
+                    productId={product.id}
+                    isFavorite={product.isFavorite || false}
+                    variant="overlay"
+                    size="md"
+                    dict={dict}
+                  />
+                </div>
               </div>
 
               {/* Miniatures - RESPONSIVE OPTIMISÉES */}
@@ -263,16 +295,17 @@ export default function ProductPageClient({
                 </Button>
 
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  <Button
-                    variant="outline"
-                    className="h-11 sm:h-12 lg:h-14 border-2 border-amber-200 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 hover:border-amber-400 transition-all duration-300 transform hover:scale-105 hover:shadow-lg lg:hover:shadow-xl group text-xs sm:text-sm"
-                  >
-                    <Heart className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1 sm:mr-2 group-hover:text-red-500 transition-colors duration-300" />
-                    <span className="font-semibold hidden sm:inline">
-                      {dict?.products?.addToFavorites || "Favoris"}
-                    </span>
-                    <span className="font-semibold sm:hidden">♥</span>
-                  </Button>
+                  {/* ✅ Remplacé par le vrai composant FavoriteButton */}
+                  <div className="flex justify-center">
+                    <FavoriteButton
+                      productId={product.id}
+                      isFavorite={product.isFavorite || false}
+                      variant="default"
+                      size="lg"
+                      dict={dict}
+                    />
+                  </div>
+
                   <Button
                     variant="outline"
                     className="h-11 sm:h-12 lg:h-14 border-2 border-blue-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 hover:border-blue-400 transition-all duration-300 transform hover:scale-105 hover:shadow-lg lg:hover:shadow-xl group text-xs sm:text-sm"

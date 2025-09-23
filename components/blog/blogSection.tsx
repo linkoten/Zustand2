@@ -90,7 +90,7 @@ export default function BlogSection({
 
   return (
     <div className="space-y-8">
-      {/* Section filtres premium */}
+      {/* Section filtres premium avec data attributes pour le scroll */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-50/50 via-white to-purple-50/50 rounded-3xl" />
         <div className="relative p-6">
@@ -103,7 +103,10 @@ export default function BlogSection({
             </h2>
           </div>
 
-          <BlogFilters lang={lang} dict={dict} />
+          {/* ✅ Container avec data attributes pour le ciblage */}
+          <div data-filter-container className="transition-all duration-300">
+            <BlogFilters lang={lang} dict={dict} />
+          </div>
         </div>
       </div>
 
@@ -179,12 +182,10 @@ export default function BlogSection({
                   {activeFilters.length > 0 ? (
                     <div className="space-y-3">
                       <p className="flex items-center gap-2">
-                        <span>
-                          {currentData.totalPosts > 1
-                            ? dict.blog?.blogSection?.resultsPlural ||
-                              "articles trouvés"
-                            : dict.blog?.blogSection?.resultsSingle ||
-                              "article trouvé"}
+                        <span className="font-semibold text-xl text-slate-800">
+                          {currentData.totalPosts.toLocaleString(
+                            lang === "fr" ? "fr-FR" : "en-US"
+                          )}
                         </span>
                         <span>
                           {currentData.totalPosts > 1

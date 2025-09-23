@@ -23,6 +23,7 @@ import BlogSection from "@/components/blog/blogSection";
 import { redirect } from "next/navigation";
 import { getUserData } from "@/lib/actions/dashboardActions";
 import { getDictionary } from "../dictionaries";
+import BlogPageClient from "@/components/blog/blogPageClient";
 
 export default async function BlogPage({
   searchParams,
@@ -166,25 +167,11 @@ export default async function BlogPage({
                   </Button>
                 )}
 
-                {/* Quick actions */}
-                <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-xl hover:bg-slate-50 border-slate-200"
-                  >
-                    <Search className="w-4 h-4 mr-2" />
-                    {dict.blog.search || "Rechercher"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-xl hover:bg-slate-50 border-slate-200"
-                  >
-                    <Filter className="w-4 h-4 mr-2" />
-                    {dict.blog.filter || "Filtrer"}
-                  </Button>
-                </div>
+                {/* Quick actions avec scroll vers les éléments */}
+                <BlogPageClient
+                  searchLabel={dict.blog.search || "Rechercher"}
+                  filterLabel={dict.blog.filter || "Filtrer"}
+                />
               </div>
             </div>
           </div>
