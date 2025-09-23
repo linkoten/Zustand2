@@ -116,6 +116,7 @@ export function NotificationButton({
     notif,
     isCompact = false,
   }: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     notif: any;
     isCompact?: boolean;
   }) => (
