@@ -30,7 +30,7 @@ import {
 } from "../ui/alert-dialog";
 import { useRouter } from "next/navigation";
 import { useHandleAddToCart } from "@/hooks/useHandleAddToCart";
-import { deleteProductAction } from "@/lib/actions/productActions"; // ✅ Import depuis productActions
+import { deleteProductAction } from "@/lib/actions/productActions";
 
 interface FossilCardProps {
   fossil: SerializedProduct;
@@ -38,13 +38,13 @@ interface FossilCardProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
 }
+
 export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const router = useRouter();
 
   const isAdmin = useUserStore((s) => s.isAdmin());
   const user = useUserStore((s) => s.user);
-  console.log("user in FossilCard", user, "isAdmin", isAdmin);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-FR", {
@@ -66,7 +66,6 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
   };
 
   const isAvailable = fossil.status === ProductStatus.AVAILABLE;
-
   const { handleAddToCart, isAdding } = useHandleAddToCart();
 
   const handleDelete = async (productId: number) => {
@@ -75,7 +74,6 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
     setDeletingId(productId);
 
     try {
-      // ✅ Utiliser la server action au lieu de fetch
       const result = await deleteProductAction(productId);
 
       if (result.success) {
@@ -83,9 +81,8 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
           dict?.fossils?.deleteSuccess ||
             `${result.data?.productTitle || "Produit"} supprimé avec succès`
         );
-        router.refresh(); // Optionnel car revalidatePath est déjà dans l'action
+        router.refresh();
       } else {
-        // ✅ Gestion d'erreur simplifiée
         toast.error(
           result.error ||
             dict?.fossils?.deleteError ||
@@ -103,7 +100,7 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
   };
 
   return (
-    <Card className="group hover:shadow-lg transition-shadow duration-200">
+    <Card className="group hover:shadow-lg lg:hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] bg-gradient-to-br from-white to-slate-50/50 border-0 shadow-md">
       <CardHeader className="p-0">
         <div className="relative aspect-square overflow-hidden rounded-t-lg">
           {fossil.images?.[0] ? (
@@ -114,14 +111,14 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
               className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <span className="text-muted-foreground">
+            <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+              <span className="text-slate-500 font-medium text-sm sm:text-base">
                 {dict?.fossils?.noImage || "Pas d'image"}
               </span>
             </div>
           )}
 
-          {/* ✅ Bouton favori en overlay (top-left) */}
+          {/* Bouton favori en overlay (top-left) */}
           <div className="absolute top-2 left-2">
             <FavoriteButton
               productId={fossil.id}
@@ -140,7 +137,7 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
                   asChild
                   size="sm"
                   variant="secondary"
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
                 >
                   <Link href={`/${lang}/fossiles/${fossil.id}/edit`}>
                     <Edit className="h-4 w-4" />
@@ -152,7 +149,7 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
                     <Button
                       size="sm"
                       variant="destructive"
-                      className="h-8 w-8 p-0"
+                      className="h-8 w-8 p-0 bg-red-500 hover:bg-red-600 border-0 shadow-lg"
                       disabled={deletingId === fossil.id}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -193,45 +190,45 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="p-4">
+      <CardContent className="p-3 sm:p-4">
         <div className="mb-3">
-          <h3 className="font-semibold text-lg leading-tight mb-1 line-clamp-2">
+          <h3 className="font-semibold text-base sm:text-lg leading-tight mb-1 line-clamp-2">
             {fossil.title}
           </h3>
-          <p className="text-2xl font-bold text-primary">
+          <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
             {formatPrice(fossil.price)}
           </p>
         </div>
 
         {fossil.genre && fossil.species && (
-          <p className="text-sm text-muted-foreground italic mb-3">
+          <p className="text-xs sm:text-sm text-slate-600 italic mb-3 line-clamp-1">
             <span className="capitalize">{fossil.genre.toLowerCase()}</span>{" "}
             <span className="capitalize">{fossil.species.toLowerCase()}</span>
           </p>
         )}
 
-        <div className="flex flex-wrap gap-1.5 mb-3">
+        <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-3">
           <Badge
             variant="secondary"
-            className={`text-xs ${getCategoryColor(fossil.category)}`}
+            className={`text-xs ${getCategoryColor(fossil.category)} font-medium`}
           >
             {fossil.category}
           </Badge>
 
           {fossil.countryOfOrigin && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs border-slate-300">
               📍 {fossil.countryOfOrigin}
             </Badge>
           )}
 
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs border-slate-300">
             ⏳ {fossil.geologicalPeriod}
           </Badge>
         </div>
 
-        <div className="text-xs text-muted-foreground space-y-1">
+        <div className="text-xs text-slate-600 space-y-1">
           {fossil.locality && (
-            <p>
+            <p className="line-clamp-1">
               <span className="font-medium">
                 {dict?.fossils?.localityLabel || "Localité"}:
               </span>{" "}
@@ -239,7 +236,7 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
             </p>
           )}
           {fossil.geologicalStage && (
-            <p>
+            <p className="line-clamp-1">
               <span className="font-medium">
                 {dict?.fossils?.stageLabel || "Étage"}:
               </span>{" "}
@@ -249,18 +246,26 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0 flex gap-2">
-        <Button asChild variant="outline" size="sm" className="flex-1">
+      <CardFooter className="p-3 sm:p-4 pt-0 flex gap-2 sm:gap-3">
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="flex-1 border-slate-300 hover:border-amber-300 hover:bg-amber-50 transition-all duration-200"
+        >
           <Link href={`/${lang}/fossiles/${fossil.id}`}>
-            <Eye className="w-4 h-4 mr-2" />
-            {dict?.fossils?.viewDetails || "Voir détails"}
+            <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm font-medium">
+              {dict?.fossils?.viewDetails || "Voir détails"}
+            </span>
           </Link>
         </Button>
 
         <Button
           onClick={() => handleAddToCart(fossil)}
-          size="lg"
+          size="sm"
           disabled={isAdding || !isAvailable}
+          className="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 text-xs sm:text-sm"
         >
           {dict?.products?.cart || "Ajouter"}
         </Button>

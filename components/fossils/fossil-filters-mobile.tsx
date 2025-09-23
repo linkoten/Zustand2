@@ -13,31 +13,37 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, Filter, X, Sparkles } from "lucide-react";
+import { Search, Filter, X, Sparkles, SlidersHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FilterOptions } from "@/types/productType";
 
-interface FossilesFiltersProps {
+interface FossilesFiltersMobileProps {
   filterOptions: FilterOptions;
   lang?: "en" | "fr";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
+  activeFiltersCount: number;
+  onClearFilters: () => void;
 }
 
-export default function FossilesFilters({
+export default function FossilesFiltersMobile({
   filterOptions,
   lang = "fr",
   dict,
-}: FossilesFiltersProps) {
+  activeFiltersCount,
+  onClearFilters,
+}: FossilesFiltersMobileProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isOpen, setIsOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState(
     searchParams.get("search") || ""
@@ -58,16 +64,6 @@ export default function FossilesFilters({
     searchParams.get("geologicalStage") || "all"
   );
 
-  // Compter les filtres actifs
-  const activeFiltersCount = [
-    selectedCategory !== "all",
-    selectedCountry !== "all",
-    selectedLocality !== "all",
-    selectedPeriod !== "all",
-    selectedStage !== "all",
-    searchTerm.trim() !== "",
-  ].filter(Boolean).length;
-
   const applyFilters = () => {
     const params = new URLSearchParams();
     if (searchTerm.trim()) params.set("search", searchTerm.trim());
@@ -84,6 +80,7 @@ export default function FossilesFilters({
 
     params.set("page", "1");
     router.push(`/${lang}/fossiles?${params.toString()}`);
+    setIsOpen(false);
   };
 
   const clearFilters = () => {
@@ -93,77 +90,105 @@ export default function FossilesFilters({
     setSelectedPeriod("all");
     setSelectedStage("all");
     setSearchTerm("");
-    router.push(`/${lang}/fossiles`);
+    onClearFilters();
+    setIsOpen(false);
   };
 
   return (
-    <Card className="h-[calc(100vh-3rem)] shadow-xl border-0 bg-gradient-to-br from-white to-slate-50/50 backdrop-blur-sm flex flex-col">
-      {/* Header fixe - hauteur définie */}
-      <CardHeader className="pb-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-t-lg flex-shrink-0 h-16">
-        <div className="flex items-center justify-between h-full">
-          <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent flex items-center gap-2">
-            <div className="relative">
-              <Filter className="w-5 h-5 text-amber-600" />
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-amber-400 rounded-full animate-ping"></div>
-            </div>
-            {dict?.fossils?.filters || "Filtres"}
-          </CardTitle>
-          {activeFiltersCount > 0 && (
-            <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-md animate-pulse">
-              {activeFiltersCount}
-            </Badge>
-          )}
-        </div>
-      </CardHeader>
+    <div className="flex items-center gap-3">
+      {/* Badge filtres actifs */}
+      {activeFiltersCount > 0 && (
+        <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-1.5 animate-pulse">
+          <Filter className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+          {activeFiltersCount}
+          <span className="hidden sm:inline ml-1">
+            {dict?.fossils?.activeFilters || "filtres"}
+          </span>
+        </Badge>
+      )}
 
-      {/* Contenu scrollable - prend l'espace restant */}
-      <div className="flex-1 min-h-0">
-        <ScrollArea className="h-full">
-          <CardContent className="space-y-6 p-6">
-            {/* Recherche améliorée */}
-            <div className="space-y-3">
-              <Label
-                htmlFor="search"
-                className="text-sm font-semibold text-slate-700 flex items-center gap-2"
-              >
-                <Search className="w-4 h-4 text-amber-600" />
-                {dict?.fossils?.searchLabel || "Rechercher"}
-              </Label>
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 rounded-lg blur-sm opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+      {/* Bouton clear rapide */}
+      {activeFiltersCount > 0 && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onClearFilters}
+          className="border-slate-300 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-all duration-200 h-8 px-2 sm:px-3"
+        >
+          <X className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+          <span className="hidden sm:inline text-xs">Reset</span>
+        </Button>
+      )}
+
+      {/* Dialog modal pour les filtres */}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="border-amber-300 bg-amber-50 hover:bg-amber-100 hover:border-amber-400 text-amber-800 font-semibold shadow-md hover:shadow-lg transition-all duration-200 relative"
+          >
+            <SlidersHorizontal className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="text-sm sm:text-base">
+              {dict?.fossils?.filters || "Filtres"}
+            </span>
+            {activeFiltersCount > 0 && (
+              <Badge className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center p-0 border-2 border-white">
+                {activeFiltersCount}
+              </Badge>
+            )}
+          </Button>
+        </DialogTrigger>
+
+        <DialogContent className="sm:max-w-md w-[95vw] max-h-[90vh] bg-gradient-to-b from-white to-slate-50/50 border-0 rounded-2xl shadow-2xl">
+          <DialogHeader className="pb-4 border-b border-slate-200">
+            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent flex items-center gap-2">
+              <SlidersHorizontal className="w-5 h-5 text-amber-600" />
+              {dict?.fossils?.filters || "Filtres"}
+              {activeFiltersCount > 0 && (
+                <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs">
+                  {activeFiltersCount}
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+
+          <ScrollArea className="max-h-[60vh] pr-4">
+            <div className="space-y-5">
+              {/* Recherche */}
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                  <Search className="w-4 h-4 text-amber-600" />
+                  {dict?.fossils?.searchLabel || "Rechercher"}
+                </Label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 group-hover:text-amber-500 transition-colors duration-200" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                   <Input
-                    id="search"
                     placeholder={
                       dict?.fossils?.searchPlaceholder ||
                       "Rechercher un fossile..."
                     }
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 border-slate-200 focus:border-amber-500 focus:ring-amber-500 bg-white/80 backdrop-blur-sm transition-all duration-200 hover:shadow-md"
+                    className="pl-10 border-slate-200 focus:border-amber-500 focus:ring-amber-500"
                   />
                   {searchTerm && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setSearchTerm("")}
-                      className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 text-slate-400 hover:text-slate-600 hover:bg-red-50 transition-colors duration-200"
+                      className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 text-slate-400 hover:text-slate-600"
                     >
                       <X className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
               </div>
-            </div>
 
-            {/* Séparateur visuel */}
-            <div className="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
+              {/* Séparateur */}
+              <div className="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
 
-            {/* Filtres avec design amélioré */}
-            <div className="space-y-5">
               {/* Catégorie */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                   <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
                   {dict?.fossils?.categoryLabel || "Catégorie"}
@@ -172,23 +197,19 @@ export default function FossilesFilters({
                   value={selectedCategory}
                   onValueChange={setSelectedCategory}
                 >
-                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500 bg-white/80 backdrop-blur-sm hover:shadow-md transition-all duration-200">
+                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500">
                     <SelectValue
                       placeholder={
                         dict?.fossils?.allCategories || "Toutes les catégories"
                       }
                     />
                   </SelectTrigger>
-                  <SelectContent className="border-slate-200 shadow-xl">
-                    <SelectItem value="all" className="hover:bg-amber-50">
+                  <SelectContent>
+                    <SelectItem value="all">
                       {dict?.fossils?.allCategories || "Toutes les catégories"}
                     </SelectItem>
                     {filterOptions.categories.map((category) => (
-                      <SelectItem
-                        key={category}
-                        value={category}
-                        className="hover:bg-amber-50"
-                      >
+                      <SelectItem key={category} value={category}>
                         {category}
                       </SelectItem>
                     ))}
@@ -197,7 +218,7 @@ export default function FossilesFilters({
               </div>
 
               {/* Pays */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   {dict?.fossils?.countryLabel || "Pays d'origine"}
@@ -206,23 +227,19 @@ export default function FossilesFilters({
                   value={selectedCountry}
                   onValueChange={setSelectedCountry}
                 >
-                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500 bg-white/80 backdrop-blur-sm hover:shadow-md transition-all duration-200">
+                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500">
                     <SelectValue
                       placeholder={
                         dict?.fossils?.allCountries || "Tous les pays"
                       }
                     />
                   </SelectTrigger>
-                  <SelectContent className="border-slate-200 shadow-xl">
-                    <SelectItem value="all" className="hover:bg-amber-50">
+                  <SelectContent>
+                    <SelectItem value="all">
                       {dict?.fossils?.allCountries || "Tous les pays"}
                     </SelectItem>
                     {filterOptions.countries.map((country) => (
-                      <SelectItem
-                        key={country}
-                        value={country}
-                        className="hover:bg-amber-50"
-                      >
+                      <SelectItem key={country} value={country}>
                         {country}
                       </SelectItem>
                     ))}
@@ -231,7 +248,7 @@ export default function FossilesFilters({
               </div>
 
               {/* Localité */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   {dict?.fossils?.localityLabel || "Localité"}
@@ -240,23 +257,19 @@ export default function FossilesFilters({
                   value={selectedLocality}
                   onValueChange={setSelectedLocality}
                 >
-                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500 bg-white/80 backdrop-blur-sm hover:shadow-md transition-all duration-200">
+                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500">
                     <SelectValue
                       placeholder={
                         dict?.fossils?.allLocalities || "Toutes les localités"
                       }
                     />
                   </SelectTrigger>
-                  <SelectContent className="border-slate-200 shadow-xl">
-                    <SelectItem value="all" className="hover:bg-amber-50">
+                  <SelectContent>
+                    <SelectItem value="all">
                       {dict?.fossils?.allLocalities || "Toutes les localités"}
                     </SelectItem>
                     {filterOptions.localities.map((locality) => (
-                      <SelectItem
-                        key={locality}
-                        value={locality}
-                        className="hover:bg-amber-50"
-                      >
+                      <SelectItem key={locality} value={locality}>
                         {locality}
                       </SelectItem>
                     ))}
@@ -265,7 +278,7 @@ export default function FossilesFilters({
               </div>
 
               {/* Période géologique */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                   {dict?.fossils?.periodLabel || "Période géologique"}
@@ -274,23 +287,19 @@ export default function FossilesFilters({
                   value={selectedPeriod}
                   onValueChange={setSelectedPeriod}
                 >
-                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500 bg-white/80 backdrop-blur-sm hover:shadow-md transition-all duration-200">
+                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500">
                     <SelectValue
                       placeholder={
                         dict?.fossils?.allPeriods || "Toutes les périodes"
                       }
                     />
                   </SelectTrigger>
-                  <SelectContent className="border-slate-200 shadow-xl">
-                    <SelectItem value="all" className="hover:bg-amber-50">
+                  <SelectContent>
+                    <SelectItem value="all">
                       {dict?.fossils?.allPeriods || "Toutes les périodes"}
                     </SelectItem>
                     {filterOptions.geologicalPeriods.map((period) => (
-                      <SelectItem
-                        key={period}
-                        value={period}
-                        className="hover:bg-amber-50"
-                      >
+                      <SelectItem key={period} value={period}>
                         {period}
                       </SelectItem>
                     ))}
@@ -299,29 +308,25 @@ export default function FossilesFilters({
               </div>
 
               {/* Étage géologique */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                   <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                   {dict?.fossils?.stageLabel || "Étage géologique"}
                 </Label>
                 <Select value={selectedStage} onValueChange={setSelectedStage}>
-                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500 bg-white/80 backdrop-blur-sm hover:shadow-md transition-all duration-200">
+                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500">
                     <SelectValue
                       placeholder={
                         dict?.fossils?.allStages || "Tous les étages"
                       }
                     />
                   </SelectTrigger>
-                  <SelectContent className="border-slate-200 shadow-xl">
-                    <SelectItem value="all" className="hover:bg-amber-50">
+                  <SelectContent>
+                    <SelectItem value="all">
                       {dict?.fossils?.allStages || "Tous les étages"}
                     </SelectItem>
                     {filterOptions.geologicalStages.map((stage) => (
-                      <SelectItem
-                        key={stage}
-                        value={stage}
-                        className="hover:bg-amber-50"
-                      >
+                      <SelectItem key={stage} value={stage}>
                         {stage}
                       </SelectItem>
                     ))}
@@ -329,30 +334,30 @@ export default function FossilesFilters({
                 </Select>
               </div>
             </div>
-          </CardContent>
-        </ScrollArea>
-      </div>
+          </ScrollArea>
 
-      {/* Footer fixe - hauteur définie */}
-      <CardFooter className="flex flex-col gap-3 p-6 border-t bg-gradient-to-r from-white to-slate-50 flex-shrink-0 h-20">
-        <Button
-          onClick={applyFilters}
-          className="w-full bg-gradient-to-r from-amber-600 via-amber-700 to-orange-600 hover:from-amber-700 hover:via-amber-800 hover:to-orange-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 border-0"
-        >
-          <Sparkles className="w-4 h-4 mr-2" />
-          {dict?.fossils?.applyFilters || "Appliquer les filtres"}
-        </Button>
-        {activeFiltersCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={clearFilters}
-            className="w-full border-slate-300 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-all duration-200 transform hover:scale-[1.02]"
-          >
-            <X className="w-4 h-4 mr-2" />
-            {dict?.fossils?.clear || "Effacer"}
-          </Button>
-        )}
-      </CardFooter>
-    </Card>
+          <DialogFooter className="flex flex-col gap-3 pt-4 border-t border-slate-200">
+            <Button
+              onClick={applyFilters}
+              className="w-full bg-gradient-to-r from-amber-600 via-amber-700 to-orange-600 hover:from-amber-700 hover:via-amber-800 hover:to-orange-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              {dict?.fossils?.applyFilters || "Appliquer les filtres"}
+            </Button>
+
+            {activeFiltersCount > 0 && (
+              <Button
+                variant="outline"
+                onClick={clearFilters}
+                className="w-full border-slate-300 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-all duration-200"
+              >
+                <X className="w-4 h-4 mr-2" />
+                {dict?.fossils?.clear || "Effacer tous les filtres"}
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
