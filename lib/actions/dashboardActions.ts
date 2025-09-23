@@ -221,6 +221,12 @@ export async function getUserFavorites(
   clerkId: string
 ): Promise<SerializedProduct[]> {
   const user = await prisma.user.findUnique({ where: { clerkId } });
+
+  // 🔍 Debug
+  console.log("🔍 Debug getUserFavorites:");
+  console.log("- clerkId:", clerkId);
+  console.log("- user found:", !!user);
+  console.log("- user.id:", user?.id);
   if (!user) return [];
   try {
     const favorites = await prisma.userFavorite.findMany({
