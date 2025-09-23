@@ -220,29 +220,35 @@ export async function getUserOrders(clerkId: string) {
 export async function getUserFavorites(
   clerkId: string
 ): Promise<SerializedProduct[]> {
-  const user = await prisma.user.findUnique({ where: { clerkId } });
-
   // 🔍 Debug
   console.log("🔍 Debug getUserFavorites:");
   console.log("- clerkId:", clerkId);
-  console.log("- user found:", !!user);
-  console.log("- user.id:", user?.id);
-  if (!user) return [];
+
   try {
     const favorites = await prisma.userFavorite.findMany({
-      where: { userId: user.id },
+      where: { userId: clerkId }, // ✅ Utiliser directement le clerkId
       include: {
         product: {
           include: {
             images: { orderBy: { order: "asc" } },
             locality: true,
-            // Ajoute d'autres relations si besoin
-            // ratings: true, // pas utile ici, on va chercher les stats séparément
           },
         },
       },
       orderBy: { createdAt: "desc" },
     });
+
+    // 🔍 Debug supplémentaire
+    console.log("- favorites found:", favorites.length);
+    console.log(
+      "- favorites data:",
+      favorites.map((f) => ({
+        id: f.id,
+        userId: f.userId,
+        productId: f.productId,
+        productTitle: f.product?.title,
+      }))
+    );
 
     // Pour chaque favori, on complète tous les champs requis
     const serializedFavorites: SerializedProduct[] = await Promise.all(
@@ -281,6 +287,7 @@ export async function getUserFavorites(
             geologicalPeriod: p.geologicalPeriod ?? "",
             geologicalStage: p.geologicalStage ?? "",
             description: p.description ?? "",
+            description2: p.description2 ?? "", // ✅ Ajout du champ manquant
             stripePriceId: p.stripePriceId ?? null,
             weight: p.weight ?? 0,
             status: p.status,
@@ -301,10 +308,11 @@ export async function getUserFavorites(
         })
     );
 
+    console.log("- final serialized favorites:", serializedFavorites.length);
     return serializedFavorites;
   } catch (error) {
     console.error(
-      "Erreur lors de la récupération des favoris utilisateur:",
+      "❌ Erreur lors de la récupération des favoris utilisateur:",
       error
     );
     return [];
