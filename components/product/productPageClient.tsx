@@ -29,7 +29,7 @@ import ProductLocationMap from "./productLocationMap";
 import { SerializedProduct } from "@/types/type";
 import { RatingStats, UserRating } from "@/types/ratingType";
 import { useHandleAddToCart } from "@/hooks/useHandleAddToCart";
-import { FavoriteButton } from "./favoriteButton"; // ✅ Import du composant FavoriteButton
+import { FavoriteButton } from "./favoriteButton";
 import Image from "next/image";
 
 interface ProductPageClientProps {
@@ -147,15 +147,6 @@ export default function ProductPageClient({
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full mr-1 sm:mr-2 animate-ping"></div>
                     {dict?.products?.available || "Disponible"}
                   </Badge>
-
-                  {/* Bouton favori avec design overlay */}
-                  <FavoriteButton
-                    productId={product.id}
-                    isFavorite={product.isFavorite || false}
-                    variant="overlay"
-                    size="md"
-                    dict={dict}
-                  />
                 </div>
               </div>
 

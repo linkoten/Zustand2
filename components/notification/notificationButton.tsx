@@ -218,7 +218,10 @@ export function NotificationButton({
   }: {
     isMobile?: boolean;
   }) => (
-    <div className={`${isMobile ? "w-full" : "w-80 sm:w-96"}`}>
+    // ✅ CORRECTION PRINCIPALE : Largeur adaptative pour desktop
+    <div
+      className={`${isMobile ? "w-full" : "w-80 sm:w-96 lg:w-[420px] xl:w-[480px]"}`}
+    >
       {/* Header */}
       <div className="sticky top-0 bg-white border-b border-slate-200 p-4 sm:p-6">
         <div className="flex items-center justify-between">
@@ -226,7 +229,7 @@ export function NotificationButton({
             <div className="p-2 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full">
               <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                 {dict?.notification?.title || "Notifications"}
               </h3>
@@ -239,18 +242,19 @@ export function NotificationButton({
           </div>
 
           {/* Actions header */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {unreadCount > 0 && (
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={handleMarkAllAsRead}
-                className="text-xs hover:bg-green-50 hover:text-green-700"
+                className="text-xs hover:bg-green-50 hover:text-green-700 whitespace-nowrap"
               >
                 <Check className="w-3 h-3 mr-1" />
-                <span className="hidden sm:inline">
+                <span className="hidden lg:inline">
                   {dict?.notification?.markAllAsRead || "Tout marquer"}
                 </span>
+                <span className="lg:hidden">✓</span>
               </Button>
             )}
 
@@ -259,7 +263,7 @@ export function NotificationButton({
                 size="sm"
                 variant="ghost"
                 onClick={() => setOpen(false)}
-                className="hover:bg-red-50 hover:text-red-700"
+                className="hover:bg-red-50 hover:text-red-700 flex-shrink-0"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -343,6 +347,11 @@ export function NotificationButton({
             className="p-0 border-0 shadow-2xl bg-white rounded-xl overflow-hidden"
             align="end"
             sideOffset={8}
+            // ✅ CORRECTION : Ajout de avoidCollisions et collisionPadding
+            avoidCollisions={true}
+            collisionPadding={20}
+            // ✅ CORRECTION : Force la largeur minimale
+            style={{ minWidth: "320px" }}
           >
             <NotificationContent />
           </PopoverContent>
