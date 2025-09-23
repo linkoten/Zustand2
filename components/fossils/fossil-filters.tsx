@@ -20,7 +20,14 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, Filter, X, Sparkles } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Search, Filter, X, Sparkles, SlidersHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FilterOptions } from "@/types/productType";
 
@@ -38,6 +45,7 @@ export default function FossilesFilters({
 }: FossilesFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isOpen, setIsOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState(
     searchParams.get("search") || ""
@@ -84,6 +92,7 @@ export default function FossilesFilters({
 
     params.set("page", "1");
     router.push(`/${lang}/fossiles?${params.toString()}`);
+    setIsOpen(false); // Fermer le sheet mobile après application
   };
 
   const clearFilters = () => {
@@ -94,32 +103,40 @@ export default function FossilesFilters({
     setSelectedStage("all");
     setSearchTerm("");
     router.push(`/${lang}/fossiles`);
+    setIsOpen(false); // Fermer le sheet mobile après reset
   };
 
-  return (
-    <Card className="h-[calc(100vh-3rem)] shadow-xl border-0 bg-gradient-to-br from-white to-slate-50/50 backdrop-blur-sm flex flex-col">
-      {/* Header fixe - hauteur définie */}
-      <CardHeader className="pb-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-t-lg flex-shrink-0 h-16">
-        <div className="flex items-center justify-between h-full">
-          <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent flex items-center gap-2">
+  // Composant de contenu des filtres (réutilisé pour desktop et mobile)
+  const FiltersContent = ({ isMobile = false }: { isMobile?: boolean }) => (
+    <div className={`${isMobile ? "h-full flex flex-col" : ""}`}>
+      {/* Header */}
+      <div
+        className={`${isMobile ? "pb-4 border-b border-slate-200 flex-shrink-0" : "pb-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-t-lg flex-shrink-0 h-16"}`}
+      >
+        <div
+          className={`flex items-center justify-between ${isMobile ? "py-2" : "h-full"}`}
+        >
+          <div className="flex items-center gap-2">
             <div className="relative">
               <Filter className="w-5 h-5 text-amber-600" />
               <div className="absolute -top-1 -right-1 w-2 h-2 bg-amber-400 rounded-full animate-ping"></div>
             </div>
-            {dict?.fossils?.filters || "Filtres"}
-          </CardTitle>
+            <span className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+              {dict?.fossils?.filters || "Filtres"}
+            </span>
+          </div>
           {activeFiltersCount > 0 && (
             <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-md animate-pulse">
               {activeFiltersCount}
             </Badge>
           )}
         </div>
-      </CardHeader>
+      </div>
 
-      {/* Contenu scrollable - prend l'espace restant */}
-      <div className="flex-1 min-h-0">
+      {/* Contenu scrollable */}
+      <div className={`${isMobile ? "flex-1 min-h-0" : "flex-1 min-h-0"}`}>
         <ScrollArea className="h-full">
-          <CardContent className="space-y-6 p-6">
+          <div className={`space-y-6 ${isMobile ? "p-4" : "p-6"}`}>
             {/* Recherche améliorée */}
             <div className="space-y-3">
               <Label
@@ -329,12 +346,14 @@ export default function FossilesFilters({
                 </Select>
               </div>
             </div>
-          </CardContent>
+          </div>
         </ScrollArea>
       </div>
 
-      {/* Footer fixe - hauteur définie */}
-      <CardFooter className="flex flex-col gap-3 p-6 border-t bg-gradient-to-r from-white to-slate-50 flex-shrink-0 h-20">
+      {/* Footer avec boutons */}
+      <div
+        className={`flex flex-col gap-3 border-t bg-gradient-to-r from-white to-slate-50 flex-shrink-0 ${isMobile ? "p-4" : "p-6"}`}
+      >
         <Button
           onClick={applyFilters}
           className="w-full bg-gradient-to-r from-amber-600 via-amber-700 to-orange-600 hover:from-amber-700 hover:via-amber-800 hover:to-orange-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 border-0"
@@ -352,7 +371,60 @@ export default function FossilesFilters({
             {dict?.fossils?.clear || "Effacer"}
           </Button>
         )}
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* VERSION DESKTOP - Sidebar fixe (masquée sur mobile) */}
+      <div className="hidden lg:block">
+        <Card className="h-[calc(100vh-3rem)] shadow-xl border-0 bg-gradient-to-br from-white to-slate-50/50 backdrop-blur-sm flex flex-col">
+          <FiltersContent />
+        </Card>
+      </div>
+
+      {/* VERSION MOBILE - Bouton flottant + Sheet (visible uniquement sur mobile/tablet) */}
+      <div className="lg:hidden">
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetTrigger asChild>
+            <Button
+              size="lg"
+              className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 rounded-full w-16 h-16 p-0"
+            >
+              <div className="relative">
+                <SlidersHorizontal className="w-6 h-6" />
+                {activeFiltersCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white text-xs flex items-center justify-center p-0 border-2 border-white">
+                    {activeFiltersCount}
+                  </Badge>
+                )}
+              </div>
+            </Button>
+          </SheetTrigger>
+
+          <SheetContent
+            side="bottom"
+            className="h-[85vh] bg-gradient-to-b from-white to-slate-50/50 border-0 rounded-t-2xl shadow-2xl"
+          >
+            <SheetHeader className="pb-4 border-b border-slate-200">
+              <SheetTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent flex items-center gap-2">
+                <SlidersHorizontal className="w-5 h-5 text-amber-600" />
+                {dict?.fossils?.filters || "Filtres"}
+                {activeFiltersCount > 0 && (
+                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+                    {activeFiltersCount}
+                  </Badge>
+                )}
+              </SheetTitle>
+            </SheetHeader>
+
+            <div className="h-[calc(100%-80px)] mt-4">
+              <FiltersContent isMobile />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </>
   );
 }

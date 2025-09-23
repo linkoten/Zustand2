@@ -187,7 +187,7 @@ export default function FossilesClient({
         {/* Grille des fossiles avec animations */}
         {fossils.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {fossils.map((fossil, index) => (
                 <AnimatedFossilCard
                   key={fossil.id}

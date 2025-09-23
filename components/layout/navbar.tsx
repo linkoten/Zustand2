@@ -103,25 +103,25 @@ export default function Navbar({ lang, dict }: NavbarProps) {
     <>
       {/* Navbar avec backdrop blur et design moderne */}
       <nav className="bg-white/95 backdrop-blur-md shadow-lg border-b border-slate-200/50 sticky top-0 z-50 transition-all duration-300">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo amélioré - Position plus à gauche */}
-            <div className="flex-shrink-0 ">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex items-center justify-between h-16 lg:h-20">
+            {/* Logo optimisé pour mobile */}
+            <div className="flex-shrink-0 min-w-0">
               <Link
                 href={`/${lang}`}
-                className="flex items-center space-x-3 group"
+                className="flex items-center space-x-2 sm:space-x-3 group"
               >
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 rounded-2xl blur-lg opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
-                  <div className="relative bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 p-3 rounded-2xl shadow-xl transform group-hover:scale-105 transition-transform duration-300">
-                    <Sparkles className="w-6 h-6 text-white" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 rounded-xl lg:rounded-2xl blur-lg opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
+                  <div className="relative bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 p-2 lg:p-3 rounded-xl lg:rounded-2xl shadow-xl transform group-hover:scale-105 transition-transform duration-300">
+                    <Sparkles className="w-4 h-4 lg:w-6 lg:h-6 text-white" />
                   </div>
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-black text-3xl tracking-tight bg-gradient-to-br from-amber-700 via-orange-600 to-red-600 bg-clip-text text-transparent drop-shadow-sm group-hover:from-amber-600 group-hover:via-orange-500 group-hover:to-red-500 transition-all duration-300">
+                <div className="flex flex-col min-w-0">
+                  <span className="font-black text-lg sm:text-xl lg:text-3xl tracking-tight bg-gradient-to-br from-amber-700 via-orange-600 to-red-600 bg-clip-text text-transparent drop-shadow-sm group-hover:from-amber-600 group-hover:via-orange-500 group-hover:to-red-500 transition-all duration-300 truncate">
                     Paleolitho
                   </span>
-                  <span className="text-xs text-slate-500 font-medium -mt-1">
+                  <span className="text-xs text-slate-500 font-medium -mt-1 hidden sm:block">
                     {lang === "en"
                       ? "Fossil Collection"
                       : "Collection de Fossiles"}
@@ -179,8 +179,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
               )}
             </div>
 
-            {/* Actions desktop avec design amélioré - Position plus à droite */}
-            <div className="hidden lg:flex items-center space-x-4 flex-shrink-0 ">
+            {/* Actions desktop avec design amélioré */}
+            <div className="hidden lg:flex items-center space-x-4 flex-shrink-0">
               {isLoaded && user && (
                 <div className="relative">
                   <NotificationButton userId={user.id} dict={dict} />
@@ -240,26 +240,33 @@ export default function Navbar({ lang, dict }: NavbarProps) {
               </div>
             </div>
 
-            {/* Menu mobile amélioré */}
-            <div className="lg:hidden flex items-center space-x-3">
+            {/* Actions mobile optimisées - COMPACT */}
+            <div className="lg:hidden flex items-center space-x-2 flex-shrink-0">
+              {/* Notifications uniquement si connecté */}
               {isLoaded && user && (
-                <NotificationButton userId={user.id} dict={dict} />
+                <div className="relative">
+                  <NotificationButton userId={user.id} dict={dict} />
+                </div>
               )}
-              <CartIconButton onClick={toggleCart} />
-              <LanguageSwitcher lang={lang} />
 
+              {/* Panier toujours visible */}
+              <div className="relative">
+                <CartIconButton onClick={toggleCart} />
+              </div>
+
+              {/* Burger menu */}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleMobileMenu}
-                className="relative group rounded-xl p-2 hover:bg-slate-100 transition-all duration-300"
+                className="relative group rounded-xl p-2 hover:bg-slate-100 transition-all duration-300 flex-shrink-0"
                 aria-label="Menu"
               >
                 <div className="relative">
                   {isMobileMenuOpen ? (
-                    <X className="h-6 w-6 text-slate-700 group-hover:text-slate-900 transition-colors duration-300" />
+                    <X className="h-5 w-5 text-slate-700 group-hover:text-slate-900 transition-colors duration-300" />
                   ) : (
-                    <Menu className="h-6 w-6 text-slate-700 group-hover:text-slate-900 transition-colors duration-300" />
+                    <Menu className="h-5 w-5 text-slate-700 group-hover:text-slate-900 transition-colors duration-300" />
                   )}
                 </div>
               </Button>
@@ -268,20 +275,20 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
           {/* Navigation mobile avec design moderne */}
           {isMobileMenuOpen && (
-            <div className="lg:hidden py-6 border-t border-slate-200/50 bg-white/95 backdrop-blur-md">
+            <div className="lg:hidden py-4 border-t border-slate-200/50 bg-white/95 backdrop-blur-md">
               <div className="flex flex-col space-y-2">
                 {/* Liens publics */}
                 {navigationLinks.map((link, index) => (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="group flex items-center gap-4 px-4 py-4 rounded-xl mx-2 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100 transition-all duration-300 transform hover:translate-x-2"
+                    className="group flex items-center gap-3 px-3 py-3 rounded-xl mx-2 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100 transition-all duration-300 transform hover:translate-x-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     {link.icon && (
                       <div
-                        className={`p-2 rounded-lg bg-gradient-to-r ${link.gradient} shadow-lg`}
+                        className={`p-2 rounded-lg bg-gradient-to-r ${link.gradient} shadow-lg flex-shrink-0`}
                       >
                         <link.icon className="w-4 h-4 text-white" />
                       </div>
@@ -294,12 +301,12 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
                 {/* Liens pour utilisateurs connectés en mobile */}
                 {isLoaded && user && (
-                  <div className="border-t border-slate-200/50 pt-4 mt-4">
+                  <div className="border-t border-slate-200/50 pt-3 mt-3">
                     {userLinks.map((link, index) => (
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="group flex items-center gap-4 px-4 py-4 rounded-xl mx-2 hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 transition-all duration-300 transform hover:translate-x-2"
+                        className="group flex items-center gap-3 px-3 py-3 rounded-xl mx-2 hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 transition-all duration-300 transform hover:translate-x-2"
                         onClick={() => setIsMobileMenuOpen(false)}
                         style={{
                           animationDelay: `${(navigationLinks.length + index) * 100}ms`,
@@ -307,7 +314,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                       >
                         {link.icon && (
                           <div
-                            className={`p-2 rounded-lg bg-gradient-to-r ${link.gradient} shadow-lg`}
+                            className={`p-2 rounded-lg bg-gradient-to-r ${link.gradient} shadow-lg flex-shrink-0`}
                           >
                             <link.icon className="w-4 h-4 text-white" />
                           </div>
@@ -320,26 +327,35 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                   </div>
                 )}
 
-                {/* Section authentification mobile */}
-                <div className="border-t border-slate-200/50 pt-6 mt-6 px-4">
+                {/* Section langue et authentification mobile */}
+                <div className="border-t border-slate-200/50 pt-4 mt-4 px-3 space-y-4">
+                  {/* Sélecteur de langue */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-slate-600">
+                      {dict.navbar.language || "Langue"}
+                    </span>
+                    <LanguageSwitcher lang={lang} />
+                  </div>
+
+                  {/* Actions authentification */}
                   {isLoaded && (
                     <>
                       {user ? (
-                        <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl">
+                        <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl">
                           <UserButton
                             afterSignOutUrl="/"
                             appearance={{
                               elements: {
                                 avatarBox:
-                                  "w-12 h-12 ring-2 ring-white shadow-lg",
+                                  "w-10 h-10 ring-2 ring-white shadow-lg flex-shrink-0",
                               },
                             }}
                           />
-                          <div className="flex-1">
-                            <p className="font-semibold text-slate-800">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-slate-800 truncate">
                               {user.firstName} {user.lastName}
                             </p>
-                            <p className="text-sm text-slate-600">
+                            <p className="text-sm text-slate-600 truncate">
                               {user.emailAddresses[0]?.emailAddress}
                             </p>
                           </div>
@@ -349,13 +365,13 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                           <Button
                             asChild
                             variant="ghost"
-                            className="w-full justify-start h-12 rounded-xl hover:bg-slate-100 group"
+                            className="w-full justify-start h-11 rounded-xl hover:bg-slate-100 group"
                           >
                             <Link
                               href={`/${lang}/sign-in`}
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
-                              <User className="mr-3 h-5 w-5 group-hover:text-blue-600 transition-colors duration-300" />
+                              <User className="mr-3 h-4 w-4 group-hover:text-blue-600 transition-colors duration-300 flex-shrink-0" />
                               <span className="font-semibold group-hover:text-blue-600 transition-colors duration-300">
                                 {dict.navbar.signin}
                               </span>
@@ -363,7 +379,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                           </Button>
                           <Button
                             asChild
-                            className="w-full h-12 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-700 hover:via-orange-700 hover:to-red-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                            className="w-full h-11 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-700 hover:via-orange-700 hover:to-red-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                           >
                             <Link
                               href={`/${lang}/sign-up`}

@@ -35,7 +35,7 @@ interface ProductPageClientProps {
   product: SerializedProduct;
   similarProducts: SerializedProduct[];
   ratingStats: RatingStats;
-  userRating: UserRating | null;
+  userRating?: UserRating | null;
   lang: "en" | "fr";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any;
@@ -53,96 +53,91 @@ export default function ProductPageClient({
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Breadcrumb amélioré avec animation */}
-      <nav className="mb-8">
-        <div className="flex items-center space-x-2 text-sm text-slate-600">
+    <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
+      {/* Breadcrumb amélioré avec animation - RESPONSIVE */}
+      <nav className="mb-4 sm:mb-6 lg:mb-8">
+        <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-slate-600 overflow-hidden">
           <Link
             href={`/${lang}`}
-            className="hover:text-amber-600 transition-all duration-200 hover:scale-105 font-medium"
+            className="hover:text-amber-600 transition-all duration-200 hover:scale-105 font-medium truncate"
           >
             {dict?.navbar?.home || "Accueil"}
           </Link>
-          <span className="text-slate-400 font-light">/</span>
+          <span className="text-slate-400 font-light flex-shrink-0">/</span>
           <Link
             href={`/${lang}/fossiles`}
-            className="hover:text-amber-600 transition-all duration-200 flex items-center group font-medium"
+            className="hover:text-amber-600 transition-all duration-200 flex items-center group font-medium truncate"
           >
-            <ArrowLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform duration-200" />
+            <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 group-hover:-translate-x-1 transition-transform duration-200 flex-shrink-0" />
             {dict?.navbar?.fossils || "Fossiles"}
           </Link>
-          <span className="text-slate-400 font-light">/</span>
-          <span className="text-slate-900 font-semibold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+          <span className="text-slate-400 font-light flex-shrink-0">/</span>
+          <span className="text-slate-900 font-semibold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent truncate">
             {product.title}
           </span>
         </div>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-        {/* Section Images avec Lens ultra améliorée */}
-        <div className="space-y-6">
-          {/* Image principale avec lens */}
-          <Card className="border-0 shadow-2xl bg-gradient-to-br from-white via-slate-50/50 to-amber-50/20 backdrop-blur-sm overflow-hidden group hover:shadow-3xl transition-all duration-500">
-            <CardContent className="p-6">
-              <div className="relative mb-4">
-                <ImageLens
-                  src={
-                    product.images[selectedImageIndex]?.imageUrl ||
-                    "/placeholder.jpg"
-                  }
-                  alt={`${product.title} - ${dict?.fossils?.viewDetails || "Vue"} ${selectedImageIndex + 1}`}
-                  width={500}
-                  height={500}
-                  className="w-full rounded-2xl shadow-xl group-hover:shadow-2xl transition-all duration-300"
-                  lensSize={150}
-                  zoomLevel={3.5}
-                />
+      {/* Layout principal responsive - STACK SUR MOBILE */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 xl:gap-16">
+        {/* Section Images avec Lens ultra améliorée - RESPONSIVE */}
+        <div className="space-y-4 sm:space-y-6 order-1">
+          {/* Image principale avec lens - RESPONSIVE */}
+          <Card className="border-0 shadow-xl lg:shadow-2xl bg-gradient-to-br from-white via-slate-50/50 to-amber-50/20 backdrop-blur-sm overflow-hidden group hover:shadow-2xl lg:hover:shadow-3xl transition-all duration-500">
+            <CardContent className="p-3 sm:p-4 lg:p-6">
+              <div className="relative mb-3 sm:mb-4">
+                {/* Image responsive avec lens conditionnel */}
+                <div className="aspect-square w-full max-w-md mx-auto lg:max-w-full">
+                  <ImageLens
+                    src={
+                      product.images[selectedImageIndex]?.imageUrl ||
+                      "/placeholder.jpg"
+                    }
+                    alt={`${product.title} - ${dict?.fossils?.viewDetails || "Vue"} ${selectedImageIndex + 1}`}
+                    width={500}
+                    height={500}
+                    className="w-full h-full rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-xl lg:group-hover:shadow-2xl transition-all duration-300 object-cover"
+                    lensSize={100}
+                    zoomLevel={2.5}
+                  />
+                </div>
 
-                {/* Badges premium améliorés */}
-                <div className="absolute top-4 left-4 flex flex-col gap-2">
-                  <Badge className="bg-black/80 backdrop-blur-sm text-white border-0 shadow-xl flex items-center gap-1 px-3 py-1.5">
-                    <ZoomIn className="w-3 h-3" />
-                    <span className="font-semibold">HD Zoom</span>
+                {/* Badges premium améliorés - RESPONSIVE */}
+                <div className="absolute top-2 sm:top-3 lg:top-4 left-2 sm:left-3 lg:left-4 flex flex-col gap-1 sm:gap-2">
+                  <Badge className="bg-black/80 backdrop-blur-sm text-white border-0 shadow-lg lg:shadow-xl flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm">
+                    <ZoomIn className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                    <span className="font-semibold hidden sm:inline">
+                      HD Zoom
+                    </span>
+                    <span className="font-semibold sm:hidden">HD</span>
                   </Badge>
-                  <Badge className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white border-0 shadow-xl px-3 py-1.5">
-                    <Sparkles className="w-3 h-3 mr-1" />
+                  <Badge className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white border-0 shadow-lg lg:shadow-xl px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm">
+                    <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
                     {selectedImageIndex + 1}/{product.images.length}
                   </Badge>
                 </div>
 
-                {/* Status badge animé premium */}
+                {/* Status badge animé premium - RESPONSIVE */}
                 <Badge
-                  className={`absolute top-4 right-4 shadow-xl backdrop-blur-sm border-2 px-3 py-2 font-semibold ${
-                    product.status === "AVAILABLE"
-                      ? "bg-emerald-100/90 text-emerald-800 border-emerald-300 animate-pulse"
-                      : "bg-red-100/90 text-red-800 border-red-300"
-                  }`}
-                  variant="outline"
+                  variant="default"
+                  className="absolute top-2 sm:top-3 lg:top-4 right-2 sm:right-3 lg:right-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 shadow-lg lg:shadow-xl animate-pulse px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm"
                 >
-                  <div
-                    className={`w-3 h-3 rounded-full mr-2 ${
-                      product.status === "AVAILABLE"
-                        ? "bg-emerald-500 animate-ping"
-                        : "bg-red-500"
-                    }`}
-                  />
-                  {product.status === "AVAILABLE"
-                    ? dict?.products?.available || "Disponible"
-                    : dict?.products?.sold || "Vendu"}
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full mr-1 sm:mr-2 animate-ping"></div>
+                  {dict?.products?.available || "Disponible"}
                 </Badge>
               </div>
 
-              {/* Miniatures ultra améliorées */}
+              {/* Miniatures - RESPONSIVE */}
               {product.images.length > 1 && (
-                <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-amber-300 scrollbar-track-slate-100">
+                <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-3 scrollbar-thin scrollbar-thumb-amber-300 scrollbar-track-slate-100">
                   {product.images.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`flex-shrink-0 w-24 h-24 rounded-2xl overflow-hidden border-3 transition-all duration-300 transform hover:scale-110 hover:rotate-1 ${
+                      className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-lg lg:rounded-2xl overflow-hidden border-2 lg:border-3 transition-all duration-300 transform hover:scale-110 hover:rotate-1 ${
                         selectedImageIndex === index
-                          ? "border-amber-500 ring-4 ring-amber-200 shadow-xl scale-105"
-                          : "border-slate-200 hover:border-amber-300 hover:shadow-lg"
+                          ? "border-amber-500 ring-2 lg:ring-4 ring-amber-200 shadow-lg lg:shadow-xl scale-105"
+                          : "border-slate-200 hover:border-amber-300 hover:shadow-md lg:hover:shadow-lg"
                       }`}
                     >
                       <Image
@@ -159,32 +154,19 @@ export default function ProductPageClient({
             </CardContent>
           </Card>
 
-          {/* Carte de localisation ultra améliorée */}
-          <Card className="border-0 shadow-2xl bg-gradient-to-br from-white via-blue-50/40 to-cyan-50/30 backdrop-blur-sm hover:shadow-3xl transition-all duration-500 group">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-3">
-                <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow duration-300">
-                  <MapPin className="w-6 h-6 text-white" />
+          {/* Carte de localisation ultra améliorée - RESPONSIVE */}
+          <Card className="border-0 shadow-xl lg:shadow-2xl bg-gradient-to-br from-white via-blue-50/40 to-cyan-50/30 backdrop-blur-sm hover:shadow-2xl lg:hover:shadow-3xl transition-all duration-500 group">
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2 sm:gap-3">
+                <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl lg:rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow duration-300 flex-shrink-0">
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
                 </div>
-                <div className="flex-1">
-                  {dict?.products?.provenance || "Provenance"}
-                  <p className="text-sm text-slate-600 font-normal">
-                    {dict?.fossils?.localityLabel || "Localité"}:{" "}
-                    {product.locality?.name ||
-                      dict?.fossilRequests?.notSpecified ||
-                      "Non spécifiée"}
-                  </p>
-                </div>
-                <Badge
-                  variant="outline"
-                  className="text-xs border-blue-300 text-blue-700 bg-blue-50 px-3 py-1"
-                >
-                  <Star className="w-3 h-3 mr-1" />
-                  {dict?.home?.geolocated || "Géolocalisé"}
-                </Badge>
+                <span className="truncate">
+                  {dict?.fossils?.origin || "Origine du fossile"}
+                </span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
               <ProductLocationMap
                 locality={product.locality}
                 height={360}
@@ -193,66 +175,68 @@ export default function ProductPageClient({
               />
             </CardContent>
           </Card>
-
-          {/* Actions rapides ultra améliorées */}
-          <div className="grid grid-cols-2 gap-4">
-            <Button
-              variant="outline"
-              className="h-14 border-2 border-amber-200 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 hover:border-amber-400 transition-all duration-300 transform hover:scale-105 hover:shadow-xl group"
-            >
-              <Heart className="w-5 h-5 mr-2 group-hover:text-red-500 transition-colors duration-300" />
-              <span className="font-semibold">
-                {dict?.products?.addToFavorites || "Favoris"}
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-14 border-2 border-blue-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 hover:border-blue-400 transition-all duration-300 transform hover:scale-105 hover:shadow-xl group"
-            >
-              <ExternalLink className="w-5 h-5 mr-2 group-hover:text-blue-600 transition-colors duration-300" />
-              <span className="font-semibold">
-                {dict?.products?.share || "Partager"}
-              </span>
-            </Button>
-          </div>
         </div>
 
-        {/* Informations produit réorganisées */}
-        <div className="space-y-6">
-          {/* Card principale réorganisée */}
-          <Card className="border-0 shadow-2xl bg-gradient-to-br from-white via-amber-50/40 to-orange-50/30 backdrop-blur-sm hover:shadow-3xl transition-shadow duration-500">
-            <CardContent className="p-10">
-              {/* En-tête avec titre et prix */}
-              <div className="flex items-start justify-between mb-8">
-                <div className="flex-1">
-                  <h1 className="text-5xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-amber-700 bg-clip-text text-transparent mb-4 leading-tight">
+        {/* Informations produit réorganisées - RESPONSIVE */}
+        <div className="space-y-4 sm:space-y-6 order-2">
+          {/* Card principale réorganisée - RESPONSIVE */}
+          <Card className="border-0 shadow-xl lg:shadow-2xl bg-gradient-to-br from-white via-amber-50/40 to-orange-50/30 backdrop-blur-sm hover:shadow-2xl lg:hover:shadow-3xl transition-shadow duration-500">
+            <CardContent className="p-4 sm:p-6 lg:p-8 xl:p-10">
+              {/* En-tête avec titre et prix - RESPONSIVE STACK */}
+              <div className="flex flex-col gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <div className="space-y-3 sm:space-y-4">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-amber-700 bg-clip-text text-transparent leading-tight">
                     {product.title}
                   </h1>
-                  <Badge
-                    variant="secondary"
-                    className="bg-slate-100 text-slate-700 px-3 py-1.5 text-sm mb-4"
-                  >
-                    <Tag className="w-4 h-4 mr-1" />
-                    {product.category}
-                  </Badge>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <Badge
+                      variant="secondary"
+                      className="bg-slate-100 text-slate-700 px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm"
+                    >
+                      <Tag className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                      {product.category}
+                    </Badge>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-3">
+
+                {/* Prix et badge - RESPONSIVE */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                  <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                     {formatPrice(product.price)}
                   </div>
                   <Badge
                     variant="outline"
-                    className="border-amber-300 text-amber-700 bg-amber-50 px-4 py-2 text-sm font-semibold"
+                    className="border-amber-300 text-amber-700 bg-amber-50 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold self-start sm:self-auto"
                   >
                     {dict?.products?.fixedPrice || "Prix fixe"}
                   </Badge>
                 </div>
               </div>
 
-              {/* Genre et Espèce */}
+              {/* Genre et Espèce - RESPONSIVE */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-200 text-center">
+                  <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
+                    {dict?.fossils?.genus || "Genre"}
+                  </p>
+                  <p className="font-bold text-slate-800 text-sm sm:text-base truncate">
+                    {product.genre ||
+                      dict?.fossilRequests?.notSpecified ||
+                      "Non spécifié"}
+                  </p>
+                </div>
+                <div className="p-3 sm:p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 text-center">
+                  <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
+                    {dict?.fossils?.species || "Espèce"}
+                  </p>
+                  <p className="font-bold text-slate-800 text-sm sm:text-base truncate">
+                    {product.species}
+                  </p>
+                </div>
+              </div>
 
-              {/* Rating avec design premium */}
-              <div className="mb-8 p-6 bg-gradient-to-r from-slate-50 via-white to-amber-50 rounded-2xl border border-slate-200 shadow-inner">
+              {/* Rating avec design premium - RESPONSIVE */}
+              <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-r from-slate-50 via-white to-amber-50 rounded-xl lg:rounded-2xl border border-slate-200 shadow-inner">
                 <RatingDisplay
                   productId={product.id}
                   stats={ratingStats}
@@ -262,110 +246,132 @@ export default function ProductPageClient({
                 />
               </div>
 
-              <Separator className="my-8 bg-gradient-to-r from-transparent via-slate-300 to-transparent h-px" />
+              <Separator className="my-6 sm:my-8 bg-gradient-to-r from-transparent via-slate-300 to-transparent h-px" />
 
-              {/* 4 rectangles d'informations */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-                {/* Période géologique */}
-                <div className="flex items-center gap-4 p-6 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 rounded-2xl border-2 border-amber-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 group">
-                  <div className="p-4 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl shadow-xl group-hover:shadow-2xl transition-shadow duration-300">
-                    <Calendar className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
-                      {dict?.fossils?.periodLabel || "Période"}
-                    </p>
-                    <p className="font-bold text-slate-800 text-xl">
-                      {product.geologicalPeriod}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Pays d'origine */}
-                <div className="flex items-center gap-4 p-6 bg-gradient-to-br from-blue-50 via-cyan-50 to-sky-50 rounded-2xl border-2 border-blue-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 group">
-                  <div className="p-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-xl group-hover:shadow-2xl transition-shadow duration-300">
-                    <MapPin className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
-                      {dict?.fossils?.countryLabel || "Origine"}
-                    </p>
-                    <p className="font-bold text-slate-800 text-xl">
-                      {dict?.countries?.[product.countryOfOrigin] ||
-                        product.countryOfOrigin}
-                    </p>
-                  </div>
-                </div>
-                {/* Étage géologique */}
-                <div className="flex items-center gap-4 p-6 bg-gradient-to-br from-purple-50 via-violet-50 to-indigo-50 rounded-2xl border-2 border-purple-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 group">
-                  <div className="p-4 bg-gradient-to-br from-purple-500 to-violet-500 rounded-2xl shadow-xl group-hover:shadow-2xl transition-shadow duration-300">
-                    <Mountain className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
-                      {dict?.fossils?.stageLabel || "Étage géologique"}
-                    </p>
-                    <p className="font-bold text-slate-800 text-xl">
-                      {product.geologicalStage ||
-                        dict?.fossilRequests?.notSpecified ||
-                        "Non spécifié"}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Localité */}
-                <div className="flex items-center gap-4 p-6 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl border-2 border-green-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300 group">
-                  <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-xl group-hover:shadow-2xl transition-shadow duration-300">
-                    <Star className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
-                      {dict?.fossils?.localityLabel || "Localité"}
-                    </p>
-                    <p className="font-bold text-slate-800 text-xl">
-                      {product.locality?.name ||
-                        dict?.fossilRequests?.notSpecified ||
-                        "Non spécifiée"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bouton d'ajout au panier centré et moins large */}
-              <div className="flex justify-center">
+              {/* Boutons d'action ultra premium - RESPONSIVE */}
+              <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                 <Button
-                  size="lg"
-                  className="w-3/4 h-16 bg-gradient-to-r from-amber-600 via-amber-700 to-orange-600 hover:from-amber-700 hover:via-amber-800 hover:to-orange-700 text-white font-bold text-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 active:scale-95 transition-all duration-300 border-0 rounded-2xl"
                   onClick={() => handleAddToCart(product)}
-                  disabled={isAdding || product.status !== "AVAILABLE"}
+                  disabled={isAdding}
+                  className="w-full bg-gradient-to-r from-amber-600 via-amber-700 to-orange-600 hover:from-amber-700 hover:via-amber-800 hover:to-orange-700 text-white font-bold py-3 sm:py-4 rounded-xl lg:rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group text-sm sm:text-base h-12 sm:h-14"
                 >
-                  <ShoppingCart className="w-7 h-7 mr-4" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                  <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   {isAdding
-                    ? "⏳ " +
-                      (dict?.products?.addingToCart || "Ajout en cours...")
-                    : product.status !== "AVAILABLE"
-                      ? "❌ " + (dict?.products?.sold || "Produit vendu")
-                      : "🛒 " + (dict?.products?.cart || "Ajouter au panier")}
+                    ? dict?.products?.adding || "Ajout..."
+                    : dict?.products?.addToCart || "Ajouter au panier"}
                 </Button>
+
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                  <Button
+                    variant="outline"
+                    className="h-12 sm:h-14 border-2 border-amber-200 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 hover:border-amber-400 transition-all duration-300 transform hover:scale-105 hover:shadow-lg lg:hover:shadow-xl group text-xs sm:text-sm"
+                  >
+                    <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 group-hover:text-red-500 transition-colors duration-300" />
+                    <span className="font-semibold hidden sm:inline">
+                      {dict?.products?.addToFavorites || "Favoris"}
+                    </span>
+                    <span className="font-semibold sm:hidden">Favoris</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-12 sm:h-14 border-2 border-blue-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 hover:border-blue-400 transition-all duration-300 transform hover:scale-105 hover:shadow-lg lg:hover:shadow-xl group text-xs sm:text-sm"
+                  >
+                    <Share2 className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 group-hover:text-blue-600 transition-colors duration-300" />
+                    <span className="font-semibold hidden sm:inline">
+                      {dict?.products?.share || "Partager"}
+                    </span>
+                    <span className="font-semibold sm:hidden">Partager</span>
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Description avec style ultra moderne */}
-          {((lang === "fr" && product.description) ||
-            (lang === "en" && product.description2)) && (
-            <Card className="border-0 shadow-2xl bg-gradient-to-br from-white via-green-50/30 to-emerald-50/20 backdrop-blur-sm hover:shadow-3xl transition-shadow duration-500">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-3">
-                  <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-lg">
-                    <Info className="w-6 h-6 text-white" />
+          {/* Informations détaillées - RESPONSIVE */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            {/* Pays d'origine */}
+            <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 rounded-xl lg:rounded-2xl border-2 border-orange-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
+              <div className="p-2 sm:p-4 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
+                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
+                  {dict?.fossils?.countryLabel || "Origine"}
+                </p>
+                <p className="font-bold text-slate-800 text-sm sm:text-base lg:text-xl truncate">
+                  {dict?.countries?.[product.countryOfOrigin] ||
+                    product.countryOfOrigin}
+                </p>
+              </div>
+            </div>
+
+            {/* Étage géologique */}
+            <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-gradient-to-br from-purple-50 via-violet-50 to-indigo-50 rounded-xl lg:rounded-2xl border-2 border-purple-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
+              <div className="p-2 sm:p-4 bg-gradient-to-br from-purple-500 to-violet-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
+                <Mountain className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
+                  {dict?.fossils?.stageLabel || "Étage géologique"}
+                </p>
+                <p className="font-bold text-slate-800 text-sm sm:text-base lg:text-xl truncate">
+                  {product.geologicalStage ||
+                    dict?.fossilRequests?.notSpecified ||
+                    "Non spécifié"}
+                </p>
+              </div>
+            </div>
+
+            {/* Localité */}
+            <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-xl lg:rounded-2xl border-2 border-green-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
+              <div className="p-2 sm:p-4 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
+                <Star className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
+                  {dict?.fossils?.localityLabel || "Localité"}
+                </p>
+                <p className="font-bold text-slate-800 text-sm sm:text-base lg:text-xl truncate">
+                  {product.locality?.name ||
+                    dict?.fossilRequests?.notSpecified ||
+                    "Non spécifié"}
+                </p>
+              </div>
+            </div>
+
+            {/* Période géologique */}
+            <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-gradient-to-br from-blue-50 via-cyan-50 to-sky-50 rounded-xl lg:rounded-2xl border-2 border-blue-200/50 hover:shadow-lg lg:hover:shadow-xl hover:scale-105 transition-all duration-300 group">
+              <div className="p-2 sm:p-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl lg:rounded-2xl shadow-lg lg:shadow-xl group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
+                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">
+                  {dict?.fossils?.periodLabel || "Période"}
+                </p>
+                <p className="font-bold text-slate-800 text-sm sm:text-base lg:text-xl truncate">
+                  {product.geologicalPeriod}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Description avec design moderne - RESPONSIVE */}
+          {(product.description || product.description2) && (
+            <Card className="border-0 shadow-xl lg:shadow-2xl bg-gradient-to-br from-white via-green-50/30 to-emerald-50/20 backdrop-blur-sm hover:shadow-2xl lg:hover:shadow-3xl transition-shadow duration-500">
+              <CardHeader className="pb-3 sm:pb-4">
+                <CardTitle className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2 sm:gap-3">
+                  <div className="p-2 sm:p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl lg:rounded-2xl shadow-lg flex-shrink-0">
+                    <Info className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
                   </div>
-                  {dict?.products?.description || "Description"}
+                  <span className="truncate">
+                    {dict?.products?.description || "Description"}
+                  </span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6">
                 <div className="prose prose-slate max-w-none">
-                  <p className="text-slate-700 leading-relaxed text-lg font-medium bg-gradient-to-r from-slate-50 to-white p-6 rounded-xl border border-slate-200">
+                  <p className="text-slate-700 leading-relaxed text-sm sm:text-base lg:text-lg font-medium bg-gradient-to-r from-slate-50 to-white p-4 sm:p-6 rounded-xl border border-slate-200">
                     {lang === "en" ? product.description2 : product.description}
                   </p>
                 </div>
@@ -375,55 +381,33 @@ export default function ProductPageClient({
         </div>
       </div>
 
-      {/* Produits similaires avec animations premium */}
+      {/* Produits similaires avec animations premium - RESPONSIVE */}
       {similarProducts.length > 0 && (
-        <div className="mt-24">
-          <Separator className="mb-16 bg-gradient-to-r from-transparent via-slate-300 to-transparent h-px" />
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-amber-700 bg-clip-text text-transparent mb-6">
+        <div className="mt-12 sm:mt-16 lg:mt-24">
+          <Separator className="mb-8 sm:mb-12 lg:mb-16 bg-gradient-to-r from-transparent via-slate-300 to-transparent h-px" />
+          <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-amber-700 bg-clip-text text-transparent mb-4 sm:mb-6">
               {dict?.products?.similarProducts || "Produits similaires"}
             </h2>
-            <p className="text-slate-600 max-w-3xl mx-auto text-lg leading-relaxed">
+            <p className="text-slate-600 max-w-3xl mx-auto text-sm sm:text-base lg:text-lg leading-relaxed px-4">
               {lang === "en"
                 ? "Discover other specimens from the same period or region that might interest you"
                 : "Découvrez d'autres spécimens de la même période ou région qui pourraient vous intéresser"}
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {similarProducts.slice(0, 4).map((similarProduct, index) => (
               <div
                 key={similarProduct.id}
                 className="transform transition-all duration-700 hover:scale-105 hover:-translate-y-3 hover:rotate-1"
-                style={{
-                  animationDelay: `${index * 150}ms`,
-                  animation: "fadeInUp 0.8s ease-out forwards",
-                }}
+                style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className="hover:shadow-2xl transition-shadow duration-500 rounded-2xl">
-                  <ProductCard
-                    product={similarProduct}
-                    lang={lang}
-                    dict={dict}
-                  />
-                </div>
+                <ProductCard product={similarProduct} lang={lang} dict={dict} />
               </div>
             ))}
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(40px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-      `}</style>
     </div>
   );
 }
