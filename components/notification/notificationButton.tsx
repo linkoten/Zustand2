@@ -121,7 +121,7 @@ export function NotificationButton({
     isCompact?: boolean;
   }) => (
     <div
-      className={`group relative p-3 sm:p-4 transition-all duration-200 hover:bg-slate-50 ${
+      className={`group relative p-2 sm:p-3 transition-all duration-200 hover:bg-slate-50 ${
         !notif.isRead
           ? "bg-gradient-to-r from-amber-50/50 to-orange-50/30 border-l-4 border-amber-400"
           : "bg-white"
@@ -129,16 +129,14 @@ export function NotificationButton({
     >
       {/* Badge non-lu */}
       {!notif.isRead && (
-        <div className="absolute top-2 right-2">
-          <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+        <div className="absolute top-1.5 right-1.5">
+          <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></div>
         </div>
       )}
 
-      <div className="flex gap-3">
+      <div className="flex gap-2 sm:gap-3">
         {/* Icône type */}
-        <div
-          className={`flex-shrink-0 ${isCompact ? "text-lg" : "text-xl"} mt-0.5`}
-        >
+        <div className={`flex-shrink-0 text-sm sm:text-base mt-0.5`}>
           {getNotificationIcon(notif.type)}
         </div>
 
@@ -146,16 +144,14 @@ export function NotificationButton({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
             <h4
-              className={`font-semibold text-slate-900 line-clamp-1 ${
-                isCompact ? "text-sm" : "text-base"
-              }`}
+              className={`font-medium text-slate-900 line-clamp-1 text-xs sm:text-sm`}
             >
               {notif.title}
             </h4>
             {!notif.isRead && (
               <Badge
                 variant="secondary"
-                className="bg-amber-100 text-amber-800 text-xs px-1.5 py-0.5 flex-shrink-0"
+                className="bg-amber-100 text-amber-800 text-xs px-1 py-0.5 flex-shrink-0"
               >
                 {dict?.notification?.new || "Nouveau"}
               </Badge>
@@ -163,17 +159,13 @@ export function NotificationButton({
           </div>
 
           <p
-            className={`text-slate-600 line-clamp-2 mb-2 ${
-              isCompact ? "text-xs" : "text-sm"
-            }`}
+            className={`text-slate-600 line-clamp-2 mb-1.5 text-xs leading-relaxed`}
           >
             {notif.message}
           </p>
 
           <div className="flex items-center justify-between">
-            <span
-              className={`text-slate-400 ${isCompact ? "text-xs" : "text-sm"}`}
-            >
+            <span className="text-slate-400 text-xs">
               {formatNotificationDate(notif.createdAt)}
             </span>
 
@@ -187,9 +179,9 @@ export function NotificationButton({
                     e.stopPropagation();
                     handleMarkAsRead(notif.id);
                   }}
-                  className="h-6 w-6 p-0 hover:bg-green-100 hover:text-green-700"
+                  className="h-5 w-5 p-0 hover:bg-green-100 hover:text-green-700"
                 >
-                  <Check className="w-3 h-3" />
+                  <Check className="w-2.5 h-2.5" />
                 </Button>
               )}
 
@@ -198,11 +190,11 @@ export function NotificationButton({
                   asChild
                   size="sm"
                   variant="ghost"
-                  className="h-6 w-6 p-0 hover:bg-blue-100 hover:text-blue-700"
+                  className="h-5 w-5 p-0 hover:bg-blue-100 hover:text-blue-700"
                   onClick={() => setOpen(false)}
                 >
                   <Link href={notif.link}>
-                    <ExternalLink className="w-3 h-3" />
+                    <ExternalLink className="w-2.5 h-2.5" />
                   </Link>
                 </Button>
               )}
@@ -218,22 +210,22 @@ export function NotificationButton({
   }: {
     isMobile?: boolean;
   }) => (
-    // ✅ CORRECTION PRINCIPALE : Largeur adaptative pour desktop
+    // ✅ Largeur adaptative réduite pour accommoder les polices plus petites
     <div
-      className={`${isMobile ? "w-full" : "w-80 sm:w-96 lg:w-[420px] xl:w-[480px]"}`}
+      className={`${isMobile ? "w-full" : "w-72 sm:w-80 lg:w-[360px] xl:w-[400px]"}`}
     >
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b border-slate-200 p-4 sm:p-6">
+      <div className="sticky top-0 bg-white border-b border-slate-200 p-3 sm:p-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full">
-              <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full">
+              <Bell className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+              <h3 className="text-sm sm:text-base font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                 {dict?.notification?.title || "Notifications"}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-500">
+              <p className="text-xs text-slate-500">
                 {unreadCount > 0
                   ? `${unreadCount} ${dict?.notification?.unread || "non lues"}`
                   : dict?.notification?.allRead || "Tout lu"}
@@ -242,15 +234,15 @@ export function NotificationButton({
           </div>
 
           {/* Actions header */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1 flex-shrink-0">
             {unreadCount > 0 && (
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={handleMarkAllAsRead}
-                className="text-xs hover:bg-green-50 hover:text-green-700 whitespace-nowrap"
+                className="text-xs hover:bg-green-50 hover:text-green-700 whitespace-nowrap h-7 px-2"
               >
-                <Check className="w-3 h-3 mr-1" />
+                <Check className="w-2.5 h-2.5 mr-1" />
                 <span className="hidden lg:inline">
                   {dict?.notification?.markAllAsRead || "Tout marquer"}
                 </span>
@@ -263,9 +255,9 @@ export function NotificationButton({
                 size="sm"
                 variant="ghost"
                 onClick={() => setOpen(false)}
-                className="hover:bg-red-50 hover:text-red-700 flex-shrink-0"
+                className="hover:bg-red-50 hover:text-red-700 flex-shrink-0 h-7 w-7 p-0"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3 h-3" />
               </Button>
             )}
           </div>
@@ -274,18 +266,18 @@ export function NotificationButton({
 
       {/* Liste des notifications */}
       <div
-        className={`${isMobile ? "max-h-[60vh]" : "max-h-96"} overflow-hidden`}
+        className={`${isMobile ? "max-h-[60vh]" : "max-h-80"} overflow-hidden`}
       >
         <ScrollArea className="h-full">
           {notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mb-4">
-                <Bell className="w-8 h-8 text-slate-400" />
+            <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mb-3">
+                <Bell className="w-6 h-6 text-slate-400" />
               </div>
-              <h4 className="text-lg font-semibold text-slate-700 mb-2">
+              <h4 className="text-sm font-semibold text-slate-700 mb-2">
                 {dict?.notification?.empty || "Aucune notification"}
               </h4>
-              <p className="text-sm text-slate-500 max-w-xs leading-relaxed">
+              <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
                 {dict?.notification?.emptyDescription ||
                   "Vous recevrez ici toutes vos notifications importantes"}
               </p>
@@ -306,16 +298,16 @@ export function NotificationButton({
 
       {/* Footer */}
       {notifications.length > 0 && (
-        <div className="border-t border-slate-200 p-3 sm:p-4 bg-slate-50">
+        <div className="border-t border-slate-200 p-2 sm:p-3 bg-slate-50">
           <Button
             asChild
             variant="ghost"
-            className="w-full justify-center text-sm font-medium hover:bg-slate-100"
+            className="w-full justify-center text-xs font-medium hover:bg-slate-100 h-7"
             onClick={() => setOpen(false)}
           >
             <Link href={`/${lang}/notifications`}>
               {dict?.notification?.viewAll || "Voir toutes les notifications"}
-              <ExternalLink className="w-4 h-4 ml-2" />
+              <ExternalLink className="w-3 h-3 ml-1" />
             </Link>
           </Button>
         </div>
@@ -337,7 +329,7 @@ export function NotificationButton({
             >
               <Bell className="w-5 h-5 text-slate-600" />
               {unreadCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs flex items-center justify-center p-0 animate-pulse">
+                <Badge className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs flex items-center justify-center p-0 animate-pulse">
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </Badge>
               )}
@@ -347,11 +339,9 @@ export function NotificationButton({
             className="p-0 border-0 shadow-2xl bg-white rounded-xl overflow-hidden"
             align="end"
             sideOffset={8}
-            // ✅ CORRECTION : Ajout de avoidCollisions et collisionPadding
             avoidCollisions={true}
             collisionPadding={20}
-            // ✅ CORRECTION : Force la largeur minimale
-            style={{ minWidth: "320px" }}
+            style={{ minWidth: "288px" }}
           >
             <NotificationContent />
           </PopoverContent>
@@ -368,13 +358,13 @@ export function NotificationButton({
             >
               <Bell className="w-5 h-5 text-slate-600" />
               {unreadCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs flex items-center justify-center p-0 animate-pulse">
+                <Badge className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs flex items-center justify-center p-0 animate-pulse">
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </Badge>
               )}
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="p-0 w-full sm:w-96 bg-white">
+          <SheetContent side="right" className="p-0 w-full sm:w-80 bg-white">
             <NotificationContent isMobile />
           </SheetContent>
         </Sheet>
