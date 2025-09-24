@@ -100,7 +100,7 @@
     "clientMsgTitle": "Message au client",
     "clientMsgDesc": "Message qui sera envoyé au client concernant cette demande",
     "clientMsgPlaceholder": "Rédigez votre message au client...",
-    "adminMsgTitle": "Message de l'équipe FossilShop",
+    "adminMsgTitle": "Message de l'équipe Paleolitho",
     "receivedLabel": "Reçu le",
     "atLabel": "à",
     "infoSectionTitle": "Informations sur la demande",
@@ -189,7 +189,7 @@
     "signup": "S'inscrire"
   },
   "home": {
-    "siteTitle": "FossilShop - Paléontologie & Fossiles",
+    "siteTitle": "Paleolitho - Paléontologie & Fossiles",
     "siteDescription": "Découvrez notre collection de fossiles authentiques et explorez l'univers fascinant de la paléontologie",
     "footerCopyright": "Tous droits réservés.",
     "heroTitle": "Paleolitho",
@@ -335,7 +335,7 @@
       "deleteSuccess": "Article supprimé avec succès",
       "deleteError": "Erreur lors de la suppression de l'article"
     },
-    "title": "Blog FossilShop",
+    "title": "Blog Paleolitho",
     "subtitle": "Découvrez nos articles sur la paléontologie et l'univers des fossiles",
     "create": "Nouvel article",
     "exploreCategories": "Explorez nos catégories",
@@ -606,7 +606,7 @@
   "dashboard": {
     "greeting": "Bonjour",
     "user": "Utilisateur",
-    "intro": "Voici un aperçu de votre activité sur FossilShop",
+    "intro": "Voici un aperçu de votre activité sur Paleolitho",
     "favorites": "Favoris",
     "savedFossils": "Fossiles sauvegardés",
     "requests": "Demandes",
