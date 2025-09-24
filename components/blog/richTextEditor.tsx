@@ -87,6 +87,10 @@ export default function RichTextEditor({
   const [addRowsDialog, setAddRowsDialog] = useState(false);
   const [addColsDialog, setAddColsDialog] = useState(false);
   const [cellColorDialog, setCellColorDialog] = useState(false);
+  const [headerCustomizationDialog, setHeaderCustomizationDialog] =
+    useState(false);
+  const [headerText, setHeaderText] = useState("");
+  const [headerColor, setHeaderColor] = useState("#f8f9fa");
 
   // ✅ États pour les formulaires
   const [tableRows, setTableRows] = useState(3);
@@ -197,6 +201,28 @@ export default function RichTextEditor({
     },
     immediatelyRender: false,
   });
+
+  // ✅ NOUVEAU : Fonction pour personnaliser l'en-tête
+  const customizeTableHeader = useCallback(() => {
+    if (editor && headerText) {
+      // Insérer le texte dans la cellule d'en-tête
+      editor.chain().focus().insertContent(headerText).run();
+
+      // Appliquer la couleur de fond à la cellule
+      editor
+        .chain()
+        .focus()
+        .setCellAttribute(
+          "style",
+          `background-color: ${headerColor}; font-weight: bold; text-align: center;`
+        )
+        .run();
+
+      setHeaderCustomizationDialog(false);
+      setHeaderText("");
+      setHeaderColor("#f8f9fa");
+    }
+  }, [editor, headerText, headerColor]);
 
   // ✅ Fonctions pour tableaux avec nombre personnalisé
   const insertCustomTable = useCallback(() => {
@@ -417,7 +443,7 @@ export default function RichTextEditor({
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">
-      {/* ✅ Barre d'outils sticky corrigée */}
+      {/* ✅ Barre d'outils sticky */}
       <div className="sticky top-16 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="bg-gray-50 p-2 flex flex-wrap gap-1 overflow-x-auto">
           {/* Mise en forme du texte */}
@@ -780,7 +806,7 @@ export default function RichTextEditor({
 
           <Separator orientation="vertical" className="h-8" />
 
-          {/* ✅ Tableau amélioré */}
+          {/* ✅ Tableau amélioré avec personnalisation d'en-têtes */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -839,6 +865,192 @@ export default function RichTextEditor({
                   </div>
                 </DialogContent>
               </Dialog>
+
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Personnaliser les en-têtes</DropdownMenuLabel>
+
+              {/* ✅ NOUVEAU : Personnalisation des en-têtes */}
+              <Dialog
+                open={headerCustomizationDialog}
+                onOpenChange={setHeaderCustomizationDialog}
+              >
+                <DialogTrigger asChild>
+                  <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    disabled={!editor.isActive("table")}
+                  >
+                    <span className="mr-2">🎨</span>
+                    Personnaliser en-tête
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      Personnaliser l&apos;en-tête de tableau
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="headerText">
+                        Texte de l&apos;en-tête
+                      </Label>
+                      <Input
+                        id="headerText"
+                        value={headerText}
+                        onChange={(e) => setHeaderText(e.target.value)}
+                        placeholder="Ex: Nom, Âge, Prix..."
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="headerColor">Couleur de fond</Label>
+                      <div className="flex gap-2 items-center">
+                        <input
+                          type="color"
+                          id="headerColor"
+                          value={headerColor}
+                          onChange={(e) => setHeaderColor(e.target.value)}
+                          className="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+                        />
+                        <Input
+                          value={headerColor}
+                          onChange={(e) => setHeaderColor(e.target.value)}
+                          placeholder="#f8f9fa"
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Couleurs prédéfinies */}
+                    <div>
+                      <Label>Couleurs prédéfinies</Label>
+                      <div className="grid grid-cols-8 gap-2 mt-2">
+                        {[
+                          "#f8f9fa", // Gris clair
+                          "#e3f2fd", // Bleu clair
+                          "#e8f5e8", // Vert clair
+                          "#fff3e0", // Orange clair
+                          "#fce4ec", // Rose clair
+                          "#f3e5f5", // Violet clair
+                          "#e0f2f1", // Teal clair
+                          "#fff8e1", // Jaune clair
+                        ].map((color) => (
+                          <button
+                            key={color}
+                            className="w-8 h-8 rounded border border-gray-300 hover:scale-110 transition-transform"
+                            style={{ backgroundColor: color }}
+                            onClick={() => setHeaderColor(color)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Aperçu */}
+                    <div>
+                      <Label>Aperçu</Label>
+                      <div
+                        className="mt-2 p-3 border rounded text-center font-bold"
+                        style={{ backgroundColor: headerColor }}
+                      >
+                        {headerText || "Votre en-tête"}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={customizeTableHeader}
+                        disabled={!headerText.trim()}
+                        className="flex-1"
+                      >
+                        Appliquer
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setHeaderCustomizationDialog(false);
+                          setHeaderText("");
+                          setHeaderColor("#f8f9fa");
+                        }}
+                      >
+                        Annuler
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* ✅ Styles d'en-têtes rapides */}
+              <DropdownMenuItem
+                onClick={() => {
+                  if (editor) {
+                    editor
+                      .chain()
+                      .focus()
+                      .setCellAttribute(
+                        "style",
+                        "background-color: #3b82f6; color: white; font-weight: bold; text-align: center;"
+                      )
+                      .run();
+                  }
+                }}
+                disabled={!editor.isActive("table")}
+              >
+                🔵 En-tête bleu
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => {
+                  if (editor) {
+                    editor
+                      .chain()
+                      .focus()
+                      .setCellAttribute(
+                        "style",
+                        "background-color: #10b981; color: white; font-weight: bold; text-align: center;"
+                      )
+                      .run();
+                  }
+                }}
+                disabled={!editor.isActive("table")}
+              >
+                🟢 En-tête vert
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => {
+                  if (editor) {
+                    editor
+                      .chain()
+                      .focus()
+                      .setCellAttribute(
+                        "style",
+                        "background-color: #ef4444; color: white; font-weight: bold; text-align: center;"
+                      )
+                      .run();
+                  }
+                }}
+                disabled={!editor.isActive("table")}
+              >
+                🔴 En-tête rouge
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => {
+                  if (editor) {
+                    editor
+                      .chain()
+                      .focus()
+                      .setCellAttribute(
+                        "style",
+                        "background-color: #f59e0b; color: white; font-weight: bold; text-align: center;"
+                      )
+                      .run();
+                  }
+                }}
+                disabled={!editor.isActive("table")}
+              >
+                🟡 En-tête orange
+              </DropdownMenuItem>
 
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Modifier le tableau</DropdownMenuLabel>

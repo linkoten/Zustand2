@@ -16,7 +16,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { X, Plus, Save, Eye, Clock } from "lucide-react";
+import { X, Plus, Save, Eye, Clock, Minimize, Maximize } from "lucide-react";
 import { BlogCategory, BlogStatus, BlogTag } from "@/lib/generated/prisma";
 
 import { toast } from "sonner";
@@ -47,6 +47,8 @@ export default function CreateArticleForm() {
   const [availableTags, setAvailableTags] = useState<BlogTag[]>([]);
   const [newTagName, setNewTagName] = useState("");
   const [isCreatingTag, setIsCreatingTag] = useState(false);
+
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Données du formulaire
   const [formData, setFormData] = useState({
@@ -89,6 +91,27 @@ export default function CreateArticleForm() {
       }));
     }
   }, [formData.title, autoSlug]);
+
+  // ✅ NOUVEAU : Gérer le mode plein écran
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+
+    if (isFullscreen) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [isFullscreen]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -177,6 +200,54 @@ export default function CreateArticleForm() {
 
   const estimatedReadTime = estimateReadTime(formData.content);
 
+  // ✅ NOUVEAU : Composant éditeur plein écran
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-50 bg-white flex flex-col">
+        {/* Header plein écran */}
+        <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl font-semibold">
+              {formData.title || "Nouvel article"}
+            </h2>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Clock className="w-4 h-4" />
+              <span>{estimatedReadTime} min</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => handleSubmit(BlogStatus.DRAFT)}
+              disabled={isLoading}
+              variant="outline"
+              size="sm"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Sauvegarder
+            </Button>
+            <Button
+              onClick={() => setIsFullscreen(false)}
+              variant="ghost"
+              size="sm"
+              title="Quitter le mode plein écran (Echap)"
+            >
+              <Minimize className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Éditeur plein écran */}
+        <div className="flex-1 overflow-hidden">
+          <RichTextEditor
+            content={formData.content}
+            onChange={(content) => handleInputChange("content", content)}
+            placeholder="Commencez à écrire votre article..."
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -236,9 +307,20 @@ export default function CreateArticleForm() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Contenu de l&apos;article</CardTitle>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Clock className="w-4 h-4" />
-                  <span>{estimatedReadTime} min de lecture</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Clock className="w-4 h-4" />
+                    <span>{estimatedReadTime} min de lecture</span>
+                  </div>
+                  {/* ✅ NOUVEAU : Bouton plein écran */}
+                  <Button
+                    onClick={() => setIsFullscreen(true)}
+                    variant="outline"
+                    size="sm"
+                    title="Mode plein écran"
+                  >
+                    <Maximize className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             </CardHeader>
