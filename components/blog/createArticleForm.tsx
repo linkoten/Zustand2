@@ -18,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { X, Plus, Save, Eye, Clock, Minimize, Maximize } from "lucide-react";
 import { BlogCategory, BlogStatus, BlogTag } from "@/lib/generated/prisma";
-
 import { toast } from "sonner";
 import RichTextEditor from "./richTextEditor";
 
@@ -324,12 +323,15 @@ export default function CreateArticleForm() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <RichTextEditor
-                content={formData.content}
-                onChange={(content) => handleInputChange("content", content)}
-                placeholder="Commencez à écrire votre article..."
-              />
+            <CardContent className="p-0">
+              {/* ✅ Conteneur avec hauteur fixe */}
+              <div className="h-[600px]">
+                <RichTextEditor
+                  content={formData.content}
+                  onChange={(content) => handleInputChange("content", content)}
+                  placeholder="Commencez à écrire votre article..."
+                />
+              </div>
             </CardContent>
           </Card>
 

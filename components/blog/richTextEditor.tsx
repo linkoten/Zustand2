@@ -53,6 +53,7 @@ import {
   Palette,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -208,15 +209,23 @@ export default function RichTextEditor({
       // D'abord, insérer le texte
       editor.chain().focus().insertContent(headerText).run();
 
-      // Ensuite, appliquer le style à la cellule actuelle
-      const currentAttributes = editor.getAttributes("tableCell");
-      const existingStyle = currentAttributes.style || "";
+      // Construire le style complet avec !important pour forcer l'application
+      const textColor = [
+        "#3b82f6",
+        "#10b981",
+        "#ef4444",
+        "#f59e0b",
+        "#a855f7",
+        "#06b6d4",
+        "#84cc16",
+        "#f97316",
+        "#000000",
+        "#333333",
+      ].includes(headerColor)
+        ? "white"
+        : "inherit";
 
-      // Combiner les styles existants avec les nouveaux
-      const newStyle =
-        `${existingStyle}; background-color: ${headerColor}; font-weight: bold; text-align: center; color: ${headerColor === "#000000" || headerColor === "#333333" ? "white" : "inherit"};`
-          .replace(/;+/g, ";")
-          .replace(/^;|;$/g, "");
+      const newStyle = `background-color: ${headerColor} !important; font-weight: bold !important; text-align: center !important; color: ${textColor} !important;`;
 
       editor.chain().focus().setCellAttribute("style", newStyle).run();
 
@@ -266,26 +275,12 @@ export default function RichTextEditor({
   const setCellBackgroundColor = useCallback(
     (color: string) => {
       if (editor) {
-        const currentAttributes = editor.getAttributes("tableCell");
-        const existingStyle = currentAttributes.style || "";
-
-        // Supprimer l'ancienne couleur de fond et ajouter la nouvelle
-        const cleanedStyle = existingStyle.replace(
-          /background-color:\s*[^;]+;?/gi,
-          ""
-        );
-        const newStyle =
-          color === "transparent"
-            ? cleanedStyle
-            : `${cleanedStyle}; background-color: ${color};`
-                .replace(/;+/g, ";")
-                .replace(/^;|;$/g, "");
-
-        editor
-          .chain()
-          .focus()
-          .setCellAttribute("style", newStyle || null)
-          .run();
+        if (color === "transparent") {
+          editor.chain().focus().setCellAttribute("style", null).run();
+        } else {
+          const newStyle = `background-color: ${color} !important;`;
+          editor.chain().focus().setCellAttribute("style", newStyle).run();
+        }
         setCellColorDialog(false);
       }
     },
@@ -295,7 +290,6 @@ export default function RichTextEditor({
   // ✅ Fonction pour convertir une cellule en en-tête
   const convertToTableHeader = useCallback(() => {
     if (editor) {
-      // Convertir la cellule courante en en-tête
       editor.chain().focus().toggleHeaderCell().run();
     }
   }, [editor]);
@@ -1348,8 +1342,13 @@ export default function RichTextEditor({
       </div>
 
       {/* ✅ Zone d'édition avec scroll */}
-      <ScrollArea className="flex-1">
-        <EditorContent editor={editor} className="min-h-full" />
+      <ScrollArea className="flex-1 h-0">
+        <div className="p-4">
+          <EditorContent
+            editor={editor}
+            className="prose prose-lg max-w-none focus:outline-none min-h-[500px]"
+          />
+        </div>
       </ScrollArea>
     </div>
   );

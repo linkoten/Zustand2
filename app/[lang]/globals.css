@@ -366,7 +366,7 @@
   margin: 0 !important;
 }
 
-/* ✅ Styles pour les tableaux */
+/* ✅ Styles pour les tableaux - AMÉLIORÉS */
 .ProseMirror table {
   border-collapse: collapse !important;
   table-layout: fixed !important;
@@ -385,9 +385,48 @@
   position: relative !important;
 }
 
+/* ✅ NOUVEAU : Suppression du style par défaut des en-têtes */
 .ProseMirror table th {
-  background-color: #f3f4f6 !important;
+  background-color: transparent !important;
   font-weight: 600 !important;
+}
+
+/* ✅ NOUVEAU : Force l'application des styles inline pour les couleurs */
+.ProseMirror table th[style*="background-color"],
+.ProseMirror table td[style*="background-color"] {
+  background-color: var(--cell-bg-color) !important;
+}
+
+/* ✅ NOUVEAU : Support des couleurs personnalisées avec attributs CSS */
+.ProseMirror table th[style],
+.ProseMirror table td[style] {
+  /* Les styles inline auront la priorité */
+}
+
+/* ✅ NOUVEAU : Désactive les styles par défaut qui interfèrent */
+.ProseMirror .tableWrapper table th {
+  background-color: transparent !important;
+}
+
+/* ✅ NOUVEAU : Styles spécifiques pour les en-têtes colorés */
+.ProseMirror table th[style*="background-color: #3b82f6"] {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}
+
+.ProseMirror table th[style*="background-color: #10b981"] {
+  background-color: #10b981 !important;
+  color: white !important;
+}
+
+.ProseMirror table th[style*="background-color: #ef4444"] {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+.ProseMirror table th[style*="background-color: #f59e0b"] {
+  background-color: #f59e0b !important;
+  color: white !important;
 }
 
 .ProseMirror table .selectedCell:after {
@@ -424,6 +463,22 @@
   border: 1px solid #d1d5db !important;
   border-radius: 0.375rem !important;
   background-color: #f9fafb !important;
+}
+
+/* ✅ NOUVEAU : Styles pour assurer la visibilité des couleurs de surlignage */
+.ProseMirror mark[data-color] {
+  background-color: var(--highlight-color) !important;
+}
+
+.ProseMirror mark[style*="background-color"] {
+  /* Les styles inline de surlignage ont la priorité */
+}
+
+/* ✅ NOUVEAU : Styles pour les cellules avec couleurs personnalisées */
+.ProseMirror table td[style*="background-color"],
+.ProseMirror table th[style*="background-color"] {
+  /* Assure que les couleurs inline sont respectées */
+  background-color: inherit !important;
 }
 
 /* Responsive design pour le blog content */
