@@ -209,23 +209,15 @@ export default function RichTextEditor({
       // D'abord, insérer le texte
       editor.chain().focus().insertContent(headerText).run();
 
-      // Construire le style complet avec !important pour forcer l'application
-      const textColor = [
-        "#3b82f6",
-        "#10b981",
-        "#ef4444",
-        "#f59e0b",
-        "#a855f7",
-        "#06b6d4",
-        "#84cc16",
-        "#f97316",
-        "#000000",
-        "#333333",
-      ].includes(headerColor)
-        ? "white"
-        : "inherit";
+      // Ensuite, appliquer le style à la cellule actuelle
+      const currentAttributes = editor.getAttributes("tableCell");
+      const existingStyle = currentAttributes.style || "";
 
-      const newStyle = `background-color: ${headerColor} !important; font-weight: bold !important; text-align: center !important; color: ${textColor} !important;`;
+      // Combiner les styles existants avec les nouveaux
+      const newStyle =
+        `${existingStyle}; background-color: ${headerColor}; font-weight: bold; text-align: center; color: ${headerColor === "#000000" || headerColor === "#333333" ? "white" : "inherit"};`
+          .replace(/;+/g, ";")
+          .replace(/^;|;$/g, "");
 
       editor.chain().focus().setCellAttribute("style", newStyle).run();
 
@@ -275,12 +267,26 @@ export default function RichTextEditor({
   const setCellBackgroundColor = useCallback(
     (color: string) => {
       if (editor) {
-        if (color === "transparent") {
-          editor.chain().focus().setCellAttribute("style", null).run();
-        } else {
-          const newStyle = `background-color: ${color} !important;`;
-          editor.chain().focus().setCellAttribute("style", newStyle).run();
-        }
+        const currentAttributes = editor.getAttributes("tableCell");
+        const existingStyle = currentAttributes.style || "";
+
+        // Supprimer l'ancienne couleur de fond et ajouter la nouvelle
+        const cleanedStyle = existingStyle.replace(
+          /background-color:\s*[^;]+;?/gi,
+          ""
+        );
+        const newStyle =
+          color === "transparent"
+            ? cleanedStyle
+            : `${cleanedStyle}; background-color: ${color};`
+                .replace(/;+/g, ";")
+                .replace(/^;|;$/g, "");
+
+        editor
+          .chain()
+          .focus()
+          .setCellAttribute("style", newStyle || null)
+          .run();
         setCellColorDialog(false);
       }
     },
@@ -290,6 +296,7 @@ export default function RichTextEditor({
   // ✅ Fonction pour convertir une cellule en en-tête
   const convertToTableHeader = useCallback(() => {
     if (editor) {
+      // Convertir la cellule courante en en-tête
       editor.chain().focus().toggleHeaderCell().run();
     }
   }, [editor]);
