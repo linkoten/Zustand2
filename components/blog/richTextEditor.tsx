@@ -23,6 +23,8 @@ import { common, createLowlight } from "lowlight";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Bold,
   Italic,
@@ -46,6 +48,8 @@ import {
   Indent,
   Outdent,
   Columns,
+  Hash,
+  Palette,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -54,7 +58,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const lowlight = createLowlight(common);
 
@@ -63,18 +75,25 @@ interface RichTextEditorProps {
   onChange: (content: string) => void;
   placeholder?: string;
 }
+
 export default function RichTextEditor({
   content,
   onChange,
 }: RichTextEditorProps) {
-  // ✅ État pour gérer le SSR
   const [isMounted, setIsMounted] = useState(false);
 
+  // ✅ États pour les dialogues
   const [tableDialog, setTableDialog] = useState(false);
+  const [addRowsDialog, setAddRowsDialog] = useState(false);
+  const [addColsDialog, setAddColsDialog] = useState(false);
+  const [cellColorDialog, setCellColorDialog] = useState(false);
+
+  // ✅ États pour les formulaires
   const [tableRows, setTableRows] = useState(3);
   const [tableCols, setTableCols] = useState(3);
+  const [rowsToAdd, setRowsToAdd] = useState(1);
+  const [colsToAdd, setColsToAdd] = useState(1);
 
-  // ✅ S'assurer que le composant est monté côté client
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -82,9 +101,24 @@ export default function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        codeBlock: false, // On utilise CodeBlockLowlight à la place
+        codeBlock: false,
+        // ✅ Configuration des listes avec niveaux multiples
+        bulletList: {
+          HTMLAttributes: {
+            class: "list-disc list-outside ml-4",
+          },
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: "list-decimal list-outside ml-4",
+          },
+        },
+        listItem: {
+          HTMLAttributes: {
+            class: "mb-1",
+          },
+        },
       }),
-      // ✅ Nouvelles extensions de formatage
       Underline,
       Subscript,
       Superscript,
@@ -96,7 +130,6 @@ export default function RichTextEditor({
       FontFamily.configure({
         types: ["textStyle"],
       }),
-      // ✅ Code avec coloration syntaxique
       CodeBlockLowlight.configure({
         lowlight,
         HTMLAttributes: {
@@ -165,7 +198,7 @@ export default function RichTextEditor({
     immediatelyRender: false,
   });
 
-  // ✅ Fonctions pour tableaux multiples
+  // ✅ Fonctions pour tableaux avec nombre personnalisé
   const insertCustomTable = useCallback(() => {
     if (editor) {
       editor
@@ -181,28 +214,42 @@ export default function RichTextEditor({
     }
   }, [editor, tableRows, tableCols]);
 
-  const addMultipleRows = useCallback(
-    (count: number) => {
+  const addCustomRows = useCallback(() => {
+    if (editor) {
+      for (let i = 0; i < rowsToAdd; i++) {
+        editor.chain().focus().addRowAfter().run();
+      }
+      setAddRowsDialog(false);
+      setRowsToAdd(1);
+    }
+  }, [editor, rowsToAdd]);
+
+  const addCustomColumns = useCallback(() => {
+    if (editor) {
+      for (let i = 0; i < colsToAdd; i++) {
+        editor.chain().focus().addColumnAfter().run();
+      }
+      setAddColsDialog(false);
+      setColsToAdd(1);
+    }
+  }, [editor, colsToAdd]);
+
+  // ✅ Fonction pour colorer les cellules de tableau
+  const setCellBackgroundColor = useCallback(
+    (color: string) => {
       if (editor) {
-        for (let i = 0; i < count; i++) {
-          editor.chain().focus().addRowAfter().run();
-        }
+        editor
+          .chain()
+          .focus()
+          .setCellAttribute("style", `background-color: ${color}`)
+          .run();
+        setCellColorDialog(false);
       }
     },
     [editor]
   );
 
-  const addMultipleColumns = useCallback(
-    (count: number) => {
-      if (editor) {
-        for (let i = 0; i < count; i++) {
-          editor.chain().focus().addColumnAfter().run();
-        }
-      }
-    },
-    [editor]
-  );
-
+  // Autres fonctions existantes...
   const addImage = useCallback(() => {
     const url = window.prompt("URL de l'image:");
     if (url && editor) {
@@ -245,7 +292,6 @@ export default function RichTextEditor({
     [editor]
   );
 
-  // ✅ Fonctions pour les tableaux
   const insertTable = useCallback(() => {
     if (editor) {
       editor
@@ -298,14 +344,11 @@ export default function RichTextEditor({
     }
   }, [editor]);
 
-  // ✅ Fonctions pour l'indentation
   const indentContent = useCallback(() => {
     if (editor) {
-      // Pour les listes, on utilise la fonction native
       if (editor.isActive("bulletList") || editor.isActive("orderedList")) {
         editor.chain().focus().sinkListItem("listItem").run();
       } else {
-        // Pour le texte normal, on ajoute une marge
         editor
           .chain()
           .focus()
@@ -319,11 +362,9 @@ export default function RichTextEditor({
 
   const outdentContent = useCallback(() => {
     if (editor) {
-      // Pour les listes, on utilise la fonction native
       if (editor.isActive("bulletList") || editor.isActive("orderedList")) {
         editor.chain().focus().liftListItem("listItem").run();
       } else {
-        // Pour le texte normal, on retire la marge
         editor
           .chain()
           .focus()
@@ -335,7 +376,6 @@ export default function RichTextEditor({
     }
   }, [editor]);
 
-  // ✅ Fonction pour insérer des colonnes (layout)
   const insertColumns = useCallback(() => {
     if (editor) {
       const columnsHtml = `
@@ -352,13 +392,12 @@ export default function RichTextEditor({
     }
   }, [editor]);
 
-  // ✅ Afficher un loader pendant que le composant se monte
   if (!isMounted || !editor) {
     return (
       <div className="border border-gray-200 rounded-lg overflow-hidden">
         <div className="bg-gray-50 border-b border-gray-200 p-2">
           <div className="flex gap-1">
-            {Array.from({ length: 25 }).map((_, i) => (
+            {Array.from({ length: 30 }).map((_, i) => (
               <div
                 key={i}
                 className="w-8 h-8 bg-gray-200 rounded animate-pulse"
@@ -378,247 +417,301 @@ export default function RichTextEditor({
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">
-      {/* ✅ Barre d'outils sticky */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
-        <div className="bg-gray-50 p-2 flex flex-wrap gap-1">
+      {/* ✅ Barre d'outils sticky corrigée */}
+      <div className="sticky top-16 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div className="bg-gray-50 p-2 flex flex-wrap gap-1 overflow-x-auto">
           {/* Mise en forme du texte */}
-          <Button
-            type="button"
-            variant={editor.isActive("bold") ? "default" : "ghost"}
-            size="sm"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            title="Gras (Ctrl+B)"
-          >
-            <Bold className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              type="button"
+              variant={editor.isActive("bold") ? "default" : "ghost"}
+              size="sm"
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              title="Gras (Ctrl+B)"
+            >
+              <Bold className="w-4 h-4" />
+            </Button>
 
-          <Button
-            type="button"
-            variant={editor.isActive("italic") ? "default" : "ghost"}
-            size="sm"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            title="Italique (Ctrl+I)"
-          >
-            <Italic className="w-4 h-4" />
-          </Button>
+            <Button
+              type="button"
+              variant={editor.isActive("italic") ? "default" : "ghost"}
+              size="sm"
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              title="Italique (Ctrl+I)"
+            >
+              <Italic className="w-4 h-4" />
+            </Button>
 
-          {/* ✅ NOUVEAU : Souligné */}
-          <Button
-            type="button"
-            variant={editor.isActive("underline") ? "default" : "ghost"}
-            size="sm"
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            title="Souligné (Ctrl+U)"
-          >
-            <Strikethrough className="w-4 h-4" />
-          </Button>
+            <Button
+              type="button"
+              variant={editor.isActive("underline") ? "default" : "ghost"}
+              size="sm"
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              title="Souligné (Ctrl+U)"
+            >
+              <span className="text-sm underline">U</span>
+            </Button>
 
-          <Button
-            type="button"
-            variant={editor.isActive("strike") ? "default" : "ghost"}
-            size="sm"
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            title="Barré"
-          >
-            <Strikethrough className="w-4 h-4" />
-          </Button>
+            <Button
+              type="button"
+              variant={editor.isActive("strike") ? "default" : "ghost"}
+              size="sm"
+              onClick={() => editor.chain().focus().toggleStrike().run()}
+              title="Barré"
+            >
+              <Strikethrough className="w-4 h-4" />
+            </Button>
 
-          <Button
-            type="button"
-            variant={editor.isActive("code") ? "default" : "ghost"}
-            size="sm"
-            onClick={() => editor.chain().focus().toggleCode().run()}
-            title="Code inline"
-          >
-            <Code className="w-4 h-4" />
-          </Button>
-
-          <Separator orientation="vertical" className="h-8" />
-
-          {/* ✅ NOUVEAU : Exposant/Indice */}
-          <Button
-            type="button"
-            variant={editor.isActive("superscript") ? "default" : "ghost"}
-            size="sm"
-            onClick={() => editor.chain().focus().toggleSuperscript().run()}
-            title="Exposant"
-          >
-            <sup className="text-xs">x²</sup>
-          </Button>
-
-          <Button
-            type="button"
-            variant={editor.isActive("subscript") ? "default" : "ghost"}
-            size="sm"
-            onClick={() => editor.chain().focus().toggleSubscript().run()}
-            title="Indice"
-          >
-            <sub className="text-xs">x₂</sub>
-          </Button>
+            <Button
+              type="button"
+              variant={editor.isActive("code") ? "default" : "ghost"}
+              size="sm"
+              onClick={() => editor.chain().focus().toggleCode().run()}
+              title="Code inline"
+            >
+              <Code className="w-4 h-4" />
+            </Button>
+          </div>
 
           <Separator orientation="vertical" className="h-8" />
 
-          {/* ✅ NOUVEAU : Couleurs et surlignage */}
+          {/* Exposant/Indice */}
+          <div className="flex gap-1">
+            <Button
+              type="button"
+              variant={editor.isActive("superscript") ? "default" : "ghost"}
+              size="sm"
+              onClick={() => editor.chain().focus().toggleSuperscript().run()}
+              title="Exposant"
+            >
+              <sup className="text-xs">x²</sup>
+            </Button>
+
+            <Button
+              type="button"
+              variant={editor.isActive("subscript") ? "default" : "ghost"}
+              size="sm"
+              onClick={() => editor.chain().focus().toggleSubscript().run()}
+              title="Indice"
+            >
+              <sub className="text-xs">x₂</sub>
+            </Button>
+          </div>
+
+          <Separator orientation="vertical" className="h-8" />
+
+          {/* Couleurs */}
+          <div className="flex gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" title="Couleur du texte">
+                  <div className="w-4 h-4 border-b-2 border-current">A</div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <div className="p-2">
+                  <p className="text-xs font-medium mb-2">Couleur du texte</p>
+                  <div className="grid grid-cols-6 gap-1">
+                    {[
+                      "#000000",
+                      "#ef4444",
+                      "#22c55e",
+                      "#3b82f6",
+                      "#a855f7",
+                      "#f59e0b",
+                      "#ec4899",
+                      "#10b981",
+                    ].map((color) => (
+                      <button
+                        key={color}
+                        className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+                        style={{ backgroundColor: color }}
+                        onClick={() => setTextColor(color)}
+                      />
+                    ))}
+                  </div>
+                  <DropdownMenuItem
+                    className="mt-2"
+                    onClick={() => editor.chain().focus().unsetColor().run()}
+                  >
+                    Couleur par défaut
+                  </DropdownMenuItem>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant={editor.isActive("highlight") ? "default" : "ghost"}
+                  size="sm"
+                  title="Surligner"
+                >
+                  <div className="w-4 h-4 bg-yellow-200 rounded text-xs flex items-center justify-center">
+                    A
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <div className="p-2">
+                  <p className="text-xs font-medium mb-2">
+                    Couleur de surlignage
+                  </p>
+                  <div className="grid grid-cols-6 gap-1">
+                    {[
+                      "#fef3c7",
+                      "#fecaca",
+                      "#bbf7d0",
+                      "#bfdbfe",
+                      "#e9d5ff",
+                      "#fed7aa",
+                    ].map((color) => (
+                      <button
+                        key={color}
+                        className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+                        style={{ backgroundColor: color }}
+                        onClick={() => setHighlight(color)}
+                      />
+                    ))}
+                  </div>
+                  <DropdownMenuItem
+                    className="mt-2"
+                    onClick={() =>
+                      editor.chain().focus().unsetHighlight().run()
+                    }
+                  >
+                    Retirer le surlignage
+                  </DropdownMenuItem>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <Separator orientation="vertical" className="h-8" />
+
+          {/* ✅ Titres étendus H1-H6 */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" title="Couleur du texte">
-                <div className="w-4 h-4 border-b-2 border-current">A</div>
+              <Button variant="ghost" size="sm" title="Titres">
+                <Hash className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <div className="p-2">
-                <p className="text-xs font-medium mb-2">Couleur du texte</p>
-                <div className="grid grid-cols-6 gap-1">
-                  {[
-                    "#000000",
-                    "#ef4444",
-                    "#22c55e",
-                    "#3b82f6",
-                    "#a855f7",
-                    "#f59e0b",
-                    "#ec4899",
-                    "#10b981",
-                  ].map((color) => (
-                    <button
-                      key={color}
-                      className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
-                      style={{ backgroundColor: color }}
-                      onClick={() => setTextColor(color)}
-                    />
-                  ))}
-                </div>
-                <DropdownMenuItem
-                  className="mt-2"
-                  onClick={() => editor.chain().focus().unsetColor().run()}
-                >
-                  Couleur par défaut
-                </DropdownMenuItem>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant={editor.isActive("highlight") ? "default" : "ghost"}
-                size="sm"
-                title="Surligner"
+              <DropdownMenuLabel>Titres</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() =>
+                  editor.chain().focus().toggleHeading({ level: 1 }).run()
+                }
               >
-                <div className="w-4 h-4 bg-yellow-200 rounded text-xs flex items-center justify-center">
-                  A
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <div className="p-2">
-                <p className="text-xs font-medium mb-2">
-                  Couleur de surlignage
-                </p>
-                <div className="grid grid-cols-6 gap-1">
-                  {[
-                    "#fef3c7",
-                    "#fecaca",
-                    "#bbf7d0",
-                    "#bfdbfe",
-                    "#e9d5ff",
-                    "#fed7aa",
-                  ].map((color) => (
-                    <button
-                      key={color}
-                      className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
-                      style={{ backgroundColor: color }}
-                      onClick={() => setHighlight(color)}
-                    />
-                  ))}
-                </div>
-                <DropdownMenuItem
-                  className="mt-2"
-                  onClick={() => editor.chain().focus().unsetHighlight().run()}
-                >
-                  Retirer le surlignage
-                </DropdownMenuItem>
-              </div>
+                <Heading1 className="w-4 h-4 mr-2" />
+                Titre 1
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  editor.chain().focus().toggleHeading({ level: 2 }).run()
+                }
+              >
+                <Heading2 className="w-4 h-4 mr-2" />
+                Titre 2
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  editor.chain().focus().toggleHeading({ level: 3 }).run()
+                }
+              >
+                <Heading3 className="w-4 h-4 mr-2" />
+                Titre 3
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  editor.chain().focus().toggleHeading({ level: 4 }).run()
+                }
+              >
+                <span className="w-4 h-4 mr-2 text-xs font-bold">H4</span>
+                Titre 4
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  editor.chain().focus().toggleHeading({ level: 5 }).run()
+                }
+              >
+                <span className="w-4 h-4 mr-2 text-xs font-bold">H5</span>
+                Titre 5
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  editor.chain().focus().toggleHeading({ level: 6 }).run()
+                }
+              >
+                <span className="w-4 h-4 mr-2 text-xs font-bold">H6</span>
+                Titre 6
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           <Separator orientation="vertical" className="h-8" />
 
-          {/* Titres */}
-          <Button
-            type="button"
-            variant={
-              editor.isActive("heading", { level: 1 }) ? "default" : "ghost"
-            }
-            size="sm"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 1 }).run()
-            }
-            title="Titre 1"
-          >
-            <Heading1 className="w-4 h-4" />
-          </Button>
+          {/* ✅ Listes avec indentation */}
+          <div className="flex gap-1">
+            <Button
+              type="button"
+              variant={editor.isActive("bulletList") ? "default" : "ghost"}
+              size="sm"
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              title="Liste à puces"
+            >
+              <List className="w-4 h-4" />
+            </Button>
 
-          <Button
-            type="button"
-            variant={
-              editor.isActive("heading", { level: 2 }) ? "default" : "ghost"
-            }
-            size="sm"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 2 }).run()
-            }
-            title="Titre 2"
-          >
-            <Heading2 className="w-4 h-4" />
-          </Button>
+            <Button
+              type="button"
+              variant={editor.isActive("orderedList") ? "default" : "ghost"}
+              size="sm"
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              title="Liste numérotée"
+            >
+              <ListOrdered className="w-4 h-4" />
+            </Button>
 
-          <Button
-            type="button"
-            variant={
-              editor.isActive("heading", { level: 3 }) ? "default" : "ghost"
-            }
-            size="sm"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 3 }).run()
-            }
-            title="Titre 3"
-          >
-            <Heading3 className="w-4 h-4" />
-          </Button>
+            <Button
+              type="button"
+              variant={editor.isActive("taskList") ? "default" : "ghost"}
+              size="sm"
+              onClick={() => editor.chain().focus().toggleTaskList().run()}
+              title="Liste de tâches"
+            >
+              <CheckSquare className="w-4 h-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={indentContent}
+              title="Indenter"
+              disabled={
+                !editor.can().sinkListItem("listItem") &&
+                !editor.isActive("paragraph")
+              }
+            >
+              <Indent className="w-4 h-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={outdentContent}
+              title="Désindenter"
+              disabled={!editor.can().liftListItem("listItem")}
+            >
+              <Outdent className="w-4 h-4" />
+            </Button>
+          </div>
 
           <Separator orientation="vertical" className="h-8" />
 
-          {/* Listes */}
-          <Button
-            type="button"
-            variant={editor.isActive("bulletList") ? "default" : "ghost"}
-            size="sm"
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            title="Liste à puces"
-          >
-            <List className="w-4 h-4" />
-          </Button>
-
-          <Button
-            type="button"
-            variant={editor.isActive("orderedList") ? "default" : "ghost"}
-            size="sm"
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            title="Liste numérotée"
-          >
-            <ListOrdered className="w-4 h-4" />
-          </Button>
-
-          <Button
-            type="button"
-            variant={editor.isActive("taskList") ? "default" : "ghost"}
-            size="sm"
-            onClick={() => editor.chain().focus().toggleTaskList().run()}
-            title="Liste de tâches"
-          >
-            <CheckSquare className="w-4 h-4" />
-          </Button>
-
+          {/* Citation */}
           <Button
             type="button"
             variant={editor.isActive("blockquote") ? "default" : "ghost"}
@@ -631,74 +724,50 @@ export default function RichTextEditor({
 
           <Separator orientation="vertical" className="h-8" />
 
-          {/* Indentation */}
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={indentContent}
-            title="Indenter"
-            disabled={
-              !editor.can().sinkListItem("listItem") &&
-              !editor.isActive("paragraph")
-            }
-          >
-            <Indent className="w-4 h-4" />
-          </Button>
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={outdentContent}
-            title="Désindenter"
-            disabled={!editor.can().liftListItem("listItem")}
-          >
-            <Outdent className="w-4 h-4" />
-          </Button>
-
-          <Separator orientation="vertical" className="h-8" />
-
           {/* Alignement */}
-          <Button
-            type="button"
-            variant={
-              editor.isActive({ textAlign: "left" }) ? "default" : "ghost"
-            }
-            size="sm"
-            onClick={() => editor.chain().focus().setTextAlign("left").run()}
-            title="Aligner à gauche"
-          >
-            <AlignLeft className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              type="button"
+              variant={
+                editor.isActive({ textAlign: "left" }) ? "default" : "ghost"
+              }
+              size="sm"
+              onClick={() => editor.chain().focus().setTextAlign("left").run()}
+              title="Aligner à gauche"
+            >
+              <AlignLeft className="w-4 h-4" />
+            </Button>
 
-          <Button
-            type="button"
-            variant={
-              editor.isActive({ textAlign: "center" }) ? "default" : "ghost"
-            }
-            size="sm"
-            onClick={() => editor.chain().focus().setTextAlign("center").run()}
-            title="Centrer"
-          >
-            <AlignCenter className="w-4 h-4" />
-          </Button>
+            <Button
+              type="button"
+              variant={
+                editor.isActive({ textAlign: "center" }) ? "default" : "ghost"
+              }
+              size="sm"
+              onClick={() =>
+                editor.chain().focus().setTextAlign("center").run()
+              }
+              title="Centrer"
+            >
+              <AlignCenter className="w-4 h-4" />
+            </Button>
 
-          <Button
-            type="button"
-            variant={
-              editor.isActive({ textAlign: "right" }) ? "default" : "ghost"
-            }
-            size="sm"
-            onClick={() => editor.chain().focus().setTextAlign("right").run()}
-            title="Aligner à droite"
-          >
-            <AlignRight className="w-4 h-4" />
-          </Button>
+            <Button
+              type="button"
+              variant={
+                editor.isActive({ textAlign: "right" }) ? "default" : "ghost"
+              }
+              size="sm"
+              onClick={() => editor.chain().focus().setTextAlign("right").run()}
+              title="Aligner à droite"
+            >
+              <AlignRight className="w-4 h-4" />
+            </Button>
+          </div>
 
           <Separator orientation="vertical" className="h-8" />
 
-          {/* Layout et structure */}
+          {/* Layout */}
           <Button
             type="button"
             variant="ghost"
@@ -709,7 +778,9 @@ export default function RichTextEditor({
             <Columns className="w-4 h-4" />
           </Button>
 
-          {/* ✅ AMÉLIORATION : Tableau avec options multiples */}
+          <Separator orientation="vertical" className="h-8" />
+
+          {/* ✅ Tableau amélioré */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -721,46 +792,177 @@ export default function RichTextEditor({
                 <TableIcon className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuContent align="start" className="w-64">
+              <DropdownMenuLabel>Créer un tableau</DropdownMenuLabel>
               <DropdownMenuItem onClick={insertTable}>
                 <TableIcon className="w-4 h-4 mr-2" />
-                Insérer tableau 3x3
+                Tableau rapide 3x3
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={insertCustomTable}>
-                <TableIcon className="w-4 h-4 mr-2" />
-                Tableau personnalisé
-              </DropdownMenuItem>
+
+              <Dialog open={tableDialog} onOpenChange={setTableDialog}>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <TableIcon className="w-4 h-4 mr-2" />
+                    Tableau personnalisé
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Créer un tableau personnalisé</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="rows">Nombre de lignes</Label>
+                      <Input
+                        id="rows"
+                        type="number"
+                        min="1"
+                        max="50"
+                        value={tableRows}
+                        onChange={(e) => setTableRows(Number(e.target.value))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="cols">Nombre de colonnes</Label>
+                      <Input
+                        id="cols"
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={tableCols}
+                        onChange={(e) => setTableCols(Number(e.target.value))}
+                      />
+                    </div>
+                    <Button onClick={insertCustomTable} className="w-full">
+                      Créer le tableau
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Modifier le tableau</DropdownMenuLabel>
+
+              {/* ✅ Ajouter lignes personnalisé */}
+              <Dialog open={addRowsDialog} onOpenChange={setAddRowsDialog}>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    disabled={!editor.isActive("table")}
+                  >
+                    Ajouter lignes personnalisé
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Ajouter des lignes</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="rowsToAdd">
+                        Nombre de lignes à ajouter
+                      </Label>
+                      <Input
+                        id="rowsToAdd"
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={rowsToAdd}
+                        onChange={(e) => setRowsToAdd(Number(e.target.value))}
+                      />
+                    </div>
+                    <Button onClick={addCustomRows} className="w-full">
+                      Ajouter {rowsToAdd} ligne{rowsToAdd > 1 ? "s" : ""}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* ✅ Ajouter colonnes personnalisé */}
+              <Dialog open={addColsDialog} onOpenChange={setAddColsDialog}>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    disabled={!editor.isActive("table")}
+                  >
+                    Ajouter colonnes personnalisé
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Ajouter des colonnes</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="colsToAdd">
+                        Nombre de colonnes à ajouter
+                      </Label>
+                      <Input
+                        id="colsToAdd"
+                        type="number"
+                        min="1"
+                        max="50"
+                        value={colsToAdd}
+                        onChange={(e) => setColsToAdd(Number(e.target.value))}
+                      />
+                    </div>
+                    <Button onClick={addCustomColumns} className="w-full">
+                      Ajouter {colsToAdd} colonne{colsToAdd > 1 ? "s" : ""}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* ✅ Couleur de fond des cellules */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    disabled={!editor.isActive("table")}
+                  >
+                    <Palette className="w-4 h-4 mr-2" />
+                    Couleur de fond cellule
+                  </DropdownMenuItem>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="right">
+                  <div className="p-2">
+                    <p className="text-xs font-medium mb-2">Couleur de fond</p>
+                    <div className="grid grid-cols-6 gap-1">
+                      {[
+                        "#ffffff",
+                        "#f8f9fa",
+                        "#e9ecef",
+                        "#dee2e6",
+                        "#fef3c7",
+                        "#fecaca",
+                        "#bbf7d0",
+                        "#bfdbfe",
+                        "#e9d5ff",
+                        "#fed7aa",
+                        "#fca5a5",
+                        "#86efac",
+                      ].map((color) => (
+                        <button
+                          key={color}
+                          className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+                          style={{ backgroundColor: color }}
+                          onClick={() => setCellBackgroundColor(color)}
+                        />
+                      ))}
+                    </div>
+                    <DropdownMenuItem
+                      className="mt-2"
+                      onClick={() => setCellBackgroundColor("transparent")}
+                    >
+                      Supprimer la couleur
+                    </DropdownMenuItem>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <DropdownMenuSeparator />
 
-              {/* ✅ NOUVEAU : Ajout multiple */}
-              <DropdownMenuItem
-                onClick={() => addMultipleColumns(2)}
-                disabled={!editor.isActive("table")}
-              >
-                Ajouter 2 colonnes
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => addMultipleColumns(3)}
-                disabled={!editor.isActive("table")}
-              >
-                Ajouter 3 colonnes
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => addMultipleRows(2)}
-                disabled={!editor.isActive("table")}
-              >
-                Ajouter 2 lignes
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => addMultipleRows(3)}
-                disabled={!editor.isActive("table")}
-              >
-                Ajouter 3 lignes
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-
-              {/* Options individuelles */}
+              {/* Actions rapides */}
               <DropdownMenuItem
                 onClick={addColumnBefore}
                 disabled={!editor.isActive("table")}
@@ -811,7 +1013,7 @@ export default function RichTextEditor({
 
           <Separator orientation="vertical" className="h-8" />
 
-          {/* ✅ NOUVEAU : Bloc de code */}
+          {/* Bloc de code */}
           <Button
             type="button"
             variant={editor.isActive("codeBlock") ? "default" : "ghost"}
@@ -824,51 +1026,55 @@ export default function RichTextEditor({
 
           <Separator orientation="vertical" className="h-8" />
 
-          {/* Médias et liens */}
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={addImage}
-            title="Insérer une image"
-          >
-            <ImageIcon className="w-4 h-4" />
-          </Button>
+          {/* Médias */}
+          <div className="flex gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={addImage}
+              title="Insérer une image"
+            >
+              <ImageIcon className="w-4 h-4" />
+            </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={addLink}
-            title="Insérer un lien"
-          >
-            <LinkIcon className="w-4 h-4" />
-          </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={addLink}
+              title="Insérer un lien"
+            >
+              <LinkIcon className="w-4 h-4" />
+            </Button>
+          </div>
 
           <Separator orientation="vertical" className="h-8" />
 
           {/* Annuler/Refaire */}
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().undo().run()}
-            disabled={!editor.can().undo()}
-            title="Annuler (Ctrl+Z)"
-          >
-            <Undo className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => editor.chain().focus().undo().run()}
+              disabled={!editor.can().undo()}
+              title="Annuler (Ctrl+Z)"
+            >
+              <Undo className="w-4 h-4" />
+            </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().redo().run()}
-            disabled={!editor.can().redo()}
-            title="Refaire (Ctrl+Y)"
-          >
-            <Redo className="w-4 h-4" />
-          </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => editor.chain().focus().redo().run()}
+              disabled={!editor.can().redo()}
+              title="Refaire (Ctrl+Y)"
+            >
+              <Redo className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
