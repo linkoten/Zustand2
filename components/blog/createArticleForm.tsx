@@ -204,8 +204,8 @@ export default function CreateArticleForm() {
   if (isFullscreen) {
     return (
       <div className="fixed inset-0 z-50 bg-white flex flex-col">
-        {/* Header plein écran */}
-        <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+        {/* Header plein écran fixe */}
+        <div className="flex-shrink-0 flex items-center justify-between p-4 border-b bg-gray-50">
           <div className="flex items-center gap-4">
             <h2 className="text-xl font-semibold">
               {formData.title || "Nouvel article"}
@@ -236,8 +236,8 @@ export default function CreateArticleForm() {
           </div>
         </div>
 
-        {/* Éditeur plein écran */}
-        <div className="flex-1 overflow-hidden">
+        {/* ✅ Éditeur plein écran avec hauteur correcte */}
+        <div className="flex-1 min-h-0">
           <RichTextEditor
             content={formData.content}
             onChange={(content) => handleInputChange("content", content)}

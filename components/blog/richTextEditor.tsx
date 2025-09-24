@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Bold,
   Italic,
@@ -106,7 +107,6 @@ export default function RichTextEditor({
     extensions: [
       StarterKit.configure({
         codeBlock: false,
-        // ✅ Configuration des listes avec niveaux multiples
         bulletList: {
           HTMLAttributes: {
             class: "list-disc list-outside ml-4",
@@ -177,6 +177,7 @@ export default function RichTextEditor({
           class: "border border-gray-300",
         },
       }),
+      // ✅ Configuration améliorée pour les en-têtes multiples
       TableHeader.configure({
         HTMLAttributes: {
           class:
@@ -195,28 +196,29 @@ export default function RichTextEditor({
     },
     editorProps: {
       attributes: {
-        class:
-          "prose prose-lg max-w-none min-h-[400px] p-4 border-l border-r border-b border-gray-200 rounded-b-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+        class: "prose prose-lg max-w-none p-4 focus:outline-none min-h-full",
       },
     },
     immediatelyRender: false,
   });
 
-  // ✅ NOUVEAU : Fonction pour personnaliser l'en-tête
+  // ✅ CORRIGÉ : Fonction pour personnaliser l'en-tête avec support multiple
   const customizeTableHeader = useCallback(() => {
     if (editor && headerText) {
-      // Insérer le texte dans la cellule d'en-tête
+      // D'abord, insérer le texte
       editor.chain().focus().insertContent(headerText).run();
 
-      // Appliquer la couleur de fond à la cellule
-      editor
-        .chain()
-        .focus()
-        .setCellAttribute(
-          "style",
-          `background-color: ${headerColor}; font-weight: bold; text-align: center;`
-        )
-        .run();
+      // Ensuite, appliquer le style à la cellule actuelle
+      const currentAttributes = editor.getAttributes("tableCell");
+      const existingStyle = currentAttributes.style || "";
+
+      // Combiner les styles existants avec les nouveaux
+      const newStyle =
+        `${existingStyle}; background-color: ${headerColor}; font-weight: bold; text-align: center; color: ${headerColor === "#000000" || headerColor === "#333333" ? "white" : "inherit"};`
+          .replace(/;+/g, ";")
+          .replace(/^;|;$/g, "");
+
+      editor.chain().focus().setCellAttribute("style", newStyle).run();
 
       setHeaderCustomizationDialog(false);
       setHeaderText("");
@@ -260,20 +262,43 @@ export default function RichTextEditor({
     }
   }, [editor, colsToAdd]);
 
-  // ✅ Fonction pour colorer les cellules de tableau
+  // ✅ CORRIGÉ : Fonction pour colorer les cellules
   const setCellBackgroundColor = useCallback(
     (color: string) => {
       if (editor) {
+        const currentAttributes = editor.getAttributes("tableCell");
+        const existingStyle = currentAttributes.style || "";
+
+        // Supprimer l'ancienne couleur de fond et ajouter la nouvelle
+        const cleanedStyle = existingStyle.replace(
+          /background-color:\s*[^;]+;?/gi,
+          ""
+        );
+        const newStyle =
+          color === "transparent"
+            ? cleanedStyle
+            : `${cleanedStyle}; background-color: ${color};`
+                .replace(/;+/g, ";")
+                .replace(/^;|;$/g, "");
+
         editor
           .chain()
           .focus()
-          .setCellAttribute("style", `background-color: ${color}`)
+          .setCellAttribute("style", newStyle || null)
           .run();
         setCellColorDialog(false);
       }
     },
     [editor]
   );
+
+  // ✅ Fonction pour convertir une cellule en en-tête
+  const convertToTableHeader = useCallback(() => {
+    if (editor) {
+      // Convertir la cellule courante en en-tête
+      editor.chain().focus().toggleHeaderCell().run();
+    }
+  }, [editor]);
 
   // Autres fonctions existantes...
   const addImage = useCallback(() => {
@@ -420,7 +445,7 @@ export default function RichTextEditor({
 
   if (!isMounted || !editor) {
     return (
-      <div className="border border-gray-200 rounded-lg overflow-hidden">
+      <div className="border border-gray-200 rounded-lg overflow-hidden h-full flex flex-col">
         <div className="bg-gray-50 border-b border-gray-200 p-2">
           <div className="flex gap-1">
             {Array.from({ length: 30 }).map((_, i) => (
@@ -431,7 +456,7 @@ export default function RichTextEditor({
             ))}
           </div>
         </div>
-        <div className="min-h-[400px] p-4 flex items-center justify-center">
+        <div className="flex-1 p-4 flex items-center justify-center">
           <div className="text-center text-gray-500">
             <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
             <p className="text-sm">Chargement de l&apos;éditeur...</p>
@@ -442,9 +467,9 @@ export default function RichTextEditor({
   }
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden">
-      {/* ✅ Barre d'outils sticky */}
-      <div className="sticky top-16 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <div className="border border-gray-200 rounded-lg overflow-hidden h-full flex flex-col">
+      {/* ✅ Barre d'outils fixe */}
+      <div className="flex-shrink-0 bg-white border-b border-gray-200 shadow-sm">
         <div className="bg-gray-50 p-2 flex flex-wrap gap-1 overflow-x-auto">
           {/* Mise en forme du texte */}
           <div className="flex gap-1">
@@ -806,7 +831,7 @@ export default function RichTextEditor({
 
           <Separator orientation="vertical" className="h-8" />
 
-          {/* ✅ Tableau amélioré avec personnalisation d'en-têtes */}
+          {/* ✅ Tableau amélioré avec en-têtes multiples */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -867,9 +892,18 @@ export default function RichTextEditor({
               </Dialog>
 
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>Personnaliser les en-têtes</DropdownMenuLabel>
+              <DropdownMenuLabel>Gestion des en-têtes</DropdownMenuLabel>
 
-              {/* ✅ NOUVEAU : Personnalisation des en-têtes */}
+              {/* ✅ NOUVEAU : Convertir en en-tête */}
+              <DropdownMenuItem
+                onClick={convertToTableHeader}
+                disabled={!editor.isActive("table")}
+              >
+                <span className="mr-2">🔄</span>
+                Convertir cellule en en-tête
+              </DropdownMenuItem>
+
+              {/* ✅ Personnalisation des en-têtes améliorée */}
               <Dialog
                 open={headerCustomizationDialog}
                 onOpenChange={setHeaderCustomizationDialog}
@@ -880,20 +914,16 @@ export default function RichTextEditor({
                     disabled={!editor.isActive("table")}
                   >
                     <span className="mr-2">🎨</span>
-                    Personnaliser en-tête
+                    Personnaliser cellule
                   </DropdownMenuItem>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>
-                      Personnaliser l&apos;en-tête de tableau
-                    </DialogTitle>
+                    <DialogTitle>Personnaliser la cellule</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="headerText">
-                        Texte de l&apos;en-tête
-                      </Label>
+                      <Label htmlFor="headerText">Texte</Label>
                       <Input
                         id="headerText"
                         value={headerText}
@@ -926,14 +956,23 @@ export default function RichTextEditor({
                       <Label>Couleurs prédéfinies</Label>
                       <div className="grid grid-cols-8 gap-2 mt-2">
                         {[
-                          "#f8f9fa", // Gris clair
-                          "#e3f2fd", // Bleu clair
-                          "#e8f5e8", // Vert clair
-                          "#fff3e0", // Orange clair
-                          "#fce4ec", // Rose clair
-                          "#f3e5f5", // Violet clair
-                          "#e0f2f1", // Teal clair
-                          "#fff8e1", // Jaune clair
+                          "#f8f9fa",
+                          "#e3f2fd",
+                          "#e8f5e8",
+                          "#fff3e0",
+                          "#fce4ec",
+                          "#f3e5f5",
+                          "#e0f2f1",
+                          "#fff8e1",
+                          // Couleurs plus foncées pour les en-têtes
+                          "#3b82f6",
+                          "#10b981",
+                          "#ef4444",
+                          "#f59e0b",
+                          "#a855f7",
+                          "#06b6d4",
+                          "#84cc16",
+                          "#f97316",
                         ].map((color) => (
                           <button
                             key={color}
@@ -950,9 +989,24 @@ export default function RichTextEditor({
                       <Label>Aperçu</Label>
                       <div
                         className="mt-2 p-3 border rounded text-center font-bold"
-                        style={{ backgroundColor: headerColor }}
+                        style={{
+                          backgroundColor: headerColor,
+                          color: [
+                            "#3b82f6",
+                            "#10b981",
+                            "#ef4444",
+                            "#f59e0b",
+                            "#a855f7",
+                            "#06b6d4",
+                            "#84cc16",
+                            "#f97316",
+                            "#000000",
+                          ].includes(headerColor)
+                            ? "white"
+                            : "inherit",
+                        }}
                       >
-                        {headerText || "Votre en-tête"}
+                        {headerText || "Votre cellule"}
                       </div>
                     </div>
 
@@ -979,10 +1033,11 @@ export default function RichTextEditor({
                 </DialogContent>
               </Dialog>
 
-              {/* ✅ Styles d'en-têtes rapides */}
+              {/* ✅ Styles d'en-têtes rapides améliorés */}
               <DropdownMenuItem
                 onClick={() => {
                   if (editor) {
+                    editor.chain().focus().toggleHeaderCell().run();
                     editor
                       .chain()
                       .focus()
@@ -1001,6 +1056,7 @@ export default function RichTextEditor({
               <DropdownMenuItem
                 onClick={() => {
                   if (editor) {
+                    editor.chain().focus().toggleHeaderCell().run();
                     editor
                       .chain()
                       .focus()
@@ -1019,6 +1075,7 @@ export default function RichTextEditor({
               <DropdownMenuItem
                 onClick={() => {
                   if (editor) {
+                    editor.chain().focus().toggleHeaderCell().run();
                     editor
                       .chain()
                       .focus()
@@ -1037,6 +1094,7 @@ export default function RichTextEditor({
               <DropdownMenuItem
                 onClick={() => {
                   if (editor) {
+                    editor.chain().focus().toggleHeaderCell().run();
                     editor
                       .chain()
                       .focus()
@@ -1055,7 +1113,7 @@ export default function RichTextEditor({
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Modifier le tableau</DropdownMenuLabel>
 
-              {/* ✅ Ajouter lignes personnalisé */}
+              {/* Dialogues pour ajout personnalisé */}
               <Dialog open={addRowsDialog} onOpenChange={setAddRowsDialog}>
                 <DialogTrigger asChild>
                   <DropdownMenuItem
@@ -1090,7 +1148,6 @@ export default function RichTextEditor({
                 </DialogContent>
               </Dialog>
 
-              {/* ✅ Ajouter colonnes personnalisé */}
               <Dialog open={addColsDialog} onOpenChange={setAddColsDialog}>
                 <DialogTrigger asChild>
                   <DropdownMenuItem
@@ -1125,7 +1182,7 @@ export default function RichTextEditor({
                 </DialogContent>
               </Dialog>
 
-              {/* ✅ Couleur de fond des cellules */}
+              {/* ✅ Couleur de fond des cellules améliorée */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <DropdownMenuItem
@@ -1290,8 +1347,10 @@ export default function RichTextEditor({
         </div>
       </div>
 
-      {/* Zone d'édition */}
-      <EditorContent editor={editor} className="min-h-[400px]" />
+      {/* ✅ Zone d'édition avec scroll */}
+      <ScrollArea className="flex-1">
+        <EditorContent editor={editor} className="min-h-full" />
+      </ScrollArea>
     </div>
   );
 }
