@@ -46,29 +46,27 @@ const categories = [
 export default function BlogFilters({ lang, dict }: BlogFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { resetFilters } = useBlogStore();
+  const { resetFilters, updateFilters: _updateZustandFilters } = useBlogStore();
 
   const [searchTerm, setSearchTerm] = useState(
-    searchParams.get("search") || ""
+    searchParams.get("search") || "",
   );
 
-  const currentCategory = searchParams.get("category");
-  const currentTag = searchParams.get("tag");
-  const currentSearch = searchParams.get("search");
+  const filters = useBlogStore((state) => state.filters);
+  const currentCategory = filters.category;
+  const currentTag = filters.tag;
+  const currentSearch = filters.search;
 
   const updateFilters = (newParams: Record<string, string | null>) => {
-    const params = new URLSearchParams(searchParams);
+    // Generate new URL params from the COMBINED STATE
+    const combinedFilters = { ...filters, ...newParams };
+    const params = new URLSearchParams();
 
-    Object.entries(newParams).forEach(([key, value]) => {
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
+    Object.entries(combinedFilters).forEach(([key, value]) => {
+      if (value && key !== "page") {
+        params.set(key, value.toString());
       }
     });
-
-    // Remettre à la page 1 lors d'un nouveau filtre
-    params.delete("page");
 
     console.log("🔄 Nouveaux filtres appliqués:", newParams);
 
@@ -77,13 +75,14 @@ export default function BlogFilters({ lang, dict }: BlogFiltersProps) {
       : `/${lang}/blog`;
     console.log("🔗 URL générée:", newUrl);
 
-    router.push(newUrl);
+    window.history.pushState(null, "", newUrl);
+    _updateZustandFilters({ ...newParams, page: 1 });
   };
 
   const clearFilters = () => {
     setSearchTerm("");
     resetFilters();
-    router.push(`/${lang}/blog`);
+    window.history.pushState(null, "", `/${lang}/blog`);
   };
 
   const handleSearch = (e: React.FormEvent) => {

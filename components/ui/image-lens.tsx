@@ -25,12 +25,17 @@ export default function ImageLens({
   const [showLens, setShowLens] = useState(false);
   const [lensPosition, setLensPosition] = useState({ x: 0, y: 0 });
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
+  const [renderedSize, setRenderedSize] = useState({
+    width: width,
+    height: height,
+  });
   const imageRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!imageRef.current) return;
 
     const rect = imageRef.current.getBoundingClientRect();
+    setRenderedSize({ width: rect.width, height: rect.height });
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
@@ -63,7 +68,7 @@ export default function ImageLens({
   };
 
   return (
-    <div className="relative inline-block group">
+    <div className="relative block w-full h-full group">
       <div
         ref={imageRef}
         className={`relative overflow-hidden transition-all duration-500 ${
@@ -72,14 +77,13 @@ export default function ImageLens({
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        style={{ width, height }}
       >
         <Image
           src={src}
           alt={alt}
           width={width}
           height={height}
-          className="w-full h-full object-cover transition-all duration-500"
+          className="w-full h-full object-contain transition-all duration-500"
           priority
         />
 
@@ -108,7 +112,7 @@ export default function ImageLens({
                 left: lensPosition.x,
                 top: lensPosition.y,
                 backgroundImage: `url(${src})`,
-                backgroundSize: `${width * zoomLevel}px ${height * zoomLevel}px`,
+                backgroundSize: `${renderedSize.width * zoomLevel}px ${renderedSize.height * zoomLevel}px`,
                 backgroundPosition: `${backgroundPosition.x}% ${backgroundPosition.y}%`,
                 boxShadow:
                   "0 0 40px rgba(0,0,0,0.5), inset 0 0 40px rgba(255,255,255,0.4), 0 0 0 3px rgba(255,255,255,0.9)",

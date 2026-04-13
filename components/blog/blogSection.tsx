@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface BlogSectionProps {
   initialData: BlogListProps;
+  categories?: any[];
   lang: "fr" | "en";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any;
@@ -26,6 +27,7 @@ interface BlogSectionProps {
 
 export default function BlogSection({
   initialData,
+  categories,
   lang,
   dict,
 }: BlogSectionProps) {
@@ -33,56 +35,42 @@ export default function BlogSection({
     useBlogStore();
 
   const searchParams = useSearchParams();
+  const filtersStore = useBlogStore((state) => state.filters);
 
-  // Initialiser le store avec les données initiales
+  // Initialisation à partir des données serveur
   useEffect(() => {
-    if (initialData && (!blogData.posts.length || blogData.totalPosts === 0)) {
-      setBlogData(initialData);
+    if (initialData) {
+      const page = parseInt(searchParams.get("page") || "1");
+      const search = searchParams.get("search") || undefined;
+      const category = searchParams.get("category") || undefined;
+      const tag = searchParams.get("tag") || undefined;
+
+      const urlFilters = { page, search, category, tag };
+      useBlogStore.setState({ filters: urlFilters, blogData: initialData });
     }
-  }, [initialData, setBlogData, blogData]);
-
-  // Synchroniser avec les paramètres URL
-  useEffect(() => {
-    const page = parseInt(searchParams.get("page") || "1");
-    const search = searchParams.get("search") || undefined;
-    const category = searchParams.get("category") || undefined;
-    const tag = searchParams.get("tag") || undefined;
-
-    const urlFilters = { page, search, category, tag };
-
-    // Vérifier si les filtres URL sont différents des filtres du store
-    const filtersChanged =
-      filters.page !== page ||
-      filters.search !== search ||
-      filters.category !== category ||
-      filters.tag !== tag;
-
-    if (filtersChanged) {
-      console.log("🔄 Synchronisation filtres URL → Store:", urlFilters);
-      loadBlogData(urlFilters);
-    }
-  }, [searchParams, filters, loadBlogData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData]);
 
   // Utiliser les données du store ou les données initiales
   const currentData = blogData.posts.length > 0 ? blogData : initialData;
 
   // Déterminer les filtres actifs pour l'affichage
   const activeFilters = [
-    searchParams.get("search") && {
+    filtersStore.search && {
       type: "search",
-      value: searchParams.get("search"),
+      value: filtersStore.search,
       icon: Search,
       label: dict.blog?.blogSection?.searchFor || "Recherche pour",
     },
-    searchParams.get("category") && {
+    filtersStore.category && {
       type: "category",
-      value: searchParams.get("category"),
+      value: filtersStore.category,
       icon: Folder,
       label: dict.blog?.blogSection?.categoryIn || "Dans la catégorie",
     },
-    searchParams.get("tag") && {
+    filtersStore.tag && {
       type: "tag",
-      value: searchParams.get("tag"),
+      value: filtersStore.tag,
       icon: Tag,
       label: dict.blog?.blogSection?.tagWith || "Avec le tag",
     },
@@ -90,6 +78,68 @@ export default function BlogSection({
 
   return (
     <div className="space-y-8">
+      {/* Navigation des catégories */}
+      <div className="mb-8 flex flex-wrap justify-center gap-3">
+        <button
+          onClick={() => {
+            useBlogStore
+              .getState()
+              .updateFilters({ category: undefined, page: 1 });
+            window.history.pushState(null, "", `/${lang}/blog`);
+          }}
+          className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+            !filtersStore.category
+              ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md transform scale-105"
+              : "bg-white text-slate-600 hover:bg-orange-50 border border-slate-200"
+          }`}
+        >
+          {dict.blog?.blogFilters?.allCategories || "Tout afficher"}
+        </button>
+        {categories?.map((catItem: any) => {
+          const cat = catItem.category;
+          const labelKey: string =
+            {
+              PALEONTOLOGIE: "categoryPaleontology",
+              DECOUVERTE: "categoryDiscovery",
+              GUIDE_COLLECTION: "categoryGuides",
+              HISTOIRE_GEOLOGIQUE: "categoryHistory",
+              ACTUALITE: "categoryActualite",
+              TECHNIQUE: "categoryTechnique",
+              EXPOSITION: "categoryExposition",
+              PORTRAIT: "categoryPortrait",
+            }[cat as string] || "";
+
+          const categoryLabel =
+            (dict.blog?.blogFilters as any)?.[labelKey] ||
+            (cat as string)
+              .replace(/_/g, " ")
+              .replace(/\b\w/g, (l: string) => l.toUpperCase());
+
+          return (
+            <button
+              key={cat as string}
+              onClick={() => {
+                useBlogStore
+                  .getState()
+                  .updateFilters({ category: cat, page: 1 });
+                window.history.pushState(
+                  null,
+                  "",
+                  `/${lang}/blog?category=${cat}`,
+                );
+              }}
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                filtersStore.category === cat
+                  ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md transform scale-105"
+                  : "bg-white text-slate-600 hover:bg-orange-50 border border-slate-200"
+              }`}
+            >
+              {categoryLabel}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Section filtres premium avec data attributes pour le scroll */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-50/50 via-white to-purple-50/50 rounded-3xl" />
@@ -134,18 +184,9 @@ export default function BlogSection({
               </div>
 
               <div className="flex items-center justify-center gap-2">
-                <div
-                  className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "0ms" }}
-                />
-                <div
-                  className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "150ms" }}
-                />
-                <div
-                  className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "300ms" }}
-                />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce [animation-delay:150ms]" />
+                <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce [animation-delay:300ms]" />
               </div>
             </div>
           </div>
@@ -158,110 +199,6 @@ export default function BlogSection({
           isLoading ? "opacity-50 scale-[0.98]" : "opacity-100 scale-100"
         }`}
       >
-        {/* Header des résultats */}
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-50 via-white to-gray-50 rounded-2xl" />
-
-          <div className="relative p-6">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              {/* Informations de résultats */}
-              <div className="space-y-4">
-                {/* Titre principal */}
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-lg">
-                    <CheckCircle className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-800">
-                    {dict.blog?.blogSection?.resultsTitle ||
-                      "Résultats de recherche"}
-                  </h3>
-                </div>
-
-                {/* Description des résultats */}
-                <div className="text-slate-600">
-                  {activeFilters.length > 0 ? (
-                    <div className="space-y-3">
-                      <p className="flex items-center gap-2">
-                        <span className="font-semibold text-xl text-slate-800">
-                          {currentData.totalPosts.toLocaleString(
-                            lang === "fr" ? "fr-FR" : "en-US"
-                          )}
-                        </span>
-                        <span>
-                          {currentData.totalPosts > 1
-                            ? dict.blog?.blogSection?.resultsPlural ||
-                              "articles trouvés"
-                            : dict.blog?.blogSection?.resultsSingle ||
-                              "article trouvé"}
-                        </span>
-                      </p>
-
-                      {/* Filtres actifs */}
-                      <div className="flex flex-wrap gap-2">
-                        {activeFilters.map((filter, index) =>
-                          filter ? (
-                            <Badge
-                              key={index}
-                              variant="secondary"
-                              className="bg-white/80 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm"
-                            >
-                              <filter.icon className="w-3 h-3" />
-                              <span className="text-xs font-medium">
-                                {filter.label} &quot;{filter.value}&quot;
-                              </span>
-                            </Badge>
-                          ) : null
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-emerald-600" />
-                      <span className="font-semibold text-xl text-slate-800">
-                        {currentData.totalPosts.toLocaleString(
-                          lang === "fr" ? "fr-FR" : "en-US"
-                        )}
-                      </span>
-                      <span>
-                        {currentData.totalPosts > 1
-                          ? dict.blog?.blogSection?.totalPlural ||
-                            "articles au total"
-                          : dict.blog?.blogSection?.totalSingle ||
-                            "article au total"}
-                      </span>
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Informations de pagination */}
-              <div className="flex items-center gap-4">
-                <div className="text-center p-4 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl shadow-sm">
-                  <div className="text-lg font-bold text-slate-800">
-                    {currentData.currentPage}
-                  </div>
-                  <div className="text-xs text-slate-600">
-                    {dict.blog?.pagination?.pageLabel || "Page"}
-                  </div>
-                </div>
-
-                <div className="text-slate-400">
-                  {dict.blog?.pagination?.ofLabel || "sur"}
-                </div>
-
-                <div className="text-center p-4 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl shadow-sm">
-                  <div className="text-lg font-bold text-slate-800">
-                    {currentData.totalPages}
-                  </div>
-                  <div className="text-xs text-slate-600">
-                    {dict.blog?.pagination?.totalLabel || "Total"}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Liste des articles avec container premium */}
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-50/30 to-transparent rounded-3xl" />

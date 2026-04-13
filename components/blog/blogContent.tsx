@@ -17,11 +17,11 @@ export default function BlogContent({ content }: BlogContentProps) {
       {/* Container premium avec design moderne */}
       <div className="relative">
         {/* Background décoratif */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-slate-50/30 to-white rounded-3xl" />
+        <div className="absolute inset-0 bg-background/50 rounded-3xl border border-border/50 shadow-inner" />
 
         {/* Contenu avec prose amélioré */}
         <div
-          className="blog-content relative prose prose-lg prose-slate max-w-none p-8 md:p-12"
+          className="blog-content relative prose prose-lg prose-slate max-w-none p-8 md:p-12 prose-headings:text-foreground prose-headings:font-bold prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-img:rounded-xl prose-img:shadow-lg prose-blockquote:border-l-4 prose-blockquote:border-terracotta/50 prose-blockquote:bg-muted/30 prose-blockquote:p-4 prose-blockquote:rounded-r-xl prose-blockquote:italic prose-blockquote:text-muted-foreground prose-strong:text-foreground"
           dangerouslySetInnerHTML={{ __html: processedContent }}
         />
       </div>

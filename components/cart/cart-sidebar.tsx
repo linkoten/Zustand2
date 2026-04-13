@@ -65,165 +65,123 @@ export function CartSidebar({ isOpen, onClose, dict }: CartSidebarProps) {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-lg flex flex-col h-full bg-gradient-to-b from-white to-slate-50/50 border-l border-slate-200/80">
-        {/* Header premium avec gradient - RÉDUIT */}
-        <SheetHeader className="pb-4 border-b border-slate-200/50 flex-shrink-0">
-          <div className="relative">
-            {/* Background gradient subtle */}
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-50 via-orange-50 to-red-50 rounded-lg opacity-50" />
-
-            <SheetTitle className="relative flex items-center justify-between gap-2 p-3 rounded-lg">
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 rounded-lg blur-sm opacity-30" />
-                  <div className="relative bg-gradient-to-r from-amber-500 to-orange-600 p-2 rounded-lg shadow-lg">
-                    <ShoppingBag className="w-4 h-4 text-white" />
-                  </div>
-                </div>
-
-                <div className="flex flex-col">
-                  <span className="text-base font-bold text-slate-800">
-                    {dict.cartSidebar.title}
-                  </span>
-                  <span className="text-xs text-slate-600 font-medium">
-                    Paleolitho Collection
-                  </span>
-                </div>
+      <SheetContent className="w-full sm:max-w-lg flex flex-col h-full bg-zinc-950 border-l border-zinc-800 p-0 text-zinc-100">
+        {/* En-tête */}
+        <SheetHeader className="p-5 border-b border-zinc-800 flex-shrink-0 bg-zinc-950">
+          <SheetTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white p-2 rounded-lg border border-zinc-200 shadow-sm">
+                <ShoppingBag className="w-5 h-5 text-zinc-900" />
               </div>
+              <div className="flex flex-col text-left">
+                <span className="text-lg font-serif font-bold text-amber-50">
+                  {dict.cartSidebar.title}
+                </span>
+                <span className="text-xs text-zinc-400">
+                  Paleolitho Collection
+                </span>
+              </div>
+            </div>
 
-              {totalItems > 0 && (
-                <Badge
-                  variant="secondary"
-                  className="bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 border-amber-200 font-bold px-2 py-1 text-xs"
-                >
-                  {totalItems} {dict.cartSidebar.itemLabel}
-                  {totalItems > 1 ? dict.cartSidebar.itemPlural : ""}
-                </Badge>
-              )}
-            </SheetTitle>
-          </div>
+            {totalItems > 0 && (
+              <Badge className="bg-white text-zinc-900 border border-zinc-200 px-3 py-1 font-bold shadow-sm">
+                {totalItems} {dict.cartSidebar.itemLabel}
+                {totalItems > 1 ? dict.cartSidebar.itemPlural : ""}
+              </Badge>
+            )}
+          </SheetTitle>
         </SheetHeader>
 
+        {/* Corps du panier */}
         {!items.length ? (
-          /* État vide élégant - CENTRE AVEC PLUS D'ESPACE */
-          <div className="flex flex-col items-center justify-center flex-1 py-8 px-6">
-            <div className="relative mb-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-200 to-slate-300 rounded-full blur-xl opacity-30" />
-              <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 p-6 rounded-full shadow-lg">
-                <ShoppingCart className="w-12 h-12 text-slate-400" />
-              </div>
+          <div className="flex flex-col items-center justify-center flex-1 p-8 text-center space-y-6">
+            <div className="bg-zinc-900 p-6 rounded-full border border-zinc-800">
+              <ShoppingCart className="w-12 h-12 text-zinc-600" />
             </div>
 
-            <div className="text-center space-y-3">
-              <h3 className="font-bold text-lg text-slate-800 mb-2">
+            <div className="space-y-2">
+              <h3 className="font-serif font-bold text-xl text-amber-50">
                 {dict.cartSidebar.emptyTitle}
               </h3>
-              <p className="text-slate-600 text-center leading-relaxed max-w-sm text-sm">
+              <p className="text-zinc-400 text-sm max-w-[250px] mx-auto">
                 {dict.cartSidebar.emptyDesc}
               </p>
-
-              <Button
-                onClick={onClose}
-                className="mt-4 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-700 hover:via-orange-700 hover:to-red-700 text-white font-bold px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-              >
-                <Package className="w-4 h-4 mr-2" />
-                {dict.cartSidebar.continueShopping}
-                <ArrowRight className="w-3 h-3 ml-2" />
-              </Button>
             </div>
+
+            <Button
+              onClick={onClose}
+              className="bg-amber-100/10 text-amber-50 hover:bg-amber-100/20 border border-amber-100/20 px-8 py-6 uppercase tracking-wider text-sm font-bold transition-all"
+            >
+              <Package className="w-4 h-4 mr-2" />
+              {dict.cartSidebar.continueShopping}
+            </Button>
           </div>
         ) : (
           <>
-            {/* Liste des items avec scroll personnalisé - MAXIMISÉ */}
+            {/* Liste des items */}
             <div className="flex-1 min-h-0 overflow-hidden">
               <ScrollArea className="h-full">
-                <div className="space-y-3 py-4 px-2">
+                <div className="p-5 space-y-4">
                   {items.map((item, index) => (
-                    <div
-                      key={item.id}
-                      style={{ animationDelay: `${index * 50}ms` }}
-                      className="animate-in slide-in-from-right-4 duration-300"
-                    >
-                      <CartItem item={item} dict={dict} />
-                    </div>
+                    <CartItem key={item.id} item={item} dict={dict} />
                   ))}
                 </div>
               </ScrollArea>
             </div>
 
-            {/* Footer premium avec récapitulatif - RÉDUIT */}
-            <div className="sticky bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/50 p-4 space-y-4 flex-shrink-0">
-              {/* Récapitulatif avec design moderne - COMPACT */}
-              <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl p-3 space-y-2 border border-slate-200/50">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-600 font-medium">
-                    {dict.cartSidebar.subtotalLabel.replace(
-                      "{count}",
-                      totalItems
-                    )}
-                  </span>
-                  <span className="font-semibold text-slate-800 text-sm">
-                    {formatPrice(totalPrice)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-600 font-medium">
+            {/* Récapitulatif et Boutons */}
+            <div className="p-5 bg-zinc-950 border-t border-zinc-800 flex-shrink-0 flex flex-col gap-5">
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-zinc-400">
                     {dict.cartSidebar.shippingLabel}
                   </span>
-                  <span className="text-green-600 font-semibold text-xs">
+                  <span className="text-emerald-400/90 font-medium">
                     {dict.cartSidebar.shippingNextStep}
                   </span>
                 </div>
 
-                <Separator className="my-2" />
+                <Separator className="bg-zinc-800" />
 
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-sm text-slate-800 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-amber-500" />
+                <div className="flex justify-between items-end">
+                  <span className="text-sm font-bold text-amber-100/70 flex items-center gap-2 uppercase tracking-widest">
                     {dict.cartSidebar.totalLabel}
                   </span>
-                  <span className="font-bold text-lg text-slate-900 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                  <span className="text-3xl font-bold font-serif text-amber-50">
                     {formatPrice(totalPrice)}
                   </span>
                 </div>
               </div>
 
-              {/* Boutons d'action premium - COMPACTS */}
-              <SheetFooter className="flex-col gap-2 sm:flex-col">
+              <div className="flex flex-col gap-3">
                 <Button
                   onClick={handleCheckout}
-                  className="w-full bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-700 hover:via-orange-700 hover:to-red-700 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group text-sm"
+                  className="w-full bg-transparent border-2 border-terracotta text-terracotta hover:bg-terracotta hover:text-parchemin py-6 text-base font-bold shadow-lg transition-colors"
                   disabled={!items.length}
                 >
-                  {/* Effet de brillance */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-
-                  <CreditCard className="w-4 h-4 mr-2" />
+                  <CreditCard className="w-5 h-5 mr-2" />
                   {dict.cartSidebar.checkoutButton}
-                  <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                 </Button>
 
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <Button
                     onClick={onClose}
                     variant="outline"
-                    className="flex-1 border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all duration-300 rounded-lg py-2 font-semibold text-xs"
+                    className="flex-1 bg-silex border-parchemin/20 text-parchemin font-bold hover:text-terracotta hover:border-terracotta/50 hover:bg-terracotta/10 py-5 transition-colors"
                   >
-                    <Package className="w-3 h-3 mr-1" />
                     {dict.cartSidebar.continueShopping}
                   </Button>
 
                   <Button
                     onClick={handleClearCart}
-                    variant="ghost"
-                    className="flex-1 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300 rounded-lg py-2 font-semibold border border-transparent text-xs"
+                    variant="outline"
+                    className="flex-1 bg-silex border-parchemin/20 text-parchemin font-bold hover:text-red-400 hover:border-red-900/50 hover:bg-destructive/10 py-5 transition-colors"
                   >
-                    <Trash2 className="w-3 h-3 mr-1" />
+                    <Trash2 className="w-4 h-4 mr-2" />
                     {dict.cartSidebar.clearButton}
                   </Button>
                 </div>
-              </SheetFooter>
+              </div>
             </div>
           </>
         )}

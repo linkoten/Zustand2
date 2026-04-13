@@ -12,11 +12,16 @@ export const metadata: Metadata = {
   robots: "noindex, nofollow",
 };
 
-export default async function CreateArticlePage() {
+export default async function CreateArticlePage({
+  params,
+}: {
+  params: Promise<{ lang: "en" | "fr" }>;
+}) {
+  const { lang } = await params;
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect(`/${lang}/sign-in`);
   }
 
   // Vérifier que l'utilisateur a les droits d'administration
@@ -28,7 +33,7 @@ export default async function CreateArticlePage() {
     !user ||
     (user.role !== UserRole.ADMIN && user.role !== UserRole.MODERATOR)
   ) {
-    redirect("/");
+    redirect(`/${lang}/fossiles`);
   }
 
   return (

@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, Filter, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { FossilCard } from "./fossil-card";
@@ -10,6 +17,7 @@ import { FilterOptions } from "@/types/productType";
 import FossilesFilters from "./fossil-filters";
 import { Badge } from "@/components/ui/badge";
 import FossilesFiltersMobile from "./fossil-filters-mobile";
+import { useFossilStore } from "@/stores/fossilStore";
 
 interface FossilesClientProps {
   fossilsData: {
@@ -22,6 +30,7 @@ interface FossilesClientProps {
   lang?: "en" | "fr";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
+  userId?: string | null;
 }
 
 // Composant animé pour chaque fossil card
@@ -50,7 +59,7 @@ function AnimatedFossilCard({
           observer.unobserve(entry.target);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     if (cardRef.current) {
@@ -76,28 +85,85 @@ function AnimatedFossilCard({
 }
 
 export default function FossilesClient({
-  fossilsData,
+  fossilsData: initialData,
   filterOptions,
   lang = "fr",
   dict,
+  userId,
 }: FossilesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { fossils, totalCount, totalPages, currentPage } = fossilsData;
+
+  const { setFossilData, setInitialFilters, setUserId, loadCatalogIndex } =
+    useFossilStore();
+  const { fossilData, isLoading } = useFossilStore();
+
+  const isInitialized = useRef(false);
+
+  useEffect(() => {
+    if (!isInitialized.current) {
+      setInitialFilters({
+        search: searchParams.get("search") || undefined,
+        category: searchParams.get("category") || undefined,
+        countryOfOrigin: searchParams.get("countryOfOrigin") || undefined,
+        locality: searchParams.get("locality") || undefined,
+        geologicalPeriod: searchParams.get("geologicalPeriod") || undefined,
+        geologicalStage: searchParams.get("geologicalStage") || undefined,
+        page: searchParams.get("page") || "1",
+      });
+      setFossilData(initialData);
+      setUserId(userId || null);
+      loadCatalogIndex();
+      isInitialized.current = true;
+    }
+  }, [
+    searchParams,
+    initialData,
+    setFossilData,
+    setInitialFilters,
+    setUserId,
+    userId,
+    loadCatalogIndex,
+  ]);
+
+  const currentData = isInitialized.current ? fossilData : initialData;
+  const { fossils, totalCount, totalPages, currentPage } = currentData;
 
   // Compter les filtres actifs pour le badge
   const activeFiltersCount = Array.from(searchParams.entries()).filter(
-    ([key, value]) => key !== "page" && value && value !== "all"
+    ([key, value]) => key !== "page" && value && value !== "all",
   ).length;
 
   const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
+    useFossilStore.getState().updateFilters({ page: page.toString() });
+    const params = new URLSearchParams(window.location.search);
     params.set("page", page.toString());
-    router.push(`/${lang}/fossiles?${params.toString()}`);
+    window.history.pushState(
+      null,
+      "",
+      `/${lang}/fossiles?${params.toString()}`,
+    );
   };
 
   const clearAllFilters = () => {
-    router.push(`/${lang}/fossiles`);
+    useFossilStore.getState().resetFilters();
+    window.history.pushState(null, "", `/${lang}/fossiles`);
+  };
+
+  const handleSortChange = (value: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (value === "default") {
+      params.delete("sort");
+      useFossilStore.getState().updateFilters({ sort: undefined });
+    } else {
+      params.set("sort", value);
+      useFossilStore.getState().updateFilters({ sort: value });
+    }
+    window.history.pushState(
+      null,
+      "",
+      `/${lang}/fossiles?${params.toString()}`,
+    );
   };
 
   const renderPaginationButtons = () => {
@@ -120,12 +186,12 @@ export default function FossilesClient({
           onClick={() => handlePageChange(i)}
           className={
             currentPage === i
-              ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 border-0 shadow-md transform hover:scale-105 transition-all duration-200"
-              : "border-slate-300 hover:border-amber-300 hover:bg-amber-50 transition-all duration-200"
+              ? "bg-[var(--terracotta)] hover:bg-[var(--terracotta)]/90 border-0 text-white shadow-md transform hover:scale-105 transition-all duration-200"
+              : "border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 transition-all duration-200"
           }
         >
           {i}
-        </Button>
+        </Button>,
       );
     }
 
@@ -136,17 +202,17 @@ export default function FossilesClient({
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       {/* En-tête avec filtres mobile - VISIBLE UNIQUEMENT SUR MOBILE */}
       <div className="lg:hidden">
-        <div className="bg-gradient-to-r from-white via-slate-50 to-white rounded-xl border-0 p-4 sm:p-6 shadow-xl backdrop-blur-sm">
+        <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm">
           <div className="flex flex-col gap-4">
             {/* Statistiques compactes */}
             <div className="text-center">
-              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-amber-700 bg-clip-text text-transparent mb-2">
+              <h2 className="text-xl sm:text-2xl font-serif font-bold text-[var(--parchemin)] mb-2">
                 {dict?.fossils?.catalogTitle || "Catalogue de fossiles"}
               </h2>
-              <p className="text-slate-600 text-sm sm:text-base">
+              <p className="text-[var(--parchemin)]/60 text-sm sm:text-base">
                 {totalCount > 0 ? (
                   <>
-                    <span className="font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                    <span className="font-bold text-[var(--terracotta)]">
                       {totalCount}
                     </span>{" "}
                     {dict?.fossils?.results || "résultats"}
@@ -157,9 +223,25 @@ export default function FossilesClient({
               </p>
             </div>
 
-            {/* Bouton filtres + badge */}
-            <div className="flex items-center justify-center">
-              <FossilesFiltersMobile
+              {/* Bouton filtres + badge */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Select
+                  value={searchParams.get("sort") || "default"}
+                  onValueChange={handleSortChange}
+                >
+                  <SelectTrigger className="w-full sm:w-[200px] border-[var(--parchemin)]/20 bg-[var(--silex)] text-[var(--parchemin)] focus:ring-[var(--terracotta)]">
+                    <SelectValue placeholder="Trier par..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a2321] text-[var(--parchemin)] border-[#d4af37]/20 shadow-2xl z-[100] opacity-100">
+                    <SelectItem value="default" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Par défaut</SelectItem>
+                    <SelectItem value="name_asc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Nom (A-Z)</SelectItem>
+                    <SelectItem value="name_desc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Nom (Z-A)</SelectItem>
+                    <SelectItem value="price_asc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Prix croissant</SelectItem>
+                    <SelectItem value="price_desc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Prix décroissant</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <FossilesFiltersMobile
                 filterOptions={filterOptions}
                 lang={lang}
                 dict={dict}
@@ -187,22 +269,22 @@ export default function FossilesClient({
         {/* Contenu principal desktop */}
         <div className="flex-1 space-y-6">
           {/* En-tête avec statistiques - DESKTOP */}
-          <div className="bg-gradient-to-r from-white via-slate-50 to-white rounded-xl border-0 p-8 shadow-xl backdrop-blur-sm">
+          <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-8 shadow-xl backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-amber-700 bg-clip-text text-transparent mb-2">
+                <h2 className="text-3xl font-serif font-bold text-[var(--parchemin)] mb-2">
                   {dict?.fossils?.catalogTitle || "Catalogue de fossiles"}
                 </h2>
-                <p className="text-slate-600 text-lg">
+                <p className="text-[var(--parchemin)]/60 text-lg">
                   {totalCount > 0 ? (
                     <>
                       {dict?.fossils?.showingResults || "Affichage de"}{" "}
-                      <span className="font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                      <span className="font-bold text-[var(--terracotta)]">
                         {(currentPage - 1) * 20 + 1}-
                         {Math.min(currentPage * 20, totalCount)}
                       </span>{" "}
                       {dict?.fossils?.of || "sur"}{" "}
-                      <span className="font-bold text-slate-800">
+                      <span className="font-bold text-[var(--parchemin)]">
                         {totalCount}
                       </span>{" "}
                       {dict?.fossils?.results || "résultats"}
@@ -213,20 +295,57 @@ export default function FossilesClient({
                 </p>
               </div>
 
-              {activeFiltersCount > 0 && (
-                <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg text-base px-4 py-2 animate-pulse">
-                  <Filter className="w-4 h-4 mr-2" />
-                  {activeFiltersCount}{" "}
-                  {dict?.fossils?.activeFilters || "filtres actifs"}
-                </Badge>
-              )}
+              <div className="flex items-center gap-4">
+                <Select
+                  value={searchParams.get("sort") || "default"}
+                  onValueChange={handleSortChange}
+                >
+                  <SelectTrigger className="w-[200px] border-[var(--parchemin)]/20 bg-[var(--silex)] text-[var(--parchemin)] focus:ring-[var(--terracotta)]">
+                    <SelectValue placeholder="Trier par..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a2321] text-[var(--parchemin)] border-[#d4af37]/20 shadow-2xl z-[100] opacity-100">
+                    <SelectItem value="default" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Par défaut</SelectItem>
+                    <SelectItem value="name_asc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Nom (A-Z)</SelectItem>
+                    <SelectItem value="name_desc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Nom (Z-A)</SelectItem>
+                    <SelectItem value="price_asc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Prix croissant</SelectItem>
+                    <SelectItem value="price_desc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Prix décroissant</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {activeFiltersCount > 0 && (
+                  <Badge className="bg-[var(--terracotta)] text-white border-0 shadow-lg text-base px-4 py-2 animate-pulse max-w-fit flex items-center justify-center min-w-max">
+                    <Filter className="w-4 h-4 mr-2" />
+                    {activeFiltersCount}{" "}
+                    {dict?.fossils?.activeFilters || "filtres actifs"}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Grille des fossiles desktop */}
           {fossils.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              {isLoading && (
+                <div className="col-span-full grid grid-cols-2 gap-4 lg:gap-8 w-full z-10 relative mb-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="flex flex-col bg-[#1a2321] border border-[var(--parchemin)]/10 rounded-xl overflow-hidden animate-pulse shadow-md">
+                      <div className="w-full aspect-[4/3] bg-white/5"></div>
+                      <div className="p-4 lg:p-5 space-y-4">
+                        <div className="flex justify-between items-start">
+                          <div className="h-6 bg-white/5 rounded-md w-2/5"></div>
+                          <div className="h-5 bg-white/5 rounded-md w-1/4"></div>
+                        </div>
+                        <div className="h-4 bg-white/5 rounded-md w-3/4"></div>
+                        <div className="h-10 bg-white/5 rounded-md w-full mt-4"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div
+                className={`grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-8 transition-opacity duration-300 ${isLoading ? "hidden pointer-events-none" : "opacity-100"}`}
+              >
                 {fossils.map((fossil, index) => (
                   <AnimatedFossilCard
                     key={fossil.id}
@@ -240,15 +359,15 @@ export default function FossilesClient({
 
               {/* Pagination desktop */}
               {totalPages > 1 && (
-                <div className="bg-gradient-to-r from-white via-slate-50 to-white rounded-xl border-0 p-8 shadow-xl backdrop-blur-sm">
+                <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-8 shadow-xl backdrop-blur-sm">
                   <div className="flex items-center justify-between">
-                    <div className="text-slate-600 font-medium">
+                    <div className="text-[var(--parchemin)]/60 font-medium">
                       {dict?.fossils?.page || "Page"}{" "}
-                      <span className="font-bold text-amber-600">
+                      <span className="font-bold text-[var(--terracotta)]">
                         {currentPage}
                       </span>{" "}
                       {dict?.fossils?.of || "sur"}{" "}
-                      <span className="font-bold text-slate-800">
+                      <span className="font-bold text-[var(--parchemin)]">
                         {totalPages}
                       </span>
                     </div>
@@ -259,7 +378,7 @@ export default function FossilesClient({
                         size="sm"
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="border-slate-300 hover:border-amber-300 hover:bg-amber-50 disabled:opacity-50 transition-all duration-200 transform hover:scale-105"
+                        className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200 transform hover:scale-105"
                       >
                         <ChevronLeft className="w-4 h-4 mr-1" />
                         {dict?.fossils?.previous || "Précédent"}
@@ -274,7 +393,7 @@ export default function FossilesClient({
                         size="sm"
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="border-slate-300 hover:border-amber-300 hover:bg-amber-50 disabled:opacity-50 transition-all duration-200 transform hover:scale-105"
+                        className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200 transform hover:scale-105"
                       >
                         {dict?.fossils?.next || "Suivant"}
                         <ChevronRight className="w-4 h-4 ml-1" />
@@ -286,16 +405,16 @@ export default function FossilesClient({
             </>
           ) : (
             /* État vide desktop */
-            <div className="bg-gradient-to-br from-white via-slate-50 to-amber-50/30 rounded-xl border-0 p-16 shadow-xl backdrop-blur-sm text-center">
+            <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-16 shadow-xl backdrop-blur-sm text-center">
               <div className="max-w-md mx-auto">
-                <div className="relative w-20 h-20 bg-gradient-to-br from-slate-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <Search className="w-10 h-10 text-slate-400" />
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full animate-ping"></div>
+                <div className="relative w-20 h-20 bg-[var(--parchemin)]/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <Search className="w-10 h-10 text-[var(--parchemin)]/40" />
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-[var(--terracotta)] rounded-full animate-ping"></div>
                 </div>
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-3">
+                <h3 className="text-2xl font-serif font-bold text-[var(--parchemin)] mb-3">
                   {dict?.fossils?.empty || "Aucun fossile trouvé"}
                 </h3>
-                <p className="text-slate-600 mb-8 text-lg leading-relaxed">
+                <p className="text-[var(--parchemin)]/60 mb-8 text-lg leading-relaxed">
                   {dict?.fossils?.emptyDescription ||
                     "Aucun fossile ne correspond à vos critères de recherche."}
                 </p>
@@ -303,7 +422,7 @@ export default function FossilesClient({
                   <Button
                     variant="outline"
                     onClick={clearAllFilters}
-                    className="border-slate-300 hover:border-amber-400 hover:bg-amber-50 transform hover:scale-105 transition-all duration-200 shadow-md"
+                    className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 transform hover:scale-105 transition-all duration-200 shadow-md"
                   >
                     <X className="w-4 h-4 mr-2" />
                     {dict?.fossils?.clearFilters || "Effacer les filtres"}
@@ -320,7 +439,24 @@ export default function FossilesClient({
         {/* Grille des fossiles mobile avec marges */}
         {fossils.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 px-2 sm:px-0">
+            {isLoading && (
+              <div className="col-span-full grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0 w-full z-10 relative mb-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex flex-col bg-[#1a2321] border border-[var(--parchemin)]/10 rounded-xl overflow-hidden animate-pulse shadow-md">
+                    <div className="w-full aspect-square bg-white/5"></div>
+                    <div className="p-3 space-y-3">
+                      <div className="flex justify-between items-start">
+                        <div className="h-4 bg-white/5 rounded-md w-1/2"></div>
+                        <div className="h-3 bg-white/5 rounded-md w-1/4"></div>
+                      </div>
+                      <div className="h-3 bg-white/5 rounded-md w-3/4"></div>
+                      <div className="h-8 bg-white/5 rounded-md w-full mt-2"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className={`grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0 transition-opacity duration-300 ${isLoading ? "hidden pointer-events-none" : "opacity-100"}`}>
               {fossils.map((fossil, index) => (
                 <AnimatedFossilCard
                   key={fossil.id}
@@ -334,15 +470,15 @@ export default function FossilesClient({
 
             {/* Pagination mobile compacte */}
             {totalPages > 1 && (
-              <div className="bg-gradient-to-r from-white via-slate-50 to-white rounded-xl border-0 p-4 sm:p-6 shadow-xl backdrop-blur-sm mx-2 sm:mx-0">
+              <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm mx-2 sm:mx-0">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
-                  <div className="text-slate-600 font-medium text-sm sm:text-base text-center sm:text-left">
+                  <div className="text-[var(--parchemin)]/60 font-medium text-sm sm:text-base text-center sm:text-left">
                     {dict?.fossils?.page || "Page"}{" "}
-                    <span className="font-bold text-amber-600">
+                    <span className="font-bold text-[var(--terracotta)]">
                       {currentPage}
                     </span>{" "}
                     {dict?.fossils?.of || "sur"}{" "}
-                    <span className="font-bold text-slate-800">
+                    <span className="font-bold text-[var(--parchemin)]">
                       {totalPages}
                     </span>
                   </div>
@@ -353,7 +489,7 @@ export default function FossilesClient({
                       size="sm"
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="border-slate-300 hover:border-amber-300 hover:bg-amber-50 disabled:opacity-50 transition-all duration-200"
+                      className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200"
                     >
                       <ChevronLeft className="w-4 h-4 sm:mr-1" />
                       <span className="hidden sm:inline">
@@ -362,7 +498,7 @@ export default function FossilesClient({
                     </Button>
 
                     {/* Indicateur simple sur mobile */}
-                    <div className="sm:hidden px-3 py-1 bg-amber-50 rounded-lg text-sm font-medium text-amber-800">
+                    <div className="sm:hidden px-3 py-1 bg-[var(--terracotta)]/20 rounded-lg text-sm font-medium text-[var(--terracotta)]">
                       {currentPage}/{totalPages}
                     </div>
 
@@ -376,7 +512,7 @@ export default function FossilesClient({
                       size="sm"
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="border-slate-300 hover:border-amber-300 hover:bg-amber-50 disabled:opacity-50 transition-all duration-200"
+                      className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200"
                     >
                       <span className="hidden sm:inline">
                         {dict?.fossils?.next || "Suivant"}
@@ -390,16 +526,16 @@ export default function FossilesClient({
           </>
         ) : (
           /* État vide mobile */
-          <div className="bg-gradient-to-br from-white via-slate-50 to-amber-50/30 rounded-xl border-0 p-8 sm:p-12 shadow-xl backdrop-blur-sm text-center mx-2 sm:mx-0">
+          <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-8 sm:p-12 shadow-xl backdrop-blur-sm text-center mx-2 sm:mx-0">
             <div className="max-w-md mx-auto">
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-slate-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Search className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-amber-400 rounded-full animate-ping"></div>
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-[var(--parchemin)]/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Search className="w-8 h-8 sm:w-10 sm:h-10 text-[var(--parchemin)]/40" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-[var(--terracotta)] rounded-full animate-ping"></div>
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-3">
+              <h3 className="text-xl sm:text-2xl font-serif font-bold text-[var(--parchemin)] mb-3">
                 {dict?.fossils?.empty || "Aucun fossile trouvé"}
               </h3>
-              <p className="text-slate-600 mb-6 sm:mb-8 text-base sm:text-lg leading-relaxed">
+              <p className="text-[var(--parchemin)]/60 mb-6 sm:mb-8 text-base sm:text-lg leading-relaxed">
                 {dict?.fossils?.emptyDescription ||
                   "Aucun fossile ne correspond à vos critères de recherche."}
               </p>
@@ -407,7 +543,7 @@ export default function FossilesClient({
                 <Button
                   variant="outline"
                   onClick={clearAllFilters}
-                  className="border-slate-300 hover:border-amber-400 hover:bg-amber-50 transform hover:scale-105 transition-all duration-200 shadow-md"
+                  className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 transform hover:scale-105 transition-all duration-200 shadow-md"
                 >
                   <X className="w-4 h-4 mr-2" />
                   {dict?.fossils?.clearFilters || "Effacer les filtres"}

@@ -148,10 +148,12 @@ export default async function FossilRequestPage({
           {/* Sidebar avec conseils */}
           <div className="lg:col-span-1 space-y-6">
             {/* Conseils */}
-            <Card className="border-0 bg-gradient-to-r from-amber-50 to-orange-50 shadow-xl">
+            <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-amber-900">
-                  <Lightbulb className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-3 text-lg font-bold text-slate-800">
+                  <div className="p-2 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg shadow-md">
+                    <Lightbulb className="h-5 w-5 text-white" />
+                  </div>
                   {dict?.fossilRequest?.tipsTitle ||
                     "Conseils pour votre demande"}
                 </CardTitle>
@@ -159,12 +161,12 @@ export default async function FossilRequestPage({
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0 shadow-sm"></div>
                     <div>
-                      <h4 className="font-semibold text-amber-900 mb-1">
+                      <h4 className="font-semibold text-slate-800 mb-1">
                         {dict?.fossilRequest?.tip1Title || "Soyez précis"}
                       </h4>
-                      <p className="text-sm text-amber-700">
+                      <p className="text-sm text-slate-600 leading-relaxed">
                         {dict?.fossilRequest?.tip1Desc ||
                           "Plus votre description est détaillée, mieux nous pourrons vous aider à trouver le fossile idéal."}
                       </p>
@@ -172,13 +174,13 @@ export default async function FossilRequestPage({
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0 shadow-sm"></div>
                     <div>
-                      <h4 className="font-semibold text-amber-900 mb-1">
+                      <h4 className="font-semibold text-slate-800 mb-1">
                         {dict?.fossilRequest?.tip2Title ||
                           "Indiquez votre budget"}
                       </h4>
-                      <p className="text-sm text-amber-700">
+                      <p className="text-sm text-slate-600 leading-relaxed">
                         {dict?.fossilRequest?.tip2Desc ||
                           "Cela nous aide à vous proposer des options adaptées à vos moyens."}
                       </p>
@@ -186,13 +188,13 @@ export default async function FossilRequestPage({
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0 shadow-sm"></div>
                     <div>
-                      <h4 className="font-semibold text-amber-900 mb-1">
+                      <h4 className="font-semibold text-slate-800 mb-1">
                         {dict?.fossilRequest?.tip3Title ||
                           "Mentionnez vos préférences"}
                       </h4>
-                      <p className="text-sm text-amber-700">
+                      <p className="text-sm text-slate-600 leading-relaxed">
                         {dict?.fossilRequest?.tip3Desc ||
                           "Époque géologique, taille, état de conservation... tous les détails comptent !"}
                       </p>
@@ -203,55 +205,57 @@ export default async function FossilRequestPage({
             </Card>
 
             {/* Processus */}
-            <Card className="border-0 bg-gradient-to-r from-emerald-50 to-green-50 shadow-xl">
+            <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-emerald-900">
-                  <Clock className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-3 text-lg font-bold text-slate-800">
+                  <div className="p-2 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg shadow-md">
+                    <Clock className="h-5 w-5 text-white" />
+                  </div>
                   {dict?.fossilRequest?.processTitle || "Notre processus"}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-emerald-200 text-emerald-800 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    <div className="w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-md">
                       1
                     </div>
                     <div>
-                      <h4 className="font-semibold text-emerald-900 text-sm">
+                      <h4 className="font-semibold text-slate-800 text-sm">
                         {dict?.fossilRequest?.step1Title ||
                           "Analyse de votre demande"}
                       </h4>
-                      <p className="text-xs text-emerald-700">
+                      <p className="text-xs text-slate-600 font-medium">
                         {dict?.fossilRequest?.step1Desc || "Sous 24h"}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-emerald-200 text-emerald-800 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    <div className="w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-md">
                       2
                     </div>
                     <div>
-                      <h4 className="font-semibold text-emerald-900 text-sm">
+                      <h4 className="font-semibold text-slate-800 text-sm">
                         {dict?.fossilRequest?.step2Title ||
                           "Recherche dans notre réseau"}
                       </h4>
-                      <p className="text-xs text-emerald-700">
+                      <p className="text-xs text-slate-600 font-medium">
                         {dict?.fossilRequest?.step2Desc || "2-7 jours"}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-emerald-200 text-emerald-800 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    <div className="w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-md">
                       3
                     </div>
                     <div>
-                      <h4 className="font-semibold text-emerald-900 text-sm">
+                      <h4 className="font-semibold text-slate-800 text-sm">
                         {dict?.fossilRequest?.step3Title ||
                           "Proposition personnalisée"}
                       </h4>
-                      <p className="text-xs text-emerald-700">
+                      <p className="text-xs text-slate-600 font-medium">
                         {dict?.fossilRequest?.step3Desc || "Photos et prix"}
                       </p>
                     </div>
@@ -261,21 +265,21 @@ export default async function FossilRequestPage({
             </Card>
 
             {/* Contact */}
-            <Card className="border-0 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-xl">
+            <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl">
               <CardHeader>
-                <CardTitle className="text-blue-900">
+                <CardTitle className="text-lg font-bold text-slate-800">
                   {dict?.fossilRequest?.contactTitle || "Besoin d'aide ?"}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-blue-700 mb-4">
+                <p className="text-sm text-slate-600 leading-relaxed mb-4">
                   {dict?.fossilRequest?.contactDesc ||
                     "Notre équipe est disponible pour répondre à vos questions."}
                 </p>
                 <Button
                   asChild
                   variant="outline"
-                  className="w-full border-blue-200 text-blue-700 hover:bg-blue-50"
+                  className="w-full border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 transition-colors"
                 >
                   <Link href={`/${lang}/contact`}>
                     {dict?.fossilRequest?.contactButton || "Nous contacter"}

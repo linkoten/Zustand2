@@ -27,14 +27,14 @@ interface OrderDetailPageProps {
 export default async function OrderDetailPage({
   params,
 }: OrderDetailPageProps) {
+  const { id, lang } = await params;
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect(`/${lang}/sign-in`);
   }
 
   const orders = await getUserOrders(userId);
-  const { id, lang } = await params;
   const dict = await getDictionary(lang);
 
   const order = orders.find((o) => o.id === id);
@@ -122,7 +122,7 @@ export default async function OrderDetailPage({
                             year: "numeric",
                             month: "long",
                             day: "numeric",
-                          }
+                          },
                         )}
                       </span>
                     </span>
@@ -141,7 +141,7 @@ export default async function OrderDetailPage({
                       {
                         style: "currency",
                         currency: "EUR",
-                      }
+                      },
                     )}
                   </div>
                 </div>
@@ -210,7 +210,7 @@ export default async function OrderDetailPage({
                         {
                           hour: "2-digit",
                           minute: "2-digit",
-                        }
+                        },
                       )}
                     </div>
                   </div>
@@ -370,7 +370,7 @@ export default async function OrderDetailPage({
                                         {
                                           style: "currency",
                                           currency: "EUR",
-                                        }
+                                        },
                                       )}
                                     </div>
                                   </div>
@@ -389,7 +389,7 @@ export default async function OrderDetailPage({
                                         {
                                           style: "currency",
                                           currency: "EUR",
-                                        }
+                                        },
                                       )}
                                     </div>
                                   </div>
@@ -421,7 +421,7 @@ export default async function OrderDetailPage({
                         {
                           style: "currency",
                           currency: "EUR",
-                        }
+                        },
                       )}
                     </div>
                   </div>

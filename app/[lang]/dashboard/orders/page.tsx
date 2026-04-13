@@ -25,14 +25,14 @@ export default async function OrdersPage({
 }: {
   params: Promise<{ lang: "en" | "fr" }>;
 }) {
+  const { lang } = await params;
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect(`/${lang}/sign-in`);
   }
 
   const orders = await getUserOrders(userId);
-  const { lang } = await params;
   const dict = await getDictionary(lang);
 
   // Calculs des statistiques
@@ -158,7 +158,7 @@ export default async function OrdersPage({
                         style: "currency",
                         currency: "EUR",
                         maximumFractionDigits: 0,
-                      }
+                      },
                     )}
                   </div>
                   <p className="text-xs text-slate-600 font-medium">
@@ -188,7 +188,7 @@ export default async function OrdersPage({
                         style: "currency",
                         currency: "EUR",
                         maximumFractionDigits: 0,
-                      }
+                      },
                     )}
                   </div>
                   <p className="text-xs text-slate-600 font-medium">
@@ -282,7 +282,7 @@ export default async function OrdersPage({
                                 "Passée le"}{" "}
                               <span className="font-medium">
                                 {new Date(order.createdAt).toLocaleDateString(
-                                  lang === "en" ? "en-GB" : "fr-FR"
+                                  lang === "en" ? "en-GB" : "fr-FR",
                                 )}
                               </span>
                             </div>
@@ -307,7 +307,7 @@ export default async function OrdersPage({
                               {
                                 style: "currency",
                                 currency: "EUR",
-                              }
+                              },
                             )}
                           </div>
                         </div>
@@ -370,7 +370,7 @@ export default async function OrdersPage({
                                 day: "numeric",
                                 month: "short",
                                 year: "numeric",
-                              }
+                              },
                             )}
                           </div>
                         </div>

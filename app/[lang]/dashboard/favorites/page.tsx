@@ -22,14 +22,14 @@ export default async function FavoritesPage({
 }: {
   params: Promise<{ lang: "en" | "fr" }>;
 }) {
+  const { lang } = await params;
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect(`/${lang}/sign-in`);
   }
 
   const favorites = await getUserFavorites(userId);
-  const { lang } = await params;
   const dict = await getDictionary(lang);
 
   // Calculs des statistiques
@@ -43,11 +43,11 @@ export default async function FavoritesPage({
       acc[product.category] = (acc[product.category] || 0) + 1;
       return acc;
     },
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
 
   const topCategory = Object.entries(categoriesCount).sort(
-    (a, b) => b[1] - a[1]
+    (a, b) => b[1] - a[1],
   )[0];
 
   return (
@@ -155,7 +155,7 @@ export default async function FavoritesPage({
                         style: "currency",
                         currency: "EUR",
                         maximumFractionDigits: 0,
-                      }
+                      },
                     )}
                   </div>
                   <p className="text-xs text-slate-600 font-medium">
@@ -185,7 +185,7 @@ export default async function FavoritesPage({
                         style: "currency",
                         currency: "EUR",
                         maximumFractionDigits: 0,
-                      }
+                      },
                     )}
                   </div>
                   <p className="text-xs text-slate-600 font-medium">

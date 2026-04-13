@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getFossilRequests } from "@/lib/actions/fossilRequestsActions";
-import { getUserData } from "@/lib/actions/dashboardActions";
+import { getOrSyncUser } from "@/lib/actions/dashboardActions";
 import { RequestStatus, RequestPriority } from "@/lib/generated/prisma";
 import FossilRequestsList from "@/components/fossilRequests/fossilRequestsList";
 import { Button } from "@/components/ui/button";
@@ -33,19 +33,18 @@ export default async function UserFossilRequestsPage({
   }>;
   params: Promise<{ lang: "en" | "fr" }>;
 }) {
+  const { lang } = await params;
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect(`/${lang}/sign-in`);
   }
 
-  const user = await getUserData(userId);
+  const user = await getOrSyncUser(userId);
 
   if (!user) {
-    redirect("/sign-in");
+    redirect(`/${lang}/sign-in`);
   }
-
-  const { lang } = await params;
   const dict = await getDictionary(lang);
 
   const resolvedSearchParams = await searchParams;
@@ -62,13 +61,13 @@ export default async function UserFossilRequestsPage({
   });
 
   const pendingCount = requestsData.requests.filter(
-    (r) => r.status === "PENDING"
+    (r) => r.status === "PENDING",
   ).length;
   const inProgressCount = requestsData.requests.filter(
-    (r) => r.status === "IN_PROGRESS"
+    (r) => r.status === "IN_PROGRESS",
   ).length;
   const completedCount = requestsData.requests.filter(
-    (r) => r.status === "COMPLETED"
+    (r) => r.status === "COMPLETED",
   ).length;
 
   return (

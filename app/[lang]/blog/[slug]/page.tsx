@@ -88,7 +88,7 @@ export async function generateStaticParams() {
   } catch (error) {
     console.error(
       "Erreur lors de la génération des paramètres statiques:",
-      error
+      error,
     );
     return [];
   }
@@ -184,17 +184,17 @@ export default async function BlogArticlePage(props: BlogArticlePageProps) {
 
             {/* Titre spectaculaire */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-8">
-              <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
                 {article.title}
               </span>
             </h1>
 
             {/* Excerpt redesigné */}
             {article.excerpt && (
-              <div className="relative mb-8">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-purple-50/50 rounded-2xl" />
+              <div className="relative mb-8 border border-terracotta/30">
+                <div className="absolute inset-0 bg-background/50 rounded-2xl" />
                 <div className="relative p-6">
-                  <p className="text-xl md:text-2xl text-slate-700 leading-relaxed font-medium">
+                  <p className="text-xl md:text-2xl text-parchemin/90 leading-relaxed font-medium">
                     {article.excerpt}
                   </p>
                 </div>
@@ -268,7 +268,7 @@ export default async function BlogArticlePage(props: BlogArticlePageProps) {
                     </p>
                     <p className="font-semibold text-slate-800">
                       {article.views.toLocaleString(
-                        lang === "fr" ? "fr-FR" : "en-US"
+                        lang === "fr" ? "fr-FR" : "en-US",
                       )}
                     </p>
                   </div>

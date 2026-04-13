@@ -11,8 +11,9 @@ import { cn } from "@/lib/utils";
 interface FavoriteButtonProps {
   productId: number;
   isFavorite: boolean;
-  variant?: "default" | "overlay";
+  variant?: "default" | "overlay" | "outline";
   size?: "sm" | "md" | "lg";
+  className?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
 }
@@ -21,6 +22,7 @@ export function FavoriteButton({
   isFavorite: initialIsFavorite,
   variant = "default",
   size = "md",
+  className,
   dict,
 }: FavoriteButtonProps) {
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
@@ -32,7 +34,7 @@ export function FavoriteButton({
     if (!user) {
       toast.error(
         dict?.products?.mustBeLoggedIn ||
-          "Vous devez être connecté pour ajouter aux favoris"
+          "Vous devez être connecté pour ajouter aux favoris",
       );
       router.push("/sign-in");
       return;
@@ -51,7 +53,7 @@ export function FavoriteButton({
         if (!response.ok) {
           throw new Error(
             dict?.products?.favoriteError ||
-              "Erreur lors de la mise à jour des favoris"
+              "Erreur lors de la mise à jour des favoris",
           );
         }
 
@@ -64,13 +66,13 @@ export function FavoriteButton({
             : dict?.products?.addedToFavorites || "Ajouté aux favoris",
           {
             icon: isFavorite ? "💔" : "❤️",
-          }
+          },
         );
       } catch (error) {
         console.error("Erreur:", error);
         toast.error(
           dict?.products?.favoriteError ||
-            "Erreur lors de la mise à jour des favoris"
+            "Erreur lors de la mise à jour des favoris",
         );
       }
     });
@@ -79,6 +81,7 @@ export function FavoriteButton({
   const buttonClasses = {
     default: "border-2 hover:bg-red-50 hover:border-red-300",
     overlay: "bg-white/90 hover:bg-white shadow-md backdrop-blur-sm",
+    outline: "border-2 border-transparent bg-transparent",
   };
 
   const sizeClasses = {
@@ -100,7 +103,8 @@ export function FavoriteButton({
         "transition-all duration-200",
         buttonClasses[variant],
         sizeClasses[size],
-        isFavorite && "border-red-500 bg-red-50 text-red-600 hover:bg-red-100"
+        isFavorite && "border-red-500 bg-red-50 text-red-600 hover:bg-red-100",
+        className,
       )}
       onClick={handleToggleFavorite}
       disabled={isPending}
@@ -109,7 +113,7 @@ export function FavoriteButton({
         className={cn(
           iconSizes[size],
           "transition-all duration-200",
-          isFavorite ? "fill-current text-red-500" : "text-gray-600"
+          isFavorite ? "fill-current text-red-500" : "text-gray-600",
         )}
       />
     </Button>

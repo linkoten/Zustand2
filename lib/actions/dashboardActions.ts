@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { User } from "../generated/prisma";
 import { SerializedProduct } from "@/types/type";
 import { getProductRatingStats } from "./ratingActions";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function getUserData(clerkId: string): Promise<User | null> {
   return prisma.user.findUnique({
@@ -9,8 +10,36 @@ export async function getUserData(clerkId: string): Promise<User | null> {
   });
 }
 
+/**
+ * Récupère l'utilisateur depuis Prisma. S'il n'existe pas encore (ex: webhook manqué),
+ * le crée à partir des données Clerk avant de le retourner.
+ */
+export async function getOrSyncUser(clerkId: string): Promise<User | null> {
+  const existing = await prisma.user.findUnique({ where: { clerkId } });
+  if (existing) return existing;
+
+  // L'utilisateur existe dans Clerk mais pas en DB → on récupère ses infos
+  const clerkUser = await currentUser();
+  if (!clerkUser || clerkUser.id !== clerkId) return null;
+
+  const email = clerkUser.emailAddresses[0]?.emailAddress ?? "";
+  const name =
+    `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() || null;
+
+  // Si un user avec cet email existe déjà (ex: créé avant Clerk), on met à jour son clerkId
+  const byEmail = await prisma.user.findUnique({ where: { email } });
+  if (byEmail) {
+    return prisma.user.update({
+      where: { email },
+      data: { clerkId, name },
+    });
+  }
+
+  return prisma.user.create({ data: { clerkId, email, name } });
+}
+
 export async function getUserDataByStripeCustomerId(
-  stripeCustomerId: string
+  stripeCustomerId: string,
 ): Promise<User | null> {
   return prisma.user.findUnique({
     where: { stripeCustomerId },
@@ -96,7 +125,7 @@ export async function getUserDashboardData(userId: string) {
   } catch (error) {
     console.error(
       "Erreur lors de la récupération des données utilisateur:",
-      error
+      error,
     );
     return {
       favorites: [],
@@ -218,7 +247,7 @@ export async function getUserOrders(clerkId: string) {
 }
 
 export async function getUserFavorites(
-  clerkId: string
+  clerkId: string,
 ): Promise<SerializedProduct[]> {
   // 🔍 Debug
   console.log("🔍 Debug getUserFavorites:");
@@ -247,7 +276,7 @@ export async function getUserFavorites(
         userId: f.userId,
         productId: f.productId,
         productTitle: f.product?.title,
-      }))
+      })),
     );
 
     // Pour chaque favori, on complète tous les champs requis
@@ -305,7 +334,7 @@ export async function getUserFavorites(
               createdAt: img.createdAt?.toISOString?.() ?? "",
             })),
           };
-        })
+        }),
     );
 
     console.log("- final serialized favorites:", serializedFavorites.length);
@@ -313,7 +342,7 @@ export async function getUserFavorites(
   } catch (error) {
     console.error(
       "❌ Erreur lors de la récupération des favoris utilisateur:",
-      error
+      error,
     );
     return [];
   }

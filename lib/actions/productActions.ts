@@ -441,9 +441,12 @@ export async function getFossils(
         },
         locality: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+orderBy:
+          filters.sort === "name_asc" ? { title: "asc" }
+          : filters.sort === "name_desc" ? { title: "desc" }
+          : filters.sort === "price_asc" ? { price: "asc" }
+          : filters.sort === "price_desc" ? { price: "desc" }
+          : { createdAt: "desc" },
       skip,
       take: limit,
     });
@@ -770,4 +773,24 @@ export async function updateLocalityAction({
       error: "Erreur lors de la modification de la localité",
     };
   }
+}
+
+export async function getFossilCatalogIndex() {
+  const products = await prisma.product.findMany({
+    where: { status: ProductStatus.AVAILABLE },
+    select: {
+      category: true,
+      countryOfOrigin: true,
+      geologicalPeriod: true,
+      geologicalStage: true,
+      locality: { select: { name: true } }
+    }
+  });
+  return products.map(p => ({
+    category: p.category,
+    countryOfOrigin: p.countryOfOrigin,
+    geologicalPeriod: p.geologicalPeriod,
+    geologicalStage: p.geologicalStage,
+    locality: p.locality?.name || null
+  }));
 }

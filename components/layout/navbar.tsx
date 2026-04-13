@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
@@ -51,7 +52,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
           totalItems: cart.items.reduce((sum, item) => sum + item.quantity, 0),
           totalPrice: cart.items.reduce(
             (sum, item) => sum + item.product.price * item.quantity,
-            0
+            0,
           ),
         });
       }
@@ -102,7 +103,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
   return (
     <>
       {/* Navbar avec backdrop blur et design moderne */}
-      <nav className="bg-white/95 backdrop-blur-md shadow-lg border-b border-slate-200/50 sticky top-0 z-50 transition-all duration-300">
+      <nav className="bg-background/80 backdrop-blur-md shadow-lg border-b border-border/40 sticky top-0 z-50 transition-all duration-300">
         <div className="container mx-auto px-3 sm:px-4">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo optimisé pour mobile */}
@@ -112,19 +113,18 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 className="flex items-center space-x-2 sm:space-x-3 group"
               >
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 rounded-xl lg:rounded-2xl blur-lg opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
-                  <div className="relative bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 p-2 lg:p-3 rounded-xl lg:rounded-2xl shadow-xl transform group-hover:scale-105 transition-transform duration-300">
-                    <Sparkles className="w-4 h-4 lg:w-6 lg:h-6 text-white" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-amber-500/20 rounded-xl lg:rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
+                  <div className="relative bg-gradient-to-br p-1 lg:p-2 rounded-xl lg:rounded-2xl transform group-hover:scale-105 transition-transform duration-300 flex items-center justify-center filter drop-shadow-[0_0_8px_rgba(205,92,60,0.5)]">
+                    <img
+                      src="/logo.svg"
+                      alt="Logo Paleolitho"
+                      className="w-8 h-8 lg:w-10 lg:h-10 object-contain drop-shadow-md rounded-full"
+                    />
                   </div>
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="font-black text-lg sm:text-xl lg:text-3xl tracking-tight bg-gradient-to-br from-amber-700 via-orange-600 to-red-600 bg-clip-text text-transparent drop-shadow-sm group-hover:from-amber-600 group-hover:via-orange-500 group-hover:to-red-500 transition-all duration-300 truncate">
+                  <span className="font-serif font-black text-lg sm:text-xl lg:text-3xl tracking-tight text-parchemin drop-shadow-sm group-hover:text-primary transition-all duration-300 truncate">
                     Paleolitho
-                  </span>
-                  <span className="text-xs text-slate-500 font-medium -mt-1 hidden sm:block">
-                    {lang === "en"
-                      ? "Fossil Collection"
-                      : "Collection de Fossiles"}
                   </span>
                 </div>
               </Link>
@@ -137,18 +137,18 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="relative group px-6 py-3 rounded-xl transition-all duration-300 hover:bg-slate-50"
+                  className="relative group px-6 py-3 rounded-xl transition-all duration-300 hover:bg-white/5"
                 >
                   <div className="flex items-center gap-3">
                     {link.icon && (
-                      <link.icon className="w-4 h-4 text-slate-600 group-hover:text-slate-800 transition-colors duration-300" />
+                      <link.icon className="w-4 h-4 text-parchemin/70 group-hover:text-primary transition-colors duration-300" />
                     )}
-                    <span className="font-semibold text-slate-700 group-hover:text-slate-900 transition-colors duration-300">
+                    <span className="font-semibold text-parchemin/80 group-hover:text-parchemin transition-colors duration-300">
                       {link.label}
                     </span>
                   </div>
                   <div
-                    className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r ${link.gradient} rounded-full group-hover:w-8 transition-all duration-300`}
+                    className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r ${link.gradient} rounded-full group-hover:w-8 transition-all duration-300 opacity-60`}
                   ></div>
                 </Link>
               ))}
@@ -160,18 +160,18 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                     <Link
                       key={link.href}
                       href={link.href}
-                      className="relative group px-6 py-3 rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50"
+                      className="relative group px-6 py-3 rounded-xl transition-all duration-300 hover:bg-white/5"
                     >
                       <div className="flex items-center gap-3">
                         {link.icon && (
-                          <link.icon className="w-4 h-4 text-purple-600 group-hover:text-purple-700 transition-colors duration-300" />
+                          <link.icon className="w-4 h-4 text-primary/80 group-hover:text-primary transition-colors duration-300" />
                         )}
-                        <span className="font-semibold text-purple-700 group-hover:text-purple-800 transition-colors duration-300">
+                        <span className="font-semibold text-primary/80 group-hover:text-primary transition-colors duration-300">
                           {link.label}
                         </span>
                       </div>
                       <div
-                        className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r ${link.gradient} rounded-full group-hover:w-8 transition-all duration-300`}
+                        className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r ${link.gradient} rounded-full group-hover:w-8 transition-all duration-300 opacity-60`}
                       ></div>
                     </Link>
                   ))}
@@ -194,37 +194,37 @@ export default function Navbar({ lang, dict }: NavbarProps) {
               {isLoaded && (
                 <>
                   {user ? (
-                    <div className="flex items-center space-x-4 pl-4 border-l border-slate-200">
+                    <div className="flex items-center space-x-4 pl-4 border-l border-border/50">
                       <div className="relative group">
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full blur opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-amber-500 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
                         <UserButton
                           afterSignOutUrl="/"
                           appearance={{
                             elements: {
                               avatarBox:
-                                "w-10 h-10 ring-2 ring-white shadow-lg hover:ring-blue-200 transition-all duration-300",
+                                "w-10 h-10 ring-2 ring-primary/20 shadow-lg hover:ring-primary/60 transition-all duration-300",
                             },
                           }}
                         />
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-4 pl-4 border-l border-slate-200">
+                    <div className="flex items-center space-x-4 pl-4 border-l border-border/50">
                       <Button
                         asChild
                         variant="ghost"
-                        className="hover:bg-slate-100 rounded-xl px-4 py-2 transition-all duration-300 group"
+                        className="hover:bg-white/5 rounded-xl px-4 py-2 transition-all duration-300 group text-parchemin/80 hover:text-parchemin"
                       >
                         <Link href={`/${lang}/sign-in`}>
-                          <User className="mr-2 h-4 w-4 group-hover:text-blue-600 transition-colors duration-300" />
-                          <span className="font-semibold group-hover:text-blue-600 transition-colors duration-300">
+                          <User className="mr-2 h-4 w-4 group-hover:text-primary transition-colors duration-300" />
+                          <span className="font-semibold group-hover:text-primary transition-colors duration-300">
                             {dict.navbar.signin}
                           </span>
                         </Link>
                       </Button>
                       <Button
                         asChild
-                        className="bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-700 hover:via-orange-700 hover:to-red-700 text-white font-bold px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                        className="bg-gradient-to-r from-primary to-amber-700 hover:from-amber-600 hover:to-amber-800 text-parchemin font-bold px-6 py-2 rounded-xl shadow-lg border border-primary/40 hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                       >
                         <Link href={`/${lang}/sign-up`}>
                           {dict.navbar.signup}
@@ -235,7 +235,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 </>
               )}
 
-              <div className="pl-4 border-l border-slate-200">
+              <div className="pl-4 border-l border-border/50">
                 <LanguageSwitcher lang={lang} />
               </div>
             </div>
@@ -259,14 +259,14 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 variant="ghost"
                 size="icon"
                 onClick={toggleMobileMenu}
-                className="relative group rounded-xl p-2 hover:bg-slate-100 transition-all duration-300 flex-shrink-0"
+                className="relative group rounded-xl p-2 hover:bg-white/5 transition-all duration-300 flex-shrink-0"
                 aria-label="Menu"
               >
                 <div className="relative">
                   {isMobileMenuOpen ? (
-                    <X className="h-5 w-5 text-slate-700 group-hover:text-slate-900 transition-colors duration-300" />
+                    <X className="h-5 w-5 text-parchemin/80 group-hover:text-primary transition-colors duration-300" />
                   ) : (
-                    <Menu className="h-5 w-5 text-slate-700 group-hover:text-slate-900 transition-colors duration-300" />
+                    <Menu className="h-5 w-5 text-parchemin/80 group-hover:text-primary transition-colors duration-300" />
                   )}
                 </div>
               </Button>
@@ -275,7 +275,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
           {/* Navigation mobile avec design moderne */}
           {isMobileMenuOpen && (
-            <div className="lg:hidden py-4 border-t border-slate-200/50 bg-white/95 backdrop-blur-md">
+            <div className="lg:hidden py-4 border-t border-border/40 bg-background/95 backdrop-blur-md">
               <div className="flex flex-col space-y-2">
                 {/* Liens publics */}
                 {navigationLinks.map((link, index) => (

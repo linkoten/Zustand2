@@ -5,7 +5,7 @@ import { Plus, Search } from "lucide-react";
 import FossilesClient from "@/components/fossils/fossilesClient";
 import { getFilterOptions, getFossils } from "@/lib/actions/productActions";
 import { SearchParams } from "@/types/productType";
-import { getUserData } from "@/lib/actions/dashboardActions";
+import { getUserData, getOrSyncUser } from "@/lib/actions/dashboardActions";
 import UserProvider from "@/components/provider/userProvider";
 import { redirect } from "next/navigation";
 import { getDictionary } from "../dictionaries";
@@ -25,11 +25,11 @@ export default async function FossilesPage({
   // ✅ Récupérer userId AVANT l'appel à getFossils
   const { userId } = await auth();
   if (!userId) {
-    redirect("/sign-in");
+    redirect(`/${lang}/sign-in`);
   }
-  const user = await getUserData(userId!);
+  const user = await getOrSyncUser(userId!);
   if (!user) {
-    redirect("/sign-in");
+    redirect(`/${lang}/sign-in`);
   }
 
   // Pagination
@@ -41,7 +41,7 @@ export default async function FossilesPage({
     resolvedSearchParams,
     userId,
     currentPage,
-    limit
+    limit,
   );
   const filterOptionsRaw = await getFilterOptions();
   const filterOptions = {
@@ -51,16 +51,36 @@ export default async function FossilesPage({
 
   return (
     <UserProvider user={user}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/20 to-stone-50">
-        <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen relative bg-silex">
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-terracotta/5 to-transparent" />
+          <div className="absolute top-[20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-cyan-900/10 blur-[100px] animate-float" />
+          <div
+            className="absolute bottom-[20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-terracotta/10 blur-[120px] animate-float"
+            style={{ animationDelay: "2s" }}
+          />
+        </div>
+
+        <div className="container mx-auto px-4 py-8 relative z-10 animate-fadeInUp">
           {/* Header moderne */}
           <div className="mb-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-end gap-6 mb-8">
-              <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+              <div className="flex-1">
+                <h1 className="text-4xl md:text-5xl font-serif font-bold text-parchemin mb-3 bg-gradient-to-r from-parchemin via-terracotta to-parchemin bg-clip-text text-transparent inline-block animate-shimmer-gold">
+                  {(dict?.fossils as any)?.title ||
+                    "La Galerie des Temps Anciens"}
+                </h1>
+                <p className="text-parchemin/70 max-w-2xl text-lg">
+                  {(dict?.fossils as any)?.description ||
+                    "Parcourez notre collection d'artefacts paléontologiques, soigneusement préservés pour traverser les âges."}
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 items-start lg:items-center">
                 <Button
                   asChild
-                  variant="outline"
-                  className="border-amber-200 hover:bg-amber-50 hover:border-amber-300"
+                  className="bg-transparent border-2 border-terracotta text-terracotta hover:bg-terracotta hover:text-parchemin font-bold shadow-lg transform hover:scale-105 transition-all duration-300"
                 >
                   <Link href={`/${lang}/fossiles/request`}>
                     <Search className="mr-2 h-4 w-4" />
@@ -69,7 +89,10 @@ export default async function FossilesPage({
                 </Button>
 
                 {user && user.role === "ADMIN" && (
-                  <Button asChild className="bg-amber-600 hover:bg-amber-700">
+                  <Button
+                    asChild
+                    className="bg-transparent border-2 border-cyan-700 text-cyan-500 hover:bg-cyan-900/30 hover:text-cyan-300 font-bold shadow-lg shadow-cyan-900/20 transform hover:scale-105 transition-all duration-300"
+                  >
                     <Link href={`/${lang}/fossiles/create`}>
                       <Plus className="mr-2 h-4 w-4" />
                       Créer un produit
@@ -78,6 +101,8 @@ export default async function FossilesPage({
                 )}
               </div>
             </div>
+
+            <div className="h-px w-full bg-gradient-to-r from-terracotta/0 via-terracotta/30 to-terracotta/0 my-4" />
           </div>
 
           <FossilesClient
@@ -85,6 +110,7 @@ export default async function FossilesPage({
             filterOptions={filterOptions}
             lang={lang}
             dict={dict}
+            userId={userId}
           />
         </div>
       </div>

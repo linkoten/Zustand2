@@ -21,25 +21,18 @@ import Image from "next/image";
 import { DashboardUser, UserDashboardData } from "@/types/dashboardType";
 
 const statusColors = {
-  PENDING:
-    "bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-yellow-200",
-  IN_PROGRESS:
-    "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border-blue-200",
-  COMPLETED:
-    "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200",
-  REJECTED:
-    "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border-red-200",
-  CANCELLED:
-    "bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-gray-200",
+  PENDING: "bg-terracotta/10 text-terracotta border-terracotta/30",
+  IN_PROGRESS: "bg-cyan-900/40 text-cyan-300 border-cyan-700/30",
+  COMPLETED: "bg-emerald-900/40 text-emerald-300 border-emerald-700/30",
+  REJECTED: "bg-red-900/40 text-red-300 border-red-700/30",
+  CANCELLED: "bg-zinc-800 text-zinc-300 border-zinc-700",
 };
 
 const priorityColors = {
-  LOW: "bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-gray-200",
-  NORMAL:
-    "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200",
-  HIGH: "bg-gradient-to-r from-orange-100 to-red-100 text-orange-800 border-orange-200",
-  URGENT:
-    "bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border-red-200",
+  LOW: "bg-zinc-800 text-zinc-300 border-zinc-700",
+  NORMAL: "bg-cyan-900/40 text-cyan-300 border-cyan-700/30",
+  HIGH: "bg-terracotta/20 text-terracotta border-terracotta/50",
+  URGENT: "bg-red-900/40 text-red-300 border-red-700/30",
 };
 
 interface UserDashboardProps {
@@ -58,28 +51,23 @@ export default async function UserDashboard({
 }: UserDashboardProps) {
   return (
     <div className="relative">
-      {/* Background décoratif */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-amber-200/20 rounded-full blur-2xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-48 h-48 bg-blue-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-emerald-200/20 rounded-full blur-2xl animate-pulse delay-2000"></div>
-      </div>
+      {/* Background décoratif supprimé ici car maintenant inclus globalement dans page.tsx pour être persistant mais propre */}
 
       <div className="container mx-auto px-4 py-12 relative z-10">
         {/* En-tête avec animation */}
         <div className="mb-12 text-center">
-          <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg border border-white/20 mb-6">
-            <Sparkles className="w-5 h-5 text-amber-500 animate-pulse" />
-            <span className="text-sm font-semibold text-slate-700">
+          <div className="inline-flex items-center gap-3 bg-silex border border-parchemin/10 px-6 py-3 rounded-full shadow-xl mb-6">
+            <Sparkles className="w-5 h-5 text-terracotta animate-glow" />
+            <span className="text-sm font-semibold text-parchemin">
               {dict?.dashboard?.welcomeBack || "Bon retour"}
             </span>
           </div>
 
-          <h1 className="text-5xl font-black mb-4 bg-gradient-to-r from-amber-600 via-orange-500 to-red-500 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-black mb-4 bg-gradient-to-r from-parchemin via-terracotta to-parchemin bg-clip-text text-transparent animate-shimmer-gold">
             {dict?.dashboard?.greeting || "Bonjour"}{" "}
             {user.name || dict?.dashboard?.user || "Utilisateur"} ! 👋
           </h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-parchemin/70 max-w-2xl mx-auto leading-relaxed">
             {dict?.dashboard?.intro ||
               "Découvrez votre univers paléontologique et suivez vos trouvailles"}
           </p>
@@ -90,7 +78,7 @@ export default async function UserDashboard({
           <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-red-50/50 to-red-100/30 hover:scale-105 transform">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-red-600/10 rounded-t-lg"></div>
-              <CardTitle className="text-sm font-semibold text-slate-700 relative z-10">
+              <CardTitle className="text-sm font-semibold text-parchemin relative z-10">
                 {dict?.dashboard?.favorites || "Favoris"}
               </CardTitle>
               <div className="relative z-10">
@@ -103,7 +91,7 @@ export default async function UserDashboard({
               <div className="text-3xl font-black mb-1 bg-gradient-to-br from-red-600 to-red-800 bg-clip-text text-transparent">
                 {data.totalFavorites}
               </div>
-              <p className="text-xs text-slate-600 font-medium">
+              <p className="text-xs text-parchemin/70 font-medium">
                 {dict?.dashboard?.savedFossils || "Fossiles sauvegardés"}
               </p>
             </CardContent>
@@ -112,7 +100,7 @@ export default async function UserDashboard({
           <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 hover:scale-105 transform">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10 rounded-t-lg"></div>
-              <CardTitle className="text-sm font-semibold text-slate-700 relative z-10">
+              <CardTitle className="text-sm font-semibold text-parchemin relative z-10">
                 {dict?.dashboard?.requests || "Demandes"}
               </CardTitle>
               <div className="relative z-10">
@@ -125,7 +113,7 @@ export default async function UserDashboard({
               <div className="text-3xl font-black mb-1 bg-gradient-to-br from-blue-600 to-blue-800 bg-clip-text text-transparent">
                 {data.totalRequests}
               </div>
-              <p className="text-xs text-slate-600 font-medium">
+              <p className="text-xs text-parchemin/70 font-medium">
                 {dict?.dashboard?.fossilRequests || "Recherches actives"}
               </p>
             </CardContent>
@@ -134,7 +122,7 @@ export default async function UserDashboard({
           <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-emerald-50/50 to-emerald-100/30 hover:scale-105 transform">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-emerald-600/10 rounded-t-lg"></div>
-              <CardTitle className="text-sm font-semibold text-slate-700 relative z-10">
+              <CardTitle className="text-sm font-semibold text-parchemin relative z-10">
                 {dict?.dashboard?.memberSince || "Membre depuis"}
               </CardTitle>
               <div className="relative z-10">
@@ -150,7 +138,7 @@ export default async function UserDashboard({
                   year: "numeric",
                 })}
               </div>
-              <p className="text-xs text-slate-600 font-medium">
+              <p className="text-xs text-parchemin/70 font-medium">
                 {dict?.dashboard?.signupDate || "Exploration continue"}
               </p>
             </CardContent>
@@ -159,7 +147,7 @@ export default async function UserDashboard({
           <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-purple-50/50 to-purple-100/30 hover:scale-105 transform">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-purple-600/10 rounded-t-lg"></div>
-              <CardTitle className="text-sm font-semibold text-slate-700 relative z-10">
+              <CardTitle className="text-sm font-semibold text-parchemin relative z-10">
                 {dict?.dashboard?.orders || "Commandes"}
               </CardTitle>
               <div className="relative z-10">
@@ -172,7 +160,7 @@ export default async function UserDashboard({
               <div className="text-3xl font-black mb-1 bg-gradient-to-br from-purple-600 to-purple-800 bg-clip-text text-transparent">
                 {data.orders.length}
               </div>
-              <p className="text-xs text-slate-600 font-medium mb-3">
+              <p className="text-xs text-parchemin/70 font-medium mb-3">
                 {dict?.dashboard?.ordersPlaced || "Achats réalisés"}
               </p>
               <Button
@@ -190,13 +178,13 @@ export default async function UserDashboard({
         </div>
 
         {/* Actions rapides redesignées */}
-        <Card className="mb-12 border-0 bg-white/80 backdrop-blur-sm shadow-2xl">
+        <Card className="mb-12 border-0 bg-silex/50/80 backdrop-blur-sm shadow-2xl">
           <CardHeader className="text-center pb-6">
-            <CardTitle className="flex items-center justify-center gap-3 text-2xl font-bold text-slate-800">
+            <CardTitle className="flex items-center justify-center gap-3 text-2xl font-bold text-parchemin">
               <TrendingUp className="h-6 w-6 text-amber-500" />
               {dict?.dashboard?.quickActions || "Actions rapides"}
             </CardTitle>
-            <p className="text-slate-600 mt-2">
+            <p className="text-parchemin/70 mt-2">
               {dict?.dashboard?.quickActionsDesc ||
                 "Accédez rapidement à vos fonctionnalités favorites"}
             </p>
@@ -221,7 +209,7 @@ export default async function UserDashboard({
               <Button
                 asChild
                 variant="outline"
-                className="h-16 border-2 border-blue-200 hover:border-blue-300 hover:bg-blue-50 group"
+                className="h-16 border-2 border-blue-200 hover:border-blue-300 hover:bg-cyan-900/30 group group"
               >
                 <Link
                   href={`/${lang}/fossiles/request`}
@@ -237,7 +225,7 @@ export default async function UserDashboard({
               <Button
                 asChild
                 variant="outline"
-                className="h-16 border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 group"
+                className="h-16 border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-900/30 group group"
               >
                 <Link
                   href={`/${lang}/dashboard/requests/user`}
@@ -271,14 +259,14 @@ export default async function UserDashboard({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Favoris récents avec design amélioré */}
-          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
+          <Card className="border-0 bg-silex/50/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
             <CardHeader className="border-b border-red-100 bg-gradient-to-r from-red-50 to-pink-50">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-3">
                   <div className="p-2 bg-gradient-to-br from-red-400 to-red-600 rounded-xl shadow-lg">
                     <Heart className="h-5 w-5 text-white" />
                   </div>
-                  <span className="text-xl font-bold text-slate-800">
+                  <span className="text-xl font-bold text-parchemin">
                     {dict?.dashboard?.recentFavorites || "Mes favoris récents"}
                   </span>
                 </CardTitle>
@@ -303,11 +291,11 @@ export default async function UserDashboard({
                   <div className="w-20 h-20 bg-gradient-to-br from-red-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Heart className="h-10 w-10 text-red-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                  <h3 className="text-lg font-semibold text-parchemin mb-2">
                     {dict?.dashboard?.noFavorites ||
                       "Aucun favori pour le moment"}
                   </h3>
-                  <p className="text-slate-600 mb-6">
+                  <p className="text-parchemin/70 mb-6">
                     {dict?.dashboard?.noFavoritesDesc ||
                       "Commencez à explorer notre collection de fossiles exceptionnels"}
                   </p>
@@ -344,10 +332,10 @@ export default async function UserDashboard({
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-slate-800 truncate group-hover:text-red-700 transition-colors">
+                        <h4 className="font-semibold text-parchemin truncate group-hover:text-red-700 transition-colors">
                           {favorite.title}
                         </h4>
-                        <p className="text-sm text-slate-600 mb-1">
+                        <p className="text-sm text-parchemin/70 mb-1">
                           {favorite.category} • {favorite.geologicalPeriod}
                         </p>
                         <p className="text-lg font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
@@ -372,14 +360,14 @@ export default async function UserDashboard({
           </Card>
 
           {/* Demandes récentes avec design amélioré */}
-          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
+          <Card className="border-0 bg-silex/50/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
             <CardHeader className="border-b border-blue-100 bg-gradient-to-r from-blue-50 to-cyan-50">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-3">
                   <div className="p-2 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl shadow-lg">
                     <Search className="h-5 w-5 text-white" />
                   </div>
-                  <span className="text-xl font-bold text-slate-800">
+                  <span className="text-xl font-bold text-parchemin">
                     {dict?.dashboard?.recentRequests || "Mes demandes récentes"}
                   </span>
                 </CardTitle>
@@ -388,7 +376,7 @@ export default async function UserDashboard({
                     asChild
                     variant="outline"
                     size="sm"
-                    className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                    className="border-blue-200 text-blue-700 hover:bg-cyan-900/30 group"
                   >
                     <Link href={`/${lang}/dashboard/requests/user`}>
                       <TrendingUp className="w-3 h-3 mr-1" />
@@ -404,10 +392,10 @@ export default async function UserDashboard({
                   <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Search className="h-10 w-10 text-blue-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                  <h3 className="text-lg font-semibold text-parchemin mb-2">
                     {dict?.dashboard?.noRequests || "Aucune demande active"}
                   </h3>
-                  <p className="text-slate-600 mb-6">
+                  <p className="text-parchemin/70 mb-6">
                     {dict?.dashboard?.noRequestsDesc ||
                       "Vous cherchez un fossile spécifique ? Nous pouvons vous aider !"}
                   </p>
@@ -430,7 +418,7 @@ export default async function UserDashboard({
                       style={{ animationDelay: `${index * 100}ms` }}
                     >
                       <div className="flex items-start justify-between mb-3">
-                        <h4 className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">
+                        <h4 className="font-semibold text-parchemin group-hover:text-blue-700 transition-colors">
                           {request.fossilType}
                         </h4>
                         <div className="flex gap-2">
@@ -447,16 +435,16 @@ export default async function UserDashboard({
                         </div>
                       </div>
 
-                      <p className="text-sm text-slate-600 mb-4 line-clamp-2 leading-relaxed">
+                      <p className="text-sm text-parchemin/70 mb-4 line-clamp-2 leading-relaxed">
                         {request.description}
                       </p>
 
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-xs text-slate-500">
+                        <div className="flex items-center gap-4 text-xs text-parchemin/50">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
                             {new Date(request.createdAt).toLocaleDateString(
-                              "fr-FR"
+                              "fr-FR",
                             )}
                           </span>
                           {request.maxBudget && (
@@ -477,7 +465,7 @@ export default async function UserDashboard({
                           asChild
                           size="sm"
                           variant="outline"
-                          className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                          className="border-blue-200 text-blue-700 hover:bg-cyan-900/30 group"
                         >
                           <Link
                             href={`/${lang}/dashboard/requests/user/${request.id}`}

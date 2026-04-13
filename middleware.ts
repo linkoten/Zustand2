@@ -16,15 +16,14 @@ function getLocale(request: NextRequest): string {
   return matchLocale(languages, locales, defaultLocale);
 }
 
-export default function middleware(request: NextRequest, event: any) {
+export default clerkMiddleware(async (_auth, request) => {
   const { pathname } = request.nextUrl;
   console.log("[middleware] Pathname:", pathname);
 
-  // Si déjà sur /fr ou /en (juste après le slash), laisse passer
+  // Si déjà sur /fr ou /en, laisse passer (Clerk gère le reste)
   const match = pathname.match(/^\/(fr|en)(\/|$)/);
   if (match) {
-    // Clerk doit s'exécuter sur les routes protégées
-    return clerkMiddleware()(request, event);
+    return NextResponse.next();
   }
 
   // Sinon, détecte la locale préférée et redirige
@@ -32,8 +31,13 @@ export default function middleware(request: NextRequest, event: any) {
   const redirectUrl = `/${locale}${pathname === "/" ? "" : pathname}`;
   console.log("[middleware] Redirection vers:", redirectUrl);
   return NextResponse.redirect(new URL(redirectUrl, request.url));
-}
+});
 
 export const config = {
-  matcher: ["/((?!_next|api|static|favicon.ico).*)", "/(api|trpc)(.*)"],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes
+    "/(api|trpc)(.*)",
+  ],
 };

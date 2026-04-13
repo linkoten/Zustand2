@@ -147,7 +147,7 @@ export default function BlogList({
       }
 
       toast.success(
-        dict.blog?.blogList?.deleteSuccess || "Article supprimé avec succès"
+        dict.blog?.blogList?.deleteSuccess || "Article supprimé avec succès",
       );
 
       // Mettre à jour la liste locale
@@ -159,7 +159,7 @@ export default function BlogList({
       console.error("Erreur:", error);
       toast.error(
         dict.blog?.blogList?.deleteError ||
-          "Erreur lors de la suppression de l'article"
+          "Erreur lors de la suppression de l'article",
       );
     } finally {
       setDeletingId(null);
@@ -224,53 +224,6 @@ export default function BlogList({
 
   return (
     <div className="space-y-12">
-      {/* Header avec compteur premium */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-50/50 to-teal-50/50 rounded-2xl" />
-        <div className="relative p-6 rounded-2xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl shadow-lg">
-                <BookOpen className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-slate-800">
-                  {dict.blog?.blogList?.articlesTitle || "Articles du blog"}
-                </h2>
-                <p className="text-slate-600 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4" />
-                  <span className="font-semibold text-emerald-700">
-                    {totalPosts.toLocaleString(
-                      lang === "fr" ? "fr-FR" : "en-US"
-                    )}
-                  </span>
-                  <span>
-                    {totalPosts > 1
-                      ? dict.blog?.blogList?.articlesTotal ||
-                        "articles disponibles"
-                      : dict.blog?.blogList?.articleTotal ||
-                        "article disponible"}
-                  </span>
-                </p>
-              </div>
-            </div>
-
-            {/* Performance indicator */}
-            <div className="text-right">
-              <div className="text-2xl font-bold text-emerald-700">
-                {(
-                  (currentPage - 1) * localPosts.length +
-                  localPosts.length
-                ).toLocaleString(lang === "fr" ? "fr-FR" : "en-US")}
-              </div>
-              <div className="text-sm text-slate-600">
-                {dict.blog?.blogList?.displayedLabel || "Affichés"}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Grille des articles ultra moderne */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {localPosts.map((post, index) => (
@@ -279,7 +232,10 @@ export default function BlogList({
             className="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0"
             style={{
               animationDelay: `${index * 100}ms`,
-              animation: "fadeInUp 0.8s ease-out both",
+              animationName: "fadeInUp",
+              animationDuration: "0.8s",
+              animationTimingFunction: "ease-out",
+              animationFillMode: "both",
             }}
           >
             {/* Background décoratif */}
@@ -368,7 +324,7 @@ export default function BlogList({
                             {dict.blog?.blogList?.deleteDescription
                               ? dict.blog.blogList.deleteDescription.replace(
                                   "{title}",
-                                  post.title
+                                  post.title,
                                 )
                               : `Êtes-vous sûr de vouloir supprimer l'article "${post.title}" ? Cette action est irréversible.`}
                           </AlertDialogDescription>
@@ -482,7 +438,7 @@ export default function BlogList({
                           day: "2-digit",
                           month: "short",
                           year: "numeric",
-                        }
+                        },
                       )}
                     </span>
                   </div>
@@ -563,7 +519,7 @@ export default function BlogList({
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                     const pageNum = Math.max(
                       1,
-                      Math.min(totalPages, currentPage - 2 + i)
+                      Math.min(totalPages, currentPage - 2 + i),
                     );
                     if (
                       pageNum < Math.max(1, currentPage - 2) ||

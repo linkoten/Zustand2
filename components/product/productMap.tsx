@@ -163,19 +163,19 @@ interface LocalityFeatureProperties {
 }
 
 // Couleurs géologiques conventionnelles améliorées
-const GEOLOGICAL_COLORS: Record<GeologicalPeriod, string> = {
-  [GeologicalPeriod.CAMBRIEN]: "#40E0D0",
-  [GeologicalPeriod.ORDOVICIEN]: "#0066CC",
-  [GeologicalPeriod.SILURIEN]: "#8A2BE2",
-  [GeologicalPeriod.DEVONIEN]: "#B22222",
-  [GeologicalPeriod.CARBONIFERE]: "#228B22",
-  [GeologicalPeriod.PERMIEN]: "#C71585",
-  [GeologicalPeriod.TRIAS]: "#CD853F",
-  [GeologicalPeriod.JURASSIQUE]: "#808000",
-  [GeologicalPeriod.CRETACE]: "#9AFF9A",
-  [GeologicalPeriod.PALEOGENE]: "#FFA500",
-  [GeologicalPeriod.NEOGENE]: "#FFD700",
-  [GeologicalPeriod.QUATERNAIRE]: "#D3D3D3",
+const GEOLOGICAL_COLORS: Record<string, string> = {
+  CAMBRIEN: "#1A9D6F",
+  ORDOVICIEN: "#B3E1B6",
+  SILURIEN: "#E6F4A8",
+  DEVONIEN: "#CB8C37",
+  CARBONIFERE: "#67A599",
+  PERMIEN: "#F04028",
+  TRIAS: "#81D2E8",
+  JURASSIQUE: "#34B2C9",
+  CRETACE: "#7FC64E",
+  PALEOGENE: "#FD9A52",
+  NEOGENE: "#F9F97F",
+  QUATERNAIRE: "#F9F97F",
 };
 
 // Fonction pour générer un polygone autour d'un point
@@ -344,18 +344,21 @@ export default function ProductMap({
     );
   }
 
-  // Créer l'icône mise en évidence après que Leaflet soit chargé
-  const highlightedIcon = new L.Icon({
-    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-    iconRetinaUrl:
-      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [28, 45],
-    iconAnchor: [14, 45],
-    popupAnchor: [1, -34],
-    shadowSize: [45, 45],
-    className: "highlighted-marker",
-  });
+  // Créer l'icône dynamique après que Leaflet soit chargé
+  const getDynamicIcon = (color: string) =>
+    new L.divIcon({
+      className: "custom-div-icon",
+      html: `<div style="background-color: ${color}; width: 34px; height: 34px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; position: relative;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <div style="position: absolute; bottom: -8px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid ${color};"></div>
+            </div>`,
+      iconSize: [34, 46],
+      iconAnchor: [17, 46],
+      popupAnchor: [0, -44],
+    });
 
   const localityFeatures = createLocalityFeatures(localities);
 
@@ -431,76 +434,73 @@ export default function ProductMap({
                 <Marker
                   key={locality.id}
                   position={[locality.latitude, locality.longitude]}
-                  icon={highlightedIcon}
+                  icon={getDynamicIcon(locality.geologicalPeriods.length > 0 ? GEOLOGICAL_COLORS[locality.geologicalPeriods[0]] || '#808080' : '#808080')}
                 >
                   <Popup
-                    className="locality-popup"
+                    className="locality-popup border-0 overflow-hidden"
                     closeButton={true}
                     autoClose={true}
                   >
-                    <div className="compact-popup-content">
-                      <div className="flex items-center gap-1 mb-2">
-                        <MapPin className="w-3 h-3 text-red-600 flex-shrink-0" />
-                        <h3 className="font-semibold text-red-600 truncate">
+                    <div className="compact-popup-content overflow-hidden rounded-lg shadow-sm" style={{ margin: '-13px -20px', padding: 0 }}>
+                      <div className="p-3 pb-2" style={{ backgroundColor: locality.geologicalPeriods.length > 0 ? GEOLOGICAL_COLORS[locality.geologicalPeriods[0]] || '#808080' : '#808080' }}>
+                        <h3 className="font-bold text-white truncate text-base flex items-center gap-2 drop-shadow-md">
+                          <MapPin className="w-4 h-4 text-white/90 flex-shrink-0" />
                           {locality.name}
                         </h3>
-                        <Badge
-                          variant="destructive"
-                          className="text-[8px] px-1 py-0"
-                        >
-                          {mapDict.productLocalityBadge}
-                        </Badge>
                       </div>
+                      <div className="px-4 py-3 bg-white space-y-3">
+                        <div className="flex items-center gap-2">
+                           <Badge className="text-[10px] px-2 py-0.5 tracking-wider font-semibold shadow-sm" style={{ backgroundColor: 'var(--terracotta)', color: 'white', border: 'none' }}>
+                            {mapDict.productLocalityBadge}
+                           </Badge>
+                        </div>
 
-                      <div className="coordinates-section text-gray-600 bg-gray-50 rounded p-1 mb-2">
-                        <p className="font-medium mb-1 text-[9px]">
-                          {mapDict.coordinates}:
-                        </p>
-                        <p className="text-[9px]">
-                          {mapDict.latitude}: {locality.latitude.toFixed(3)}°
-                        </p>
-                        <p className="text-[9px]">
-                          {mapDict.longitude}: {locality.longitude.toFixed(3)}°
-                        </p>
-                      </div>
-
-                      {locality.geologicalPeriods.length > 0 && (
-                        <div className="mb-2">
-                          <p className="font-medium text-[10px] mb-1 flex items-center gap-1">
-                            <Layers className="w-2 h-2" />
-                            {mapDict.geologicalPeriods}:
-                          </p>
-                          <div className="flex flex-wrap gap-1">
-                            {locality.geologicalPeriods.map((period) => (
-                              <span
-                                key={period}
-                                className="period-badge"
-                                style={{
-                                  backgroundColor: GEOLOGICAL_COLORS[period],
-                                  fontSize: "7px",
-                                  padding: "1px 3px",
-                                  borderRadius: "4px",
-                                  color: "white",
-                                  fontWeight: "600",
-                                }}
-                              >
-                                {period}
-                              </span>
-                            ))}
+                        <div className="text-slate-600 bg-slate-50 rounded-md p-2 border border-slate-100">
+                          <p className="font-bold text-slate-400 text-[9px] uppercase tracking-[0.1em] mb-1">{mapDict.coordinates}</p>
+                          <div className="flex gap-4 text-[10px] font-medium text-slate-700">
+                            <span><span className="text-slate-400 font-normal">Lat:</span> {locality.latitude.toFixed(3)}°</span>
+                            <span><span className="text-slate-400 font-normal">Lon:</span> {locality.longitude.toFixed(3)}°</span>
                           </div>
                         </div>
-                      )}
 
-                      {locality.geologicalStages.length > 0 && (
-                        <div>
-                          <p className="font-medium text-[10px] mb-1">
-                            {mapDict.geologicalStages}:
-                          </p>
-                          <div className="text-[9px] text-gray-600 bg-blue-50 rounded p-1">
-                            {locality.geologicalStages.join(", ")}
+                        {locality.geologicalPeriods.length > 0 && (
+                          <div>
+                            <p className="font-bold text-slate-400 text-[9px] uppercase tracking-[0.1em] mb-1.5 flex items-center gap-1.5">
+                              <Layers className="w-3 h-3" />
+                              {mapDict.geologicalPeriods}
+                            </p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {locality.geologicalPeriods.map((period) => (
+                                <span
+                                  key={period}
+                                  style={{
+                                    backgroundColor: GEOLOGICAL_COLORS[period] || "#808080",
+                                    color: "#fff",
+                                    fontSize: "9px",
+                                    padding: "3px 8px",
+                                    borderRadius: "12px",
+                                    fontWeight: "700",
+                                    boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
+                                  }}
+                                >
+                                  {period}
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+
+                        {locality.geologicalStages.length > 0 && (
+                          <div>
+                            <p className="font-bold text-slate-400 text-[9px] uppercase tracking-[0.1em] mb-1.5">
+                              {mapDict.geologicalStages}
+                            </p>
+                            <div className="text-[10px] font-medium text-slate-700 bg-slate-50 border border-slate-100 rounded px-2 py-1.5">
+                              {locality.geologicalStages.join(", ")}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </Popup>
                 </Marker>
@@ -583,47 +583,52 @@ export default function ProductMap({
 
                   layer.bindPopup(
                     `
-                    <div class="compact-popup-content" style="min-width: 160px; max-width: 200px;">
-                      <div class="flex items-center gap-1 mb-2">
-                        <h3 class="font-semibold text-sm truncate">${name}</h3>
+                    <div class="compact-popup-content overflow-hidden rounded-lg shadow-sm" style="margin: -13px -20px; padding: 0; min-width: 180px; max-width: 220px;">
+                      <div class="p-3 pb-2" style="background-color: ${geologicalPeriods.length > 0 ? GEOLOGICAL_COLORS[geologicalPeriods[0]] || '#808080' : '#808080'}">
+                        <h3 class="font-bold text-white truncate text-base flex items-center gap-2 drop-shadow-md">
+                          ${name}
+                        </h3>
                       </div>
-                      
-                      <div class="coordinates-section text-gray-600 bg-gray-50 rounded p-1 mb-2" style="font-size: 9px;">
-                        <p class="font-medium mb-1">${mapDict.coordinates}:</p>
-                        <p>${mapDict.latitude}: ${latitude.toFixed(3)}°</p>
-                        <p>${mapDict.longitude}: ${longitude.toFixed(3)}°</p>
-                      </div>
-                      
-                      ${
-                        geologicalPeriods.length > 0
-                          ? `
-                        <div class="mb-2">
-                          <p class="font-medium mb-1" style="font-size: 10px;">${mapDict.geologicalPeriods}:</p>
-                          <div class="flex flex-wrap gap-1">
-                            ${geologicalPeriods
-                              .map(
-                                (period: GeologicalPeriod) =>
-                                  `<span style="background-color: ${GEOLOGICAL_COLORS[period] || "#808080"}; font-size: 7px; padding: 1px 3px; border-radius: 4px; color: white; font-weight: 600;">${period}</span>`
-                              )
-                              .join("")}
+                      <div class="px-4 py-3 bg-white space-y-3">
+                        <div class="text-slate-600 bg-slate-50 rounded-md p-2 border border-slate-100">
+                          <p class="font-bold text-slate-400 text-[9px] uppercase tracking-[0.1em] mb-1">${mapDict.coordinates}</p>
+                          <div class="flex gap-4 text-[10px] font-medium text-slate-700">
+                            <span><span class="text-slate-400 font-normal">Lat:</span> ${latitude.toFixed(3)}°</span>
+                            <span><span class="text-slate-400 font-normal">Lon:</span> ${longitude.toFixed(3)}°</span>
                           </div>
                         </div>
-                      `
-                          : ""
-                      }
-                      
-                      ${
-                        geologicalStages.length > 0
-                          ? `
-                        <div>
-                          <p class="font-medium mb-1" style="font-size: 10px;">${mapDict.geologicalStages}:</p>
-                          <div class="text-gray-600 bg-blue-50 rounded p-1" style="font-size: 9px;">
-                            ${geologicalStages.join(", ")}
+
+                        ${
+                          geologicalPeriods.length > 0
+                            ? `
+                          <div>
+                            <p class="font-bold text-slate-400 text-[9px] uppercase tracking-[0.1em] mb-1.5">${mapDict.geologicalPeriods}</p>
+                            <div class="flex flex-wrap gap-1.5">
+                              ${geologicalPeriods
+                                .map(
+                                  (period: GeologicalPeriod) =>
+                                    `<span style="background-color: ${GEOLOGICAL_COLORS[period] || "#808080"}; color: #fff; font-size: 9px; padding: 3px 8px; border-radius: 12px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">${period}</span>`
+                                )
+                                .join("")}
+                            </div>
                           </div>
-                        </div>
-                      `
-                          : ""
-                      }
+                        `
+                            : ""
+                        }
+
+                        ${
+                          geologicalStages.length > 0
+                            ? `
+                          <div>
+                            <p class="font-bold text-slate-400 text-[9px] uppercase tracking-[0.1em] mb-1.5">${mapDict.geologicalStages}</p>
+                            <div class="text-[10px] font-medium text-slate-700 bg-slate-50 border border-slate-100 rounded px-2 py-1.5">
+                              ${geologicalStages.join(", ")}
+                            </div>
+                          </div>
+                        `
+                            : ""
+                        }
+                      </div>
                     </div>
                   `,
                     {

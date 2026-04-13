@@ -1,16 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -24,6 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, Filter, X, Sparkles, SlidersHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FilterOptions } from "@/types/productType";
+import { useFossilStore } from "@/stores/fossilStore";
 
 interface FossilesFiltersMobileProps {
   filterOptions: FilterOptions;
@@ -45,53 +40,130 @@ export default function FossilesFiltersMobile({
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
 
+  const { facets } = useFossilStore();
+
+  const parseArray = (str: string | null) => {
+    if (!str || str === "all") return [];
+    return str.split(",").filter(Boolean);
+  };
+
   const [searchTerm, setSearchTerm] = useState(
-    searchParams.get("search") || ""
+    searchParams.get("search") || "",
   );
-  const [selectedCategory, setSelectedCategory] = useState(
-    searchParams.get("category") || "all"
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    parseArray(searchParams.get("category")),
   );
-  const [selectedCountry, setSelectedCountry] = useState(
-    searchParams.get("countryOfOrigin") || "all"
+  const [selectedCountries, setSelectedCountries] = useState<string[]>(
+    parseArray(searchParams.get("countryOfOrigin")),
   );
-  const [selectedLocality, setSelectedLocality] = useState(
-    searchParams.get("locality") || "all"
+  const [selectedLocalities, setSelectedLocalities] = useState<string[]>(
+    parseArray(searchParams.get("locality")),
   );
-  const [selectedPeriod, setSelectedPeriod] = useState(
-    searchParams.get("geologicalPeriod") || "all"
+  const [selectedPeriods, setSelectedPeriods] = useState<string[]>(
+    parseArray(searchParams.get("geologicalPeriod")),
   );
-  const [selectedStage, setSelectedStage] = useState(
-    searchParams.get("geologicalStage") || "all"
+  const [selectedStages, setSelectedStages] = useState<string[]>(
+    parseArray(searchParams.get("geologicalStage")),
   );
+
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 600);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Handle dynamic apply whenever filters change
+  useEffect(() => {
+    applyFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selectedCategories,
+    selectedCountries,
+    selectedLocalities,
+    selectedPeriods,
+    selectedStages,
+    debouncedSearch,
+  ]);
+  const toggleFilter = (setState: any, val: string, checked: boolean) => {
+    setState((prev: string[]) =>
+      checked ? [...prev, val] : prev.filter((v) => v !== val),
+    );
+  };
 
   const applyFilters = () => {
     const params = new URLSearchParams();
-    if (searchTerm.trim()) params.set("search", searchTerm.trim());
-    if (selectedCategory && selectedCategory !== "all")
-      params.set("category", selectedCategory);
-    if (selectedCountry && selectedCountry !== "all")
-      params.set("countryOfOrigin", selectedCountry);
-    if (selectedLocality && selectedLocality !== "all")
-      params.set("locality", selectedLocality);
-    if (selectedPeriod && selectedPeriod !== "all")
-      params.set("geologicalPeriod", selectedPeriod);
-    if (selectedStage && selectedStage !== "all")
-      params.set("geologicalStage", selectedStage);
+    const newFilters: any = {};
+
+    if (debouncedSearch.trim()) {
+      params.set("search", debouncedSearch.trim());
+      newFilters.search = debouncedSearch.trim();
+    } else {
+      newFilters.search = undefined;
+    }
+
+    if (selectedCategories.length > 0) {
+      const val = selectedCategories.join(",");
+      params.set("category", val);
+      newFilters.category = val;
+    } else {
+      newFilters.category = undefined;
+    }
+
+    if (selectedCountries.length > 0) {
+      const val = selectedCountries.join(",");
+      params.set("countryOfOrigin", val);
+      newFilters.countryOfOrigin = val;
+    } else {
+      newFilters.countryOfOrigin = undefined;
+    }
+
+    if (selectedLocalities.length > 0) {
+      const val = selectedLocalities.join(",");
+      params.set("locality", val);
+      newFilters.locality = val;
+    } else {
+      newFilters.locality = undefined;
+    }
+
+    if (selectedPeriods.length > 0) {
+      const val = selectedPeriods.join(",");
+      params.set("geologicalPeriod", val);
+      newFilters.geologicalPeriod = val;
+    } else {
+      newFilters.geologicalPeriod = undefined;
+    }
+
+    if (selectedStages.length > 0) {
+      const val = selectedStages.join(",");
+      params.set("geologicalStage", val);
+      newFilters.geologicalStage = val;
+    } else {
+      newFilters.geologicalStage = undefined;
+    }
 
     params.set("page", "1");
-    router.push(`/${lang}/fossiles?${params.toString()}`);
-    setIsOpen(false);
+    newFilters.page = "1";
+
+    useFossilStore.getState().updateFilters(newFilters);
+    window.history.pushState(
+      null,
+      "",
+      `/${lang}/fossiles?${params.toString()}`,
+    );
   };
 
   const clearFilters = () => {
-    setSelectedCategory("all");
-    setSelectedCountry("all");
-    setSelectedLocality("all");
-    setSelectedPeriod("all");
-    setSelectedStage("all");
+    setSelectedCategories([]);
+    setSelectedCountries([]);
+    setSelectedLocalities([]);
+    setSelectedPeriods([]);
+    setSelectedStages([]);
     setSearchTerm("");
+
+    useFossilStore.getState().resetFilters();
+    window.history.pushState(null, "", `/${lang}/fossiles`);
     onClearFilters();
-    setIsOpen(false);
   };
 
   return (
@@ -188,163 +260,233 @@ export default function FossilesFiltersMobile({
               <div className="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
 
               {/* Catégorie */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                   <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
                   {dict?.fossils?.categoryLabel || "Catégorie"}
                 </Label>
-                <Select
-                  value={selectedCategory}
-                  onValueChange={setSelectedCategory}
-                >
-                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500">
-                    <SelectValue
-                      placeholder={
-                        dict?.fossils?.allCategories || "Toutes les catégories"
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">
-                      {dict?.fossils?.allCategories || "Toutes les catégories"}
-                    </SelectItem>
-                    {filterOptions.categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                  {filterOptions.categories.map((option) => {
+                    const count = facets?.categories[option] || 0;
+                    if (count === 0 && !selectedCategories.includes(option))
+                      return null;
+                    return (
+                      <div key={option} className="flex items-start space-x-3">
+                        <Checkbox
+                          id={`categories-${option}`}
+                          checked={selectedCategories.includes(option)}
+                          onCheckedChange={(c) =>
+                            toggleFilter(
+                              setSelectedCategories,
+                              option,
+                              c as boolean,
+                            )
+                          }
+                          className="mt-0.5 border-amber-500 data-[state=checked]:bg-amber-500"
+                        />
+                        <Label
+                          htmlFor={`categories-${option}`}
+                          className="flex-1 text-sm font-medium leading-none cursor-pointer text-slate-700"
+                        >
+                          {option}
+                        </Label>
+                        <span className="text-xs text-slate-400">
+                          ({count})
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {filterOptions.categories.length === 0 && (
+                    <div className="text-sm text-slate-400 italic">
+                      Aucune option
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Pays */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
                   {dict?.fossils?.countryLabel || "Pays d'origine"}
                 </Label>
-                <Select
-                  value={selectedCountry}
-                  onValueChange={setSelectedCountry}
-                >
-                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500">
-                    <SelectValue
-                      placeholder={
-                        dict?.fossils?.allCountries || "Tous les pays"
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">
-                      {dict?.fossils?.allCountries || "Tous les pays"}
-                    </SelectItem>
-                    {filterOptions.countries.map((country) => (
-                      <SelectItem key={country} value={country}>
-                        {country}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                  {filterOptions.countries.map((option) => {
+                    const count = facets?.countries[option] || 0;
+                    if (count === 0 && !selectedCountries.includes(option))
+                      return null;
+                    return (
+                      <div key={option} className="flex items-start space-x-3">
+                        <Checkbox
+                          id={`countries-${option}`}
+                          checked={selectedCountries.includes(option)}
+                          onCheckedChange={(c) =>
+                            toggleFilter(
+                              setSelectedCountries,
+                              option,
+                              c as boolean,
+                            )
+                          }
+                          className="mt-0.5 border-cyan-500 data-[state=checked]:bg-cyan-500"
+                        />
+                        <Label
+                          htmlFor={`countries-${option}`}
+                          className="flex-1 text-sm font-medium leading-none cursor-pointer text-slate-700"
+                        >
+                          {option}
+                        </Label>
+                        <span className="text-xs text-slate-400">
+                          ({count})
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {filterOptions.countries.length === 0 && (
+                    <div className="text-sm text-slate-400 italic">
+                      Aucune option
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Localité */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
                   {dict?.fossils?.localityLabel || "Localité"}
                 </Label>
-                <Select
-                  value={selectedLocality}
-                  onValueChange={setSelectedLocality}
-                >
-                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500">
-                    <SelectValue
-                      placeholder={
-                        dict?.fossils?.allLocalities || "Toutes les localités"
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">
-                      {dict?.fossils?.allLocalities || "Toutes les localités"}
-                    </SelectItem>
-                    {filterOptions.localities.map((locality) => (
-                      <SelectItem key={locality} value={locality}>
-                        {locality}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                  {filterOptions.localities.map((option) => {
+                    const count = facets?.localities[option] || 0;
+                    if (count === 0 && !selectedLocalities.includes(option))
+                      return null;
+                    return (
+                      <div key={option} className="flex items-start space-x-3">
+                        <Checkbox
+                          id={`localities-${option}`}
+                          checked={selectedLocalities.includes(option)}
+                          onCheckedChange={(c) =>
+                            toggleFilter(
+                              setSelectedLocalities,
+                              option,
+                              c as boolean,
+                            )
+                          }
+                          className="mt-0.5 border-emerald-500 data-[state=checked]:bg-emerald-500"
+                        />
+                        <Label
+                          htmlFor={`localities-${option}`}
+                          className="flex-1 text-sm font-medium leading-none cursor-pointer text-slate-700"
+                        >
+                          {option}
+                        </Label>
+                        <span className="text-xs text-slate-400">
+                          ({count})
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {filterOptions.localities.length === 0 && (
+                    <div className="text-sm text-slate-400 italic">
+                      Aucune option
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Période géologique */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-violet-400 rounded-full"></div>
                   {dict?.fossils?.periodLabel || "Période géologique"}
                 </Label>
-                <Select
-                  value={selectedPeriod}
-                  onValueChange={setSelectedPeriod}
-                >
-                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500">
-                    <SelectValue
-                      placeholder={
-                        dict?.fossils?.allPeriods || "Toutes les périodes"
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">
-                      {dict?.fossils?.allPeriods || "Toutes les périodes"}
-                    </SelectItem>
-                    {filterOptions.geologicalPeriods.map((period) => (
-                      <SelectItem key={period} value={period}>
-                        {period}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                  {filterOptions.geologicalPeriods.map((option) => {
+                    const count = facets?.periods[option] || 0;
+                    if (count === 0 && !selectedPeriods.includes(option))
+                      return null;
+                    return (
+                      <div key={option} className="flex items-start space-x-3">
+                        <Checkbox
+                          id={`periods-${option}`}
+                          checked={selectedPeriods.includes(option)}
+                          onCheckedChange={(c) =>
+                            toggleFilter(
+                              setSelectedPeriods,
+                              option,
+                              c as boolean,
+                            )
+                          }
+                          className="mt-0.5 border-violet-400 data-[state=checked]:bg-violet-400"
+                        />
+                        <Label
+                          htmlFor={`periods-${option}`}
+                          className="flex-1 text-sm font-medium leading-none cursor-pointer text-slate-700"
+                        >
+                          {option}
+                        </Label>
+                        <span className="text-xs text-slate-400">
+                          ({count})
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {filterOptions.geologicalPeriods.length === 0 && (
+                    <div className="text-sm text-slate-400 italic">
+                      Aucune option
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Étage géologique */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                   <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                   {dict?.fossils?.stageLabel || "Étage géologique"}
                 </Label>
-                <Select value={selectedStage} onValueChange={setSelectedStage}>
-                  <SelectTrigger className="border-slate-200 focus:border-amber-500 focus:ring-amber-500">
-                    <SelectValue
-                      placeholder={
-                        dict?.fossils?.allStages || "Tous les étages"
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">
-                      {dict?.fossils?.allStages || "Tous les étages"}
-                    </SelectItem>
-                    {filterOptions.geologicalStages.map((stage) => (
-                      <SelectItem key={stage} value={stage}>
-                        {stage}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                  {filterOptions.geologicalStages.map((option) => {
+                    const count = facets?.stages[option] || 0;
+                    if (count === 0 && !selectedStages.includes(option))
+                      return null;
+                    return (
+                      <div key={option} className="flex items-start space-x-3">
+                        <Checkbox
+                          id={`stages-${option}`}
+                          checked={selectedStages.includes(option)}
+                          onCheckedChange={(c) =>
+                            toggleFilter(
+                              setSelectedStages,
+                              option,
+                              c as boolean,
+                            )
+                          }
+                          className="mt-0.5 border-orange-500 data-[state=checked]:bg-orange-500"
+                        />
+                        <Label
+                          htmlFor={`stages-${option}`}
+                          className="flex-1 text-sm font-medium leading-none cursor-pointer text-slate-700"
+                        >
+                          {option}
+                        </Label>
+                        <span className="text-xs text-slate-400">
+                          ({count})
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {filterOptions.geologicalStages.length === 0 && (
+                    <div className="text-sm text-slate-400 italic">
+                      Aucune option
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </ScrollArea>
 
           <DialogFooter className="flex flex-col gap-3 pt-4 border-t border-slate-200">
-            <Button
-              onClick={applyFilters}
-              className="w-full bg-gradient-to-r from-amber-600 via-amber-700 to-orange-600 hover:from-amber-700 hover:via-amber-800 hover:to-orange-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              {dict?.fossils?.applyFilters || "Appliquer les filtres"}
-            </Button>
-
             {activeFiltersCount > 0 && (
               <Button
                 variant="outline"

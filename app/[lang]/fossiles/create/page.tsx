@@ -4,16 +4,21 @@ import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-export default async function CreateProductPage() {
+export default async function CreateProductPage({
+  params,
+}: {
+  params: Promise<{ lang: "en" | "fr" }>;
+}) {
+  const { lang } = await params;
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect(`/${lang}/sign-in`);
   }
   const user = await getUserData(userId);
 
   if (user?.role !== "ADMIN") {
-    redirect("/fossiles");
+    redirect(`/${lang}/fossiles`);
   }
 
   // Récupérer toutes les localités

@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ProductStatus } from "@/lib/generated/prisma";
-import { Eye, Edit, Trash2, AlertTriangle } from "lucide-react";
+import { Eye, Edit, Trash2, AlertTriangle, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import Link from "next/link";
@@ -54,14 +54,15 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
   };
 
   const getCategoryColor = (category: string) => {
-    const colors = {
-      TRILOBITE: "bg-blue-100 text-blue-800",
-      AMMONITE: "bg-green-100 text-green-800",
-      DENT: "bg-red-100 text-red-800",
-      COQUILLAGE: "bg-yellow-100 text-yellow-800",
+    const colors: Record<string, string> = {
+      TRILOBITE: "bg-cyan-900/40 text-cyan-300 border border-cyan-700/30",
+      AMMONITE:
+        "bg-emerald-900/40 text-emerald-300 border border-emerald-700/30",
+      DENT: "bg-red-900/40 text-red-300 border border-red-700/30",
+      COQUILLAGE: "bg-amber-900/40 text-amber-300 border border-amber-700/30",
     };
     return (
-      colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800"
+      colors[category] ?? "bg-zinc-800 text-zinc-300 border border-zinc-700"
     );
   };
 
@@ -79,20 +80,20 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
       if (result.success) {
         toast.success(
           dict?.fossils?.deleteSuccess ||
-            `${result.data?.productTitle || "Produit"} supprimé avec succès`
+            `${result.data?.productTitle || "Produit"} supprimé avec succès`,
         );
         router.refresh();
       } else {
         toast.error(
           result.error ||
             dict?.fossils?.deleteError ||
-            "Erreur lors de la suppression"
+            "Erreur lors de la suppression",
         );
       }
     } catch (error) {
       console.error("Erreur:", error);
       toast.error(
-        dict?.fossils?.deleteError || "Erreur lors de la suppression"
+        dict?.fossils?.deleteError || "Erreur lors de la suppression",
       );
     } finally {
       setDeletingId(null);
@@ -100,108 +101,108 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
   };
 
   return (
-    <Card className="group hover:shadow-lg lg:hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] bg-gradient-to-br from-white to-slate-50/50 border-0 shadow-md">
-      <CardHeader className="p-0">
-        <div className="relative aspect-square overflow-hidden rounded-t-lg">
-          {fossil.images?.[0] ? (
-            <Image
-              src={fossil.images[0].imageUrl}
-              alt={fossil.images[0].altText || fossil.title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-              <span className="text-slate-500 font-medium text-sm sm:text-base">
-                {dict?.fossils?.noImage || "Pas d'image"}
-              </span>
-            </div>
-          )}
-
-          {/* Bouton favori en overlay (top-left) */}
-          <div className="absolute top-2 left-2">
-            <FavoriteButton
-              productId={fossil.id}
-              isFavorite={fossil.isFavorite || false}
-              variant="overlay"
-              size="sm"
-              dict={dict}
-            />
-          </div>
-
-          {/* Boutons admin en overlay (top-right) */}
-          {isAdmin && (
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="flex gap-1">
-                <Button
-                  asChild
-                  size="sm"
-                  variant="secondary"
-                  className="h-8 w-8 p-0 bg-white/90 hover:bg-white border-0 shadow-lg"
-                >
-                  <Link href={`/${lang}/fossiles/${fossil.id}/edit`}>
-                    <Edit className="h-4 w-4" />
-                  </Link>
-                </Button>
-
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      className="h-8 w-8 p-0 bg-red-500 hover:bg-red-600 border-0 shadow-lg"
-                      disabled={deletingId === fossil.id}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="flex items-center gap-2">
-                        <AlertTriangle className="h-5 w-5 text-destructive" />
-                        {dict?.fossils?.deleteTitle ||
-                          "Confirmer la suppression"}
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        {dict?.fossils?.deleteDescription
-                          ? dict.fossils.deleteDescription.replace(
-                              "{title}",
-                              fossil.title
-                            )
-                          : `Êtes-vous sûr de vouloir supprimer le fossile "${fossil.title}" ? Cette action est irréversible.`}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>
-                        {dict?.fossils?.deleteCancel || "Annuler"}
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => handleDelete(fossil.id)}
-                        className="bg-destructive hover:bg-destructive/90"
-                      >
-                        {dict?.fossils?.deleteConfirm || "Supprimer"}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+    <Card className="group flex flex-col h-full bg-zinc-950 border border-zinc-800 hover:border-zinc-500 overflow-hidden rounded-xl transition-all duration-300">
+      <CardHeader className="p-0 relative shrink-0">
+        <Link href={`/${lang}/fossiles/${fossil.id}`} className="block">
+          <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-900">
+            {fossil.images?.[0] ? (
+              <Image
+                src={fossil.images[0].imageUrl}
+                alt={fossil.images[0].altText || fossil.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <span className="text-zinc-600 font-serif text-sm">
+                  {dict?.fossils?.noImage || "Pas d'image"}
+                </span>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Overlay gradient pour que les badges / boutons lisent bien */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent opacity-60 pointer-events-none" />
+          </div>
+        </Link>
+
+        {/* Bouton favori */}
+        <div className="absolute top-3 left-3 z-10">
+          <FavoriteButton
+            productId={fossil.id}
+            isFavorite={fossil.isFavorite || false}
+            variant="overlay"
+            size="sm"
+            dict={dict}
+          />
         </div>
+
+        {/* Badges Admin */}
+        {isAdmin && (
+          <div className="absolute top-3 right-3 flex gap-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <Button
+              asChild
+              size="icon"
+              className="h-8 w-8 bg-zinc-900/80 hover:bg-white text-zinc-300 hover:text-zinc-900 border border-zinc-700 hover:border-white shadow-sm transition-colors rounded-lg backdrop-blur-sm"
+            >
+              <Link href={`/${lang}/fossiles/${fossil.id}/edit`}>
+                <Edit className="h-4 w-4" />
+              </Link>
+            </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  size="icon"
+                  className="h-8 w-8 bg-red-950/80 hover:bg-red-600 text-red-400 hover:text-white border border-red-900/50 shadow-sm transition-colors rounded-lg backdrop-blur-sm"
+                  disabled={deletingId === fossil.id}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-zinc-950 border-zinc-800">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-zinc-100 flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-red-500" />
+                    {dict?.fossils?.deleteTitle || "Confirmer la suppression"}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-zinc-400">
+                    {dict?.fossils?.deleteDescription
+                      ? dict.fossils.deleteDescription.replace(
+                          "{title}",
+                          fossil.title,
+                        )
+                      : `Êtes-vous sûr de vouloir supprimer le fossile "${fossil.title}" ? Cette action est irréversible.`}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="bg-zinc-900 text-zinc-300 border-zinc-800 hover:bg-zinc-800 hover:text-white">
+                    {dict?.fossils?.deleteCancel || "Annuler"}
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => handleDelete(fossil.id)}
+                    className="bg-red-600 text-white hover:bg-red-700"
+                  >
+                    {dict?.fossils?.deleteConfirm || "Supprimer"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="p-3 sm:p-4">
         <div className="mb-3">
-          <h3 className="font-semibold text-base sm:text-lg leading-tight mb-1 line-clamp-2">
+          <h3 className="font-serif font-semibold text-base sm:text-lg leading-tight mb-1 line-clamp-2 text-[var(--parchemin)] group-hover:text-[var(--parchemin)] tracking-wide">
             {fossil.title}
           </h3>
-          <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+          <p className="text-xl sm:text-2xl font-bold text-[var(--terracotta)] drop-shadow-sm">
             {formatPrice(fossil.price)}
           </p>
         </div>
 
         {fossil.genre && fossil.species && (
-          <p className="text-xs sm:text-sm text-slate-600 italic mb-3 line-clamp-1">
+          <p className="text-xs sm:text-sm text-[var(--parchemin)]/50 italic mb-3 line-clamp-1 font-light tracking-wide">
             <span className="capitalize">{fossil.genre.toLowerCase()}</span>{" "}
             <span className="capitalize">{fossil.species.toLowerCase()}</span>
           </p>
@@ -216,20 +217,26 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
           </Badge>
 
           {fossil.countryOfOrigin && (
-            <Badge variant="outline" className="text-xs border-slate-300">
+            <Badge
+              variant="outline"
+              className="text-xs border-[var(--parchemin)]/20 text-[var(--parchemin)]/70"
+            >
               📍 {fossil.countryOfOrigin}
             </Badge>
           )}
 
-          <Badge variant="outline" className="text-xs border-slate-300">
+          <Badge
+            variant="outline"
+            className="text-xs border-[var(--terracotta)]/30 text-[var(--terracotta)]/80"
+          >
             ⏳ {fossil.geologicalPeriod}
           </Badge>
         </div>
 
-        <div className="text-xs text-slate-600 space-y-1">
+        <div className="text-xs text-[var(--parchemin)]/50 space-y-1 font-light">
           {fossil.locality && (
             <p className="line-clamp-1">
-              <span className="font-medium">
+              <span className="font-medium text-[var(--parchemin)]/70">
                 {dict?.fossils?.localityLabel || "Localité"}:
               </span>{" "}
               {fossil.locality.name}
@@ -237,7 +244,7 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
           )}
           {fossil.geologicalStage && (
             <p className="line-clamp-1">
-              <span className="font-medium">
+              <span className="font-medium text-[var(--parchemin)]/70">
                 {dict?.fossils?.stageLabel || "Étage"}:
               </span>{" "}
               {fossil.geologicalStage}
@@ -247,28 +254,31 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
       </CardContent>
 
       <CardFooter className="p-3 sm:p-4 pt-0 flex gap-2 sm:gap-3">
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="flex-1 border-slate-300 hover:border-amber-300 hover:bg-amber-50 transition-all duration-200"
-        >
-          <Link href={`/${lang}/fossiles/${fossil.id}`}>
-            <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-            <span className="text-xs sm:text-sm font-medium">
-              {dict?.fossils?.viewDetails || "Voir détails"}
+        <div className="flex flex-col gap-2 sm:gap-3 w-full">
+          <Button
+            onClick={() => handleAddToCart(fossil)}
+            size="default"
+            disabled={isAdding || !isAvailable}
+            className="w-full bg-transparent border-2 border-terracotta text-terracotta hover:bg-terracotta hover:text-parchemin font-bold text-sm sm:text-base py-5 shadow-lg transition-all duration-300 rounded-xl uppercase tracking-wider group/btn"
+          >
+            <span className="relative z-10 flex items-center justify-center">
+              <ShoppingCart className="w-5 h-5 mr-2 transition-transform duration-300 group-hover/btn:-translate-y-1 group-hover/btn:translate-x-1" />
+              {dict?.products?.cart || "Ajouter au panier"}
             </span>
-          </Link>
-        </Button>
+          </Button>
 
-        <Button
-          onClick={() => handleAddToCart(fossil)}
-          size="sm"
-          disabled={isAdding || !isAvailable}
-          className="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 text-xs sm:text-sm"
-        >
-          {dict?.products?.cart || "Ajouter"}
-        </Button>
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="w-full text-[var(--parchemin)]/70 hover:text-[var(--terracotta)] hover:bg-[var(--terracotta)]/5 transition-colors duration-200 text-xs sm:text-sm font-medium"
+          >
+            <Link href={`/${lang}/fossiles/${fossil.id}`}>
+              <Eye className="w-4 h-4 mr-2" />
+              {dict?.fossils?.viewDetails || "Voir les détails"}
+            </Link>
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

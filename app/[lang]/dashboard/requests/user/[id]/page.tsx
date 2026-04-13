@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getUserData } from "@/lib/actions/dashboardActions";
+import { getOrSyncUser } from "@/lib/actions/dashboardActions";
 import { getFossilRequestById } from "@/lib/actions/fossilRequestsActions";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -16,19 +16,18 @@ interface UserFossilRequestDetailPageProps {
 export default async function UserFossilRequestDetailPage({
   params,
 }: UserFossilRequestDetailPageProps) {
+  const { id, lang } = await params;
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect(`/${lang}/sign-in`);
   }
 
-  const user = await getUserData(userId);
+  const user = await getOrSyncUser(userId);
 
   if (!user) {
-    redirect("/sign-in");
+    redirect(`/${lang}/sign-in`);
   }
-
-  const { id, lang } = await params;
   const request = await getFossilRequestById(id);
 
   const dict = await getDictionary(lang);

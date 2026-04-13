@@ -58,6 +58,9 @@ export interface ActiveFilters {
   locality?: string;
   geologicalPeriod?: string;
   geologicalStage?: string;
+  search?: string;
+  page?: string;
+  sort?: string;
 }
 
 export interface FossilRequestFormData {
@@ -74,9 +77,11 @@ export interface FossilRequestFormData {
 }
 
 export interface SearchParams {
+  search?: string;
   category?: string;
   countryOfOrigin?: string;
   locality?: string;
   geologicalPeriod?: string;
   geologicalStage?: string;
+  sort?: string;
 }
