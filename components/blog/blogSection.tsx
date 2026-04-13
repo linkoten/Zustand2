@@ -19,10 +19,9 @@ import { Badge } from "@/components/ui/badge";
 
 interface BlogSectionProps {
   initialData: BlogListProps;
-  categories?: any[];
+  categories?: { category: string; [key: string]: unknown }[];
   lang: "fr" | "en";
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  dict: any;
+  dict: Record<string, Record<string, Record<string, string> | string | undefined> | undefined>;
 }
 
 export default function BlogSection({
@@ -95,7 +94,7 @@ export default function BlogSection({
         >
           {dict.blog?.blogFilters?.allCategories || "Tout afficher"}
         </button>
-        {categories?.map((catItem: any) => {
+        {categories?.map((catItem: { category: string; [key: string]: unknown }) => {
           const cat = catItem.category;
           const labelKey: string =
             {
@@ -110,7 +109,7 @@ export default function BlogSection({
             }[cat as string] || "";
 
           const categoryLabel =
-            (dict.blog?.blogFilters as any)?.[labelKey] ||
+            (dict.blog?.blogFilters as Record<string, string>)?.[labelKey] ||
             (cat as string)
               .replace(/_/g, " ")
               .replace(/\b\w/g, (l: string) => l.toUpperCase());
