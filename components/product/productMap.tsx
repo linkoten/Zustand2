@@ -182,7 +182,7 @@ const GEOLOGICAL_COLORS: Record<string, string> = {
 const generatePolygonAroundPoint = (
   lat: number,
   lon: number,
-  radiusKm: number = 5
+  radiusKm: number = 5,
 ) => {
   const radiusDeg = radiusKm / 111;
   return [
@@ -196,7 +196,7 @@ const generatePolygonAroundPoint = (
 
 // Fonction pour créer les features GeoJSON
 const createLocalityFeatures = (
-  localities: LocalityData[]
+  localities: LocalityData[],
 ): Feature<Geometry, LocalityFeatureProperties>[] => {
   return localities.map((locality) => ({
     type: "Feature" as const,
@@ -249,7 +249,7 @@ export default function ProductMap({
   const [isClient, setIsClient] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapType, setMapType] = useState<"street" | "satellite" | "terrain">(
-    "satellite"
+    "satellite",
   );
 
   // Vérifier si on est côté client
@@ -278,7 +278,7 @@ export default function ProductMap({
 
             // Vérifier si le CSS n'est pas déjà chargé
             const existingLink = document.querySelector(
-              `link[href="${linkElement.href}"]`
+              `link[href="${linkElement.href}"]`,
             );
             if (!existingLink) {
               document.head.appendChild(linkElement);
@@ -434,15 +434,33 @@ export default function ProductMap({
                 <Marker
                   key={locality.id}
                   position={[locality.latitude, locality.longitude]}
-                  icon={getDynamicIcon(locality.geologicalPeriods.length > 0 ? GEOLOGICAL_COLORS[locality.geologicalPeriods[0]] || '#808080' : '#808080')}
+                  icon={getDynamicIcon(
+                    locality.geologicalPeriods.length > 0
+                      ? GEOLOGICAL_COLORS[locality.geologicalPeriods[0]] ||
+                          "#808080"
+                      : "#808080",
+                  )}
                 >
                   <Popup
                     className="locality-popup border-0 overflow-hidden"
                     closeButton={true}
                     autoClose={true}
                   >
-                    <div className="compact-popup-content overflow-hidden rounded-lg shadow-sm" style={{ margin: '-13px -20px', padding: 0 }}>
-                      <div className="p-3 pb-2" style={{ backgroundColor: locality.geologicalPeriods.length > 0 ? GEOLOGICAL_COLORS[locality.geologicalPeriods[0]] || '#808080' : '#808080' }}>
+                    <div
+                      className="compact-popup-content overflow-hidden rounded-lg shadow-sm"
+                      style={{ margin: "-13px -20px", padding: 0 }}
+                    >
+                      <div
+                        className="p-3 pb-2"
+                        style={{
+                          backgroundColor:
+                            locality.geologicalPeriods.length > 0
+                              ? GEOLOGICAL_COLORS[
+                                  locality.geologicalPeriods[0]
+                                ] || "#808080"
+                              : "#808080",
+                        }}
+                      >
                         <h3 className="font-bold text-white truncate text-base flex items-center gap-2 drop-shadow-md">
                           <MapPin className="w-4 h-4 text-white/90 flex-shrink-0" />
                           {locality.name}
@@ -450,16 +468,35 @@ export default function ProductMap({
                       </div>
                       <div className="px-4 py-3 bg-white space-y-3">
                         <div className="flex items-center gap-2">
-                           <Badge className="text-[10px] px-2 py-0.5 tracking-wider font-semibold shadow-sm" style={{ backgroundColor: 'var(--terracotta)', color: 'white', border: 'none' }}>
+                          <Badge
+                            className="text-[10px] px-2 py-0.5 tracking-wider font-semibold shadow-sm"
+                            style={{
+                              backgroundColor: "var(--terracotta)",
+                              color: "white",
+                              border: "none",
+                            }}
+                          >
                             {mapDict.productLocalityBadge}
-                           </Badge>
+                          </Badge>
                         </div>
 
                         <div className="text-slate-600 bg-slate-50 rounded-md p-2 border border-slate-100">
-                          <p className="font-bold text-slate-400 text-[9px] uppercase tracking-[0.1em] mb-1">{mapDict.coordinates}</p>
+                          <p className="font-bold text-slate-400 text-[9px] uppercase tracking-[0.1em] mb-1">
+                            {mapDict.coordinates}
+                          </p>
                           <div className="flex gap-4 text-[10px] font-medium text-slate-700">
-                            <span><span className="text-slate-400 font-normal">Lat:</span> {locality.latitude.toFixed(3)}°</span>
-                            <span><span className="text-slate-400 font-normal">Lon:</span> {locality.longitude.toFixed(3)}°</span>
+                            <span>
+                              <span className="text-slate-400 font-normal">
+                                Lat:
+                              </span>{" "}
+                              {locality.latitude.toFixed(3)}°
+                            </span>
+                            <span>
+                              <span className="text-slate-400 font-normal">
+                                Lon:
+                              </span>{" "}
+                              {locality.longitude.toFixed(3)}°
+                            </span>
                           </div>
                         </div>
 
@@ -474,13 +511,14 @@ export default function ProductMap({
                                 <span
                                   key={period}
                                   style={{
-                                    backgroundColor: GEOLOGICAL_COLORS[period] || "#808080",
+                                    backgroundColor:
+                                      GEOLOGICAL_COLORS[period] || "#808080",
                                     color: "#fff",
                                     fontSize: "9px",
                                     padding: "3px 8px",
                                     borderRadius: "12px",
                                     fontWeight: "700",
-                                    boxShadow: "0 1px 3px rgba(0,0,0,0.15)"
+                                    boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
                                   }}
                                 >
                                   {period}
@@ -516,7 +554,7 @@ export default function ProductMap({
                 } as FeatureCollection<Geometry, LocalityFeatureProperties>
               }
               style={(
-                feature: Feature<Geometry, LocalityFeatureProperties>
+                feature: Feature<Geometry, LocalityFeatureProperties>,
               ) => ({
                 color: feature?.properties?.color || "#808080",
                 weight: 2,
@@ -526,7 +564,7 @@ export default function ProductMap({
               onEachFeature={(
                 feature: Feature<Geometry, LocalityFeatureProperties>,
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                layer: any
+                layer: any,
               ) => {
                 if (feature.properties) {
                   const {
@@ -540,7 +578,7 @@ export default function ProductMap({
                   layer.on({
                     mouseover: (
                       e: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      any
+                      any,
                     ) => {
                       const layer = e.target;
                       layer.setStyle({
@@ -551,7 +589,7 @@ export default function ProductMap({
                     },
                     mouseout: (
                       e: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      any
+                      any,
                     ) => {
                       const layer = e.target;
                       layer.setStyle({
@@ -562,7 +600,7 @@ export default function ProductMap({
                     },
                     click: (
                       e: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      any
+                      any,
                     ) => {
                       const map = e.target._map;
                       if (map) {
@@ -574,7 +612,7 @@ export default function ProductMap({
                             {
                               animate: true,
                               duration: 0.5,
-                            }
+                            },
                           );
                         }
                       }
@@ -584,7 +622,7 @@ export default function ProductMap({
                   layer.bindPopup(
                     `
                     <div class="compact-popup-content overflow-hidden rounded-lg shadow-sm" style="margin: -13px -20px; padding: 0; min-width: 180px; max-width: 220px;">
-                      <div class="p-3 pb-2" style="background-color: ${geologicalPeriods.length > 0 ? GEOLOGICAL_COLORS[geologicalPeriods[0]] || '#808080' : '#808080'}">
+                      <div class="p-3 pb-2" style="background-color: ${geologicalPeriods.length > 0 ? GEOLOGICAL_COLORS[geologicalPeriods[0]] || "#808080" : "#808080"}">
                         <h3 class="font-bold text-white truncate text-base flex items-center gap-2 drop-shadow-md">
                           ${name}
                         </h3>
@@ -607,7 +645,7 @@ export default function ProductMap({
                               ${geologicalPeriods
                                 .map(
                                   (period: GeologicalPeriod) =>
-                                    `<span style="background-color: ${GEOLOGICAL_COLORS[period] || "#808080"}; color: #fff; font-size: 9px; padding: 3px 8px; border-radius: 12px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">${period}</span>`
+                                    `<span style="background-color: ${GEOLOGICAL_COLORS[period] || "#808080"}; color: #fff; font-size: 9px; padding: 3px 8px; border-radius: 12px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">${period}</span>`,
                                 )
                                 .join("")}
                             </div>
@@ -637,7 +675,7 @@ export default function ProductMap({
                       closeOnEscapeKey: true,
                       maxWidth: 200,
                       minWidth: 160,
-                    }
+                    },
                   );
                 }
               }}

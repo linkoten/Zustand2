@@ -68,11 +68,12 @@ export default async function FossilesPage({
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
               <div className="flex-1">
                 <h1 className="text-4xl md:text-5xl font-serif font-bold text-parchemin mb-3 bg-gradient-to-r from-parchemin via-terracotta to-parchemin bg-clip-text text-transparent inline-block animate-shimmer-gold">
-                  {(dict?.fossils as any)?.title ||
+                  {(dict as { fossils?: { title?: string } })?.fossils?.title ||
                     "La Galerie des Temps Anciens"}
                 </h1>
                 <p className="text-parchemin/70 max-w-2xl text-lg">
-                  {(dict?.fossils as any)?.description ||
+                  {(dict as { fossils?: { description?: string } })?.fossils
+                    ?.description ||
                     "Parcourez notre collection d'artefacts paléontologiques, soigneusement préservés pour traverser les âges."}
                 </p>
               </div>

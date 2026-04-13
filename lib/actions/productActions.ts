@@ -243,7 +243,7 @@ export async function updateProductAction({
 
 // ✅ Fonction de suppression de produit
 export async function deleteProductAction(
-  productId: number
+  productId: number,
 ): Promise<ActionResult<{ productTitle: string }>> {
   try {
     // ✅ Vérifier que l'utilisateur est admin
@@ -352,7 +352,7 @@ export async function getFossils(
   filters: SearchParams & { search?: string } = {},
   userId?: string | null,
   page: number = 1,
-  limit: number = 20
+  limit: number = 20,
 ): Promise<{
   fossils: SerializedProduct[];
   totalCount: number;
@@ -441,12 +441,16 @@ export async function getFossils(
         },
         locality: true,
       },
-orderBy:
-          filters.sort === "name_asc" ? { title: "asc" }
-          : filters.sort === "name_desc" ? { title: "desc" }
-          : filters.sort === "price_asc" ? { price: "asc" }
-          : filters.sort === "price_desc" ? { price: "desc" }
-          : { createdAt: "desc" },
+      orderBy:
+        filters.sort === "name_asc"
+          ? { title: "asc" }
+          : filters.sort === "name_desc"
+            ? { title: "desc" }
+            : filters.sort === "price_asc"
+              ? { price: "asc" }
+              : filters.sort === "price_desc"
+                ? { price: "desc" }
+                : { createdAt: "desc" },
       skip,
       take: limit,
     });
@@ -513,7 +517,7 @@ orderBy:
 }
 
 export async function getProduct(
-  id: string
+  id: string,
 ): Promise<SerializedProduct | null> {
   try {
     const productId = parseInt(id);
@@ -588,7 +592,7 @@ export async function getProduct(
 export async function getSimilarProducts(
   currentProductId: number,
   category: string,
-  limit: number = 4
+  limit: number = 4,
 ): Promise<SerializedProduct[]> {
   try {
     const products = await prisma.product.findMany({
@@ -699,7 +703,7 @@ export async function getFilterOptions() {
       countries: countriesResult.map((item) => item.countryOfOrigin).sort(),
       localities: localitiesResult,
       geologicalPeriods: geologicalPeriodsResult.map(
-        (item) => item.geologicalPeriod
+        (item) => item.geologicalPeriod,
       ),
       geologicalStages: geologicalStagesResult
         .map((item) => item.geologicalStage)
@@ -709,7 +713,7 @@ export async function getFilterOptions() {
   } catch (error) {
     console.error(
       "Erreur lors de la récupération des options de filtre:",
-      error
+      error,
     );
     return {
       categories: [],
@@ -783,14 +787,14 @@ export async function getFossilCatalogIndex() {
       countryOfOrigin: true,
       geologicalPeriod: true,
       geologicalStage: true,
-      locality: { select: { name: true } }
-    }
+      locality: { select: { name: true } },
+    },
   });
-  return products.map(p => ({
+  return products.map((p) => ({
     category: p.category,
     countryOfOrigin: p.countryOfOrigin,
     geologicalPeriod: p.geologicalPeriod,
     geologicalStage: p.geologicalStage,
-    locality: p.locality?.name || null
+    locality: p.locality?.name || null,
   }));
 }

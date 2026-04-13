@@ -223,25 +223,50 @@ export default function FossilesClient({
               </p>
             </div>
 
-              {/* Bouton filtres + badge */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Select
-                  value={searchParams.get("sort") || "default"}
-                  onValueChange={handleSortChange}
-                >
-                  <SelectTrigger className="w-full sm:w-[200px] border-[var(--parchemin)]/20 bg-[var(--silex)] text-[var(--parchemin)] focus:ring-[var(--terracotta)]">
-                    <SelectValue placeholder="Trier par..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#1a2321] text-[var(--parchemin)] border-[#d4af37]/20 shadow-2xl z-[100] opacity-100">
-                    <SelectItem value="default" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Par défaut</SelectItem>
-                    <SelectItem value="name_asc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Nom (A-Z)</SelectItem>
-                    <SelectItem value="name_desc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Nom (Z-A)</SelectItem>
-                    <SelectItem value="price_asc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Prix croissant</SelectItem>
-                    <SelectItem value="price_desc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Prix décroissant</SelectItem>
-                  </SelectContent>
-                </Select>
+            {/* Bouton filtres + badge */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Select
+                value={searchParams.get("sort") || "default"}
+                onValueChange={handleSortChange}
+              >
+                <SelectTrigger className="w-full sm:w-[200px] border-[var(--parchemin)]/20 bg-[var(--silex)] text-[var(--parchemin)] focus:ring-[var(--terracotta)]">
+                  <SelectValue placeholder="Trier par..." />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1a2321] text-[var(--parchemin)] border-[#d4af37]/20 shadow-2xl z-[100] opacity-100">
+                  <SelectItem
+                    value="default"
+                    className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]"
+                  >
+                    Par défaut
+                  </SelectItem>
+                  <SelectItem
+                    value="name_asc"
+                    className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]"
+                  >
+                    Nom (A-Z)
+                  </SelectItem>
+                  <SelectItem
+                    value="name_desc"
+                    className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]"
+                  >
+                    Nom (Z-A)
+                  </SelectItem>
+                  <SelectItem
+                    value="price_asc"
+                    className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]"
+                  >
+                    Prix croissant
+                  </SelectItem>
+                  <SelectItem
+                    value="price_desc"
+                    className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]"
+                  >
+                    Prix décroissant
+                  </SelectItem>
+                </SelectContent>
+              </Select>
 
-                <FossilesFiltersMobile
+              <FossilesFiltersMobile
                 filterOptions={filterOptions}
                 lang={lang}
                 dict={dict}
@@ -304,11 +329,36 @@ export default function FossilesClient({
                     <SelectValue placeholder="Trier par..." />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1a2321] text-[var(--parchemin)] border-[#d4af37]/20 shadow-2xl z-[100] opacity-100">
-                    <SelectItem value="default" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Par défaut</SelectItem>
-                    <SelectItem value="name_asc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Nom (A-Z)</SelectItem>
-                    <SelectItem value="name_desc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Nom (Z-A)</SelectItem>
-                    <SelectItem value="price_asc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Prix croissant</SelectItem>
-                    <SelectItem value="price_desc" className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]">Prix décroissant</SelectItem>
+                    <SelectItem
+                      value="default"
+                      className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]"
+                    >
+                      Par défaut
+                    </SelectItem>
+                    <SelectItem
+                      value="name_asc"
+                      className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]"
+                    >
+                      Nom (A-Z)
+                    </SelectItem>
+                    <SelectItem
+                      value="name_desc"
+                      className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]"
+                    >
+                      Nom (Z-A)
+                    </SelectItem>
+                    <SelectItem
+                      value="price_asc"
+                      className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]"
+                    >
+                      Prix croissant
+                    </SelectItem>
+                    <SelectItem
+                      value="price_desc"
+                      className="focus:bg-[var(--terracotta)]/10 focus:text-[var(--parchemin)]"
+                    >
+                      Prix décroissant
+                    </SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -329,7 +379,10 @@ export default function FossilesClient({
               {isLoading && (
                 <div className="col-span-full grid grid-cols-2 gap-4 lg:gap-8 w-full z-10 relative mb-4">
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="flex flex-col bg-[#1a2321] border border-[var(--parchemin)]/10 rounded-xl overflow-hidden animate-pulse shadow-md">
+                    <div
+                      key={i}
+                      className="flex flex-col bg-[#1a2321] border border-[var(--parchemin)]/10 rounded-xl overflow-hidden animate-pulse shadow-md"
+                    >
                       <div className="w-full aspect-[4/3] bg-white/5"></div>
                       <div className="p-4 lg:p-5 space-y-4">
                         <div className="flex justify-between items-start">
@@ -442,7 +495,10 @@ export default function FossilesClient({
             {isLoading && (
               <div className="col-span-full grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0 w-full z-10 relative mb-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="flex flex-col bg-[#1a2321] border border-[var(--parchemin)]/10 rounded-xl overflow-hidden animate-pulse shadow-md">
+                  <div
+                    key={i}
+                    className="flex flex-col bg-[#1a2321] border border-[var(--parchemin)]/10 rounded-xl overflow-hidden animate-pulse shadow-md"
+                  >
                     <div className="w-full aspect-square bg-white/5"></div>
                     <div className="p-3 space-y-3">
                       <div className="flex justify-between items-start">
@@ -456,7 +512,9 @@ export default function FossilesClient({
                 ))}
               </div>
             )}
-            <div className={`grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0 transition-opacity duration-300 ${isLoading ? "hidden pointer-events-none" : "opacity-100"}`}>
+            <div
+              className={`grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0 transition-opacity duration-300 ${isLoading ? "hidden pointer-events-none" : "opacity-100"}`}
+            >
               {fossils.map((fossil, index) => (
                 <AnimatedFossilCard
                   key={fossil.id}

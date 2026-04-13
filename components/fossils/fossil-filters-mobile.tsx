@@ -23,8 +23,7 @@ import { useFossilStore } from "@/stores/fossilStore";
 interface FossilesFiltersMobileProps {
   filterOptions: FilterOptions;
   lang?: "en" | "fr";
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  dict?: any;
+  dict?: Record<string, Record<string, string | undefined> | undefined>;
   activeFiltersCount: number;
   onClearFilters: () => void;
 }
@@ -85,7 +84,11 @@ export default function FossilesFiltersMobile({
     selectedStages,
     debouncedSearch,
   ]);
-  const toggleFilter = (setState: any, val: string, checked: boolean) => {
+  const toggleFilter = (
+    setState: React.Dispatch<React.SetStateAction<string[]>>,
+    val: string,
+    checked: boolean,
+  ) => {
     setState((prev: string[]) =>
       checked ? [...prev, val] : prev.filter((v) => v !== val),
     );
@@ -93,7 +96,7 @@ export default function FossilesFiltersMobile({
 
   const applyFilters = () => {
     const params = new URLSearchParams();
-    const newFilters: any = {};
+    const newFilters: Record<string, string | string[] | undefined> = {};
 
     if (debouncedSearch.trim()) {
       params.set("search", debouncedSearch.trim());
