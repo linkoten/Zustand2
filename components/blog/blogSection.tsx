@@ -59,19 +59,19 @@ export default function BlogSection({
       type: "search",
       value: filtersStore.search,
       icon: Search,
-      label: dict.blog?.blogSection?.searchFor || "Recherche pour",
+      label: (dict.blog?.blogSection as Record<string, string>)?.searchFor || "Recherche pour",
     },
     filtersStore.category && {
       type: "category",
       value: filtersStore.category,
       icon: Folder,
-      label: dict.blog?.blogSection?.categoryIn || "Dans la catégorie",
+      label: (dict.blog?.blogSection as Record<string, string>)?.categoryIn || "Dans la catégorie",
     },
     filtersStore.tag && {
       type: "tag",
       value: filtersStore.tag,
       icon: Tag,
-      label: dict.blog?.blogSection?.tagWith || "Avec le tag",
+      label: (dict.blog?.blogSection as Record<string, string>)?.tagWith || "Avec le tag",
     },
   ].filter(Boolean);
 
@@ -92,7 +92,7 @@ export default function BlogSection({
               : "bg-white text-slate-600 hover:bg-orange-50 border border-slate-200"
           }`}
         >
-          {dict.blog?.blogFilters?.allCategories || "Tout afficher"}
+          {(dict.blog?.blogFilters as Record<string, string>)?.allCategories || "Tout afficher"}
         </button>
         {categories?.map((catItem: { category: string; [key: string]: unknown }) => {
           const cat = catItem.category;
@@ -148,7 +148,7 @@ export default function BlogSection({
               <Filter className="w-6 h-6 text-white" />
             </div>
             <h2 className="text-2xl font-bold text-slate-800">
-              {dict.blog?.blogSection?.filtersTitle || "Filtres et recherche"}
+              {(dict.blog?.blogSection as Record<string, string>)?.filtersTitle || "Filtres et recherche"}
             </h2>
           </div>
 
@@ -174,10 +174,10 @@ export default function BlogSection({
 
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-slate-800">
-                  {dict.blog?.blogSection?.loading || "Chargement..."}
+                  {(dict.blog?.blogSection as Record<string, string>)?.loading || "Chargement..."}
                 </h3>
                 <p className="text-sm text-slate-600">
-                  {dict.blog?.blogSection?.loadingText ||
+                  {(dict.blog?.blogSection as Record<string, string>)?.loadingText ||
                     "Récupération des derniers articles..."}
                 </p>
               </div>
@@ -221,11 +221,11 @@ export default function BlogSection({
 
                 <div className="space-y-3">
                   <h3 className="text-2xl font-bold text-slate-800">
-                    {dict.blog?.blogSection?.noResults ||
+                    {(dict.blog?.blogSection as Record<string, string>)?.noResults ||
                       "Aucun résultat trouvé"}
                   </h3>
                   <p className="text-slate-600 max-w-md mx-auto">
-                    {dict.blog?.blogSection?.noResultsText ||
+                    {(dict.blog?.blogSection as Record<string, string>)?.noResultsText ||
                       "Essayez de modifier vos critères de recherche ou explorez d'autres catégories."}
                   </p>
                 </div>
