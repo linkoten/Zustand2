@@ -21,7 +21,10 @@ interface BlogSectionProps {
   initialData: BlogListProps;
   categories?: { category: string; [key: string]: unknown }[];
   lang: "fr" | "en";
-  dict: Record<string, Record<string, Record<string, string> | string | undefined> | undefined>;
+  dict: Record<
+    string,
+    Record<string, Record<string, string> | string | undefined> | undefined
+  >;
 }
 
 export default function BlogSection({
@@ -59,19 +62,25 @@ export default function BlogSection({
       type: "search",
       value: filtersStore.search,
       icon: Search,
-      label: (dict.blog?.blogSection as Record<string, string>)?.searchFor || "Recherche pour",
+      label:
+        (dict.blog?.blogSection as Record<string, string>)?.searchFor ||
+        "Recherche pour",
     },
     filtersStore.category && {
       type: "category",
       value: filtersStore.category,
       icon: Folder,
-      label: (dict.blog?.blogSection as Record<string, string>)?.categoryIn || "Dans la catégorie",
+      label:
+        (dict.blog?.blogSection as Record<string, string>)?.categoryIn ||
+        "Dans la catégorie",
     },
     filtersStore.tag && {
       type: "tag",
       value: filtersStore.tag,
       icon: Tag,
-      label: (dict.blog?.blogSection as Record<string, string>)?.tagWith || "Avec le tag",
+      label:
+        (dict.blog?.blogSection as Record<string, string>)?.tagWith ||
+        "Avec le tag",
     },
   ].filter(Boolean);
 
@@ -92,51 +101,54 @@ export default function BlogSection({
               : "bg-white text-slate-600 hover:bg-orange-50 border border-slate-200"
           }`}
         >
-          {(dict.blog?.blogFilters as Record<string, string>)?.allCategories || "Tout afficher"}
+          {(dict.blog?.blogFilters as Record<string, string>)?.allCategories ||
+            "Tout afficher"}
         </button>
-        {categories?.map((catItem: { category: string; [key: string]: unknown }) => {
-          const cat = catItem.category;
-          const labelKey: string =
-            {
-              PALEONTOLOGIE: "categoryPaleontology",
-              DECOUVERTE: "categoryDiscovery",
-              GUIDE_COLLECTION: "categoryGuides",
-              HISTOIRE_GEOLOGIQUE: "categoryHistory",
-              ACTUALITE: "categoryActualite",
-              TECHNIQUE: "categoryTechnique",
-              EXPOSITION: "categoryExposition",
-              PORTRAIT: "categoryPortrait",
-            }[cat as string] || "";
+        {categories?.map(
+          (catItem: { category: string; [key: string]: unknown }) => {
+            const cat = catItem.category;
+            const labelKey: string =
+              {
+                PALEONTOLOGIE: "categoryPaleontology",
+                DECOUVERTE: "categoryDiscovery",
+                GUIDE_COLLECTION: "categoryGuides",
+                HISTOIRE_GEOLOGIQUE: "categoryHistory",
+                ACTUALITE: "categoryActualite",
+                TECHNIQUE: "categoryTechnique",
+                EXPOSITION: "categoryExposition",
+                PORTRAIT: "categoryPortrait",
+              }[cat as string] || "";
 
-          const categoryLabel =
-            (dict.blog?.blogFilters as Record<string, string>)?.[labelKey] ||
-            (cat as string)
-              .replace(/_/g, " ")
-              .replace(/\b\w/g, (l: string) => l.toUpperCase());
+            const categoryLabel =
+              (dict.blog?.blogFilters as Record<string, string>)?.[labelKey] ||
+              (cat as string)
+                .replace(/_/g, " ")
+                .replace(/\b\w/g, (l: string) => l.toUpperCase());
 
-          return (
-            <button
-              key={cat as string}
-              onClick={() => {
-                useBlogStore
-                  .getState()
-                  .updateFilters({ category: cat, page: 1 });
-                window.history.pushState(
-                  null,
-                  "",
-                  `/${lang}/blog?category=${cat}`,
-                );
-              }}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                filtersStore.category === cat
-                  ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md transform scale-105"
-                  : "bg-white text-slate-600 hover:bg-orange-50 border border-slate-200"
-              }`}
-            >
-              {categoryLabel}
-            </button>
-          );
-        })}
+            return (
+              <button
+                key={cat as string}
+                onClick={() => {
+                  useBlogStore
+                    .getState()
+                    .updateFilters({ category: cat, page: 1 });
+                  window.history.pushState(
+                    null,
+                    "",
+                    `/${lang}/blog?category=${cat}`,
+                  );
+                }}
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                  filtersStore.category === cat
+                    ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md transform scale-105"
+                    : "bg-white text-slate-600 hover:bg-orange-50 border border-slate-200"
+                }`}
+              >
+                {categoryLabel}
+              </button>
+            );
+          },
+        )}
       </div>
 
       {/* Section filtres premium avec data attributes pour le scroll */}
@@ -148,7 +160,8 @@ export default function BlogSection({
               <Filter className="w-6 h-6 text-white" />
             </div>
             <h2 className="text-2xl font-bold text-slate-800">
-              {(dict.blog?.blogSection as Record<string, string>)?.filtersTitle || "Filtres et recherche"}
+              {(dict.blog?.blogSection as Record<string, string>)
+                ?.filtersTitle || "Filtres et recherche"}
             </h2>
           </div>
 
@@ -174,11 +187,12 @@ export default function BlogSection({
 
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-slate-800">
-                  {(dict.blog?.blogSection as Record<string, string>)?.loading || "Chargement..."}
+                  {(dict.blog?.blogSection as Record<string, string>)
+                    ?.loading || "Chargement..."}
                 </h3>
                 <p className="text-sm text-slate-600">
-                  {(dict.blog?.blogSection as Record<string, string>)?.loadingText ||
-                    "Récupération des derniers articles..."}
+                  {(dict.blog?.blogSection as Record<string, string>)
+                    ?.loadingText || "Récupération des derniers articles..."}
                 </p>
               </div>
 
@@ -221,11 +235,12 @@ export default function BlogSection({
 
                 <div className="space-y-3">
                   <h3 className="text-2xl font-bold text-slate-800">
-                    {(dict.blog?.blogSection as Record<string, string>)?.noResults ||
-                      "Aucun résultat trouvé"}
+                    {(dict.blog?.blogSection as Record<string, string>)
+                      ?.noResults || "Aucun résultat trouvé"}
                   </h3>
                   <p className="text-slate-600 max-w-md mx-auto">
-                    {(dict.blog?.blogSection as Record<string, string>)?.noResultsText ||
+                    {(dict.blog?.blogSection as Record<string, string>)
+                      ?.noResultsText ||
                       "Essayez de modifier vos critères de recherche ou explorez d'autres catégories."}
                   </p>
                 </div>

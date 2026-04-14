@@ -131,7 +131,20 @@ export default function FossilesClient({
 
   // Compter les filtres actifs pour le badge
   const activeFiltersCount = Array.from(searchParams.entries()).filter(
-    ([key, value]) => key !== "page" && value && value !== "all",
+    ([key, value]) => {
+      if (key === "page" || !value || value === "all") return false;
+      if (
+        key === "minPrice" &&
+        value === (filterOptions.minPrice || 0).toString()
+      )
+        return false;
+      if (
+        key === "maxPrice" &&
+        value === (filterOptions.maxPrice || 1000).toString()
+      )
+        return false;
+      return true;
+    },
   ).length;
 
   const handlePageChange = (page: number) => {

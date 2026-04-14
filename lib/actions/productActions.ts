@@ -394,23 +394,42 @@ export async function getFossils(
       ];
     }
 
+    // Prix
+    if (filters.minPrice || filters.maxPrice) {
+      whereConditions.price = {
+        ...(filters.minPrice ? { gte: Number(filters.minPrice) } : {}),
+        ...(filters.maxPrice ? { lte: Number(filters.maxPrice) } : {}),
+      };
+    }
+
     if (filters.category) {
       whereConditions.category = filters.category as Category;
     }
     if (filters.countryOfOrigin) {
-      whereConditions.countryOfOrigin = filters.countryOfOrigin;
+      const countries = filters.countryOfOrigin.split(",").filter(Boolean);
+      whereConditions.countryOfOrigin =
+        countries.length === 1
+          ? countries[0]
+          : { in: countries };
     }
     if (filters.locality) {
-      whereConditions.locality = {
-        name: filters.locality, // ou id: Number(filters.locality) si tu filtres par id
-      };
+      const localityNames = filters.locality.split(",").filter(Boolean);
+      whereConditions.locality =
+        localityNames.length === 1
+          ? { name: localityNames[0] }
+          : { name: { in: localityNames } };
     }
     if (filters.geologicalPeriod) {
+      const periods = filters.geologicalPeriod.split(",").filter(Boolean);
       whereConditions.geologicalPeriod =
-        filters.geologicalPeriod as GeologicalPeriod;
+        periods.length === 1
+          ? (periods[0] as GeologicalPeriod)
+          : { in: periods as GeologicalPeriod[] };
     }
     if (filters.geologicalStage) {
-      whereConditions.geologicalStage = filters.geologicalStage;
+      const stages = filters.geologicalStage.split(",").filter(Boolean);
+      whereConditions.geologicalStage =
+        stages.length === 1 ? stages[0] : { in: stages };
     }
 
     // Calculer le nombre total d'éléments correspondant aux filtres
@@ -666,6 +685,7 @@ export async function getFilterOptions() {
       localitiesResult,
       geologicalPeriodsResult,
       geologicalStagesResult,
+      priceResult,
     ] = await Promise.all([
       prisma.product.findMany({
         where: { status: ProductStatus.AVAILABLE },
@@ -683,7 +703,14 @@ export async function getFilterOptions() {
             some: { status: ProductStatus.AVAILABLE },
           },
         },
-        select: { id: true, name: true },
+        select: {
+          id: true,
+          name: true,
+          latitude: true,
+          longitude: true,
+          geologicalPeriods: true,
+          geologicalStages: true,
+        },
         orderBy: { name: "asc" },
       }),
       prisma.product.findMany({
@@ -696,12 +723,18 @@ export async function getFilterOptions() {
         select: { geologicalStage: true },
         distinct: ["geologicalStage"],
       }),
+      prisma.product.aggregate({
+        where: { status: "AVAILABLE" },
+        _min: { price: true },
+        _max: { price: true },
+      }),
     ]);
 
     return {
       categories: categoriesResult.map((item) => item.category),
       countries: countriesResult.map((item) => item.countryOfOrigin).sort(),
-      localities: localitiesResult,
+      localities: localitiesResult.map((loc) => loc.name),
+      localityObjects: localitiesResult,
       geologicalPeriods: geologicalPeriodsResult.map(
         (item) => item.geologicalPeriod,
       ),
@@ -709,6 +742,14 @@ export async function getFilterOptions() {
         .map((item) => item.geologicalStage)
         .filter(Boolean) // ✅ Filtrer les valeurs null
         .sort(),
+      minPrice:
+        priceResult && priceResult._min && priceResult._min.price !== null
+          ? Number(priceResult._min.price)
+          : 0,
+      maxPrice:
+        priceResult && priceResult._max && priceResult._max.price !== null
+          ? Number(priceResult._max.price)
+          : 1000,
     };
   } catch (error) {
     console.error(
@@ -721,6 +762,8 @@ export async function getFilterOptions() {
       localities: [],
       geologicalPeriods: [],
       geologicalStages: [],
+      minPrice: 0,
+      maxPrice: 1000,
     };
   }
 }

@@ -20,15 +20,25 @@ export interface CreateProductData {
   }>;
 }
 
+export interface LocalityMapData {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  geologicalPeriods: string[];
+  geologicalStages: string[];
+}
+
 export interface FilterOptions {
   categories: string[];
   countries: string[];
   localities: string[];
   geologicalPeriods: string[];
   geologicalStages: string[];
+  minPrice: number;
+  maxPrice: number;
+  localityObjects?: LocalityMapData[];
 }
-
-// ✅ Utiliser un type personnalisé au lieu du type Prisma brut
 export interface EditableProduct {
   id: number;
   title: string;
@@ -44,14 +54,6 @@ export interface EditableProduct {
   status: string;
 }
 
-export interface FilterOptions {
-  categories: string[];
-  countries: string[];
-  localities: string[];
-  geologicalPeriods: string[];
-  geologicalStages: string[];
-}
-
 export interface ActiveFilters {
   category?: string;
   countryOfOrigin?: string;
@@ -61,6 +63,8 @@ export interface ActiveFilters {
   search?: string;
   page?: string;
   sort?: string;
+  minPrice?: string;
+  maxPrice?: string;
 }
 
 export interface FossilRequestFormData {
@@ -84,4 +88,6 @@ export interface SearchParams {
   geologicalPeriod?: string;
   geologicalStage?: string;
   sort?: string;
+  minPrice?: string;
+  maxPrice?: string;
 }

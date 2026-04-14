@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Supercluster from "supercluster";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { MapPin, Globe, Layers } from "lucide-react";
@@ -125,6 +126,28 @@ const mapStyles = `
     font-size: 7px;
     padding: 1px 3px;
   }
+
+  .locality-label {
+    background: rgba(0, 0, 0, 0.65);
+    border: none;
+    box-shadow: none;
+    color: white;
+    font-weight: 700;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .locality-label::before {
+    display: none;
+  }
+
+  .cluster-icon {
+    background: none;
+    border: none;
+  }
 `;
 
 // Hook pour injecter les styles CSS
@@ -148,18 +171,8 @@ interface LocalityData {
   name: string;
   latitude: number;
   longitude: number;
-  geologicalPeriods: GeologicalPeriod[];
+  geologicalPeriods: string[];
   geologicalStages: string[];
-}
-
-// Interface pour les propriétés des features GeoJSON
-interface LocalityFeatureProperties {
-  name: string;
-  latitude: number;
-  longitude: number;
-  geologicalPeriods: GeologicalPeriod[];
-  geologicalStages: string[];
-  color: string;
 }
 
 // Couleurs géologiques conventionnelles améliorées
@@ -178,47 +191,6 @@ const GEOLOGICAL_COLORS: Record<string, string> = {
   QUATERNAIRE: "#F9F97F",
 };
 
-// Fonction pour générer un polygone autour d'un point
-const generatePolygonAroundPoint = (
-  lat: number,
-  lon: number,
-  radiusKm: number = 5,
-) => {
-  const radiusDeg = radiusKm / 111;
-  return [
-    [lon - radiusDeg, lat + radiusDeg],
-    [lon + radiusDeg, lat + radiusDeg],
-    [lon + radiusDeg, lat - radiusDeg],
-    [lon - radiusDeg, lat - radiusDeg],
-    [lon - radiusDeg, lat + radiusDeg],
-  ];
-};
-
-// Fonction pour créer les features GeoJSON
-const createLocalityFeatures = (
-  localities: LocalityData[],
-): Feature<Geometry, LocalityFeatureProperties>[] => {
-  return localities.map((locality) => ({
-    type: "Feature" as const,
-    properties: {
-      name: locality.name,
-      latitude: locality.latitude,
-      longitude: locality.longitude,
-      geologicalPeriods: locality.geologicalPeriods,
-      geologicalStages: locality.geologicalStages,
-      color:
-        locality.geologicalPeriods.length > 0
-          ? GEOLOGICAL_COLORS[locality.geologicalPeriods[0]]
-          : "#808080",
-    },
-    geometry: {
-      type: "Polygon" as const,
-      coordinates: [
-        generatePolygonAroundPoint(locality.latitude, locality.longitude),
-      ],
-    },
-  }));
-};
 
 interface ProductMapProps {
   localities: LocalityData[];
@@ -231,6 +203,9 @@ interface ProductMapProps {
   dict?: any;
   height?: number;
   showLegend?: boolean;
+  onLocalitySelect?: (name: string) => void;
+  selectedLocalities?: string[];
+  flyToLocality?: string;
 }
 
 export default function ProductMap({
@@ -243,6 +218,9 @@ export default function ProductMap({
   dict,
   height = 340,
   showLegend = false,
+  onLocalitySelect,
+  selectedLocalities = [],
+  flyToLocality,
 }: ProductMapProps) {
   useMapStyles();
 
@@ -252,10 +230,185 @@ export default function ProductMap({
     "satellite",
   );
 
+  const selectedLocalitiesRef = useRef<string[]>(selectedLocalities);
+  const mapRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mapInstance, setMapInstance] = useState<any>(null);
+  const clusterLayerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const updateClustersRef = useRef<() => void>(() => {});
+
   // Vérifier si on est côté client
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Sync selectedLocalities ref and refresh cluster markers
+  useEffect(() => {
+    selectedLocalitiesRef.current = selectedLocalities;
+    updateClustersRef.current();
+  }, [selectedLocalities]);
+
+  // Fly to locality when flyToLocality prop changes
+  useEffect(() => {
+    if (flyToLocality && mapRef.current) {
+      const loc = localities.find((l) => l.name === flyToLocality);
+      if (loc && loc.latitude && loc.longitude) {
+        const currentZoom = mapRef.current.getZoom();
+        mapRef.current.flyTo(
+          [loc.latitude, loc.longitude],
+          Math.max(currentZoom, 6),
+          { animate: true, duration: 0.8 },
+        );
+      }
+    }
+  }, [flyToLocality, localities]);
+
+  // Clustering avec Supercluster
+  useEffect(() => {
+    if (!mapInstance || localities.length === 0) return;
+    const map = mapInstance;
+
+    // Nettoyer l'ancien layer
+    if (clusterLayerRef.current) {
+      map.removeLayer(clusterLayerRef.current);
+    }
+
+    // Index Supercluster
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sc = new Supercluster<{ id: number; name: string; geologicalPeriods: string[]; geologicalStages: string[] }>({ radius: 70, maxZoom: 14, minPoints: 2 });
+    sc.load(
+      localities.map((loc) => ({
+        type: "Feature" as const,
+        properties: {
+          id: loc.id,
+          name: loc.name,
+          geologicalPeriods: loc.geologicalPeriods,
+          geologicalStages: loc.geologicalStages,
+        },
+        geometry: {
+          type: "Point" as const,
+          coordinates: [loc.longitude, loc.latitude] as [number, number],
+        },
+      })),
+    );
+
+    const layerGroup = L.layerGroup().addTo(map);
+    clusterLayerRef.current = layerGroup;
+
+    const doUpdate = () => {
+      layerGroup.clearLayers();
+      const bounds = map.getBounds();
+      if (!bounds) return;
+      const currentZoom = Math.floor(map.getZoom());
+      const bbox: [number, number, number, number] = [
+        bounds.getWest(),
+        bounds.getSouth(),
+        bounds.getEast(),
+        bounds.getNorth(),
+      ];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const clustersData: any[] = sc.getClusters(bbox, currentZoom);
+
+      clustersData.forEach((cluster) => {
+        const [lng, lat] = cluster.geometry.coordinates;
+        const props = cluster.properties;
+
+        if (props.cluster) {
+          // --- Bulle cluster ---
+          const count: number = props.point_count;
+          const size = count < 10 ? 34 : count < 50 ? 44 : 56;
+          const icon = L.divIcon({
+            html: `<div style="width:${size}px;height:${size}px;background:rgba(180,80,40,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:${size < 44 ? 11 : 13}px;box-shadow:0 2px 10px rgba(0,0,0,0.4);border:2px solid rgba(255,210,170,0.7);">${count}</div>`,
+            className: "cluster-icon",
+            iconAnchor: [size / 2, size / 2],
+            iconSize: [size, size],
+          });
+          const marker = L.marker([lat, lng], { icon });
+          marker.on("click", () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const expansion = sc.getClusterExpansionZoom((props as any).cluster_id);
+            map.flyTo([lat, lng], expansion, { animate: true, duration: 0.5 });
+          });
+          layerGroup.addLayer(marker);
+        } else {
+          // --- Marqueur individuel ---
+          const name: string = props.name;
+          const geologicalPeriods: string[] = props.geologicalPeriods || [];
+          const geologicalStages: string[] = props.geologicalStages || [];
+          const isSelected = selectedLocalitiesRef.current.includes(name);
+          const periodColor =
+            geologicalPeriods.length > 0
+              ? GEOLOGICAL_COLORS[geologicalPeriods[0]] || "#808080"
+              : "#808080";
+
+          const marker = L.circleMarker([lat, lng], {
+            radius: isSelected ? 10 : 8,
+            color: isSelected ? "#FFFFFF" : periodColor,
+            fillColor: periodColor,
+            weight: isSelected ? 3 : 2,
+            fillOpacity: isSelected ? 0.95 : 0.75,
+            opacity: 1,
+          });
+
+          // Nom permanent
+          marker.bindTooltip(name, {
+            permanent: true,
+            direction: "top",
+            className: "locality-label",
+            offset: L.point(0, -10),
+            opacity: 0.9,
+          });
+
+          // Popup riche
+          const periodsHtml =
+            geologicalPeriods.length > 0
+              ? `<div class="flex flex-wrap gap-1 mt-1">${geologicalPeriods
+                  .map(
+                    (p: string) =>
+                      `<span style="background:${GEOLOGICAL_COLORS[p] || "#808080"};color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700">${p}</span>`,
+                  )
+                  .join("")}</div>`
+              : "";
+          const stagesHtml =
+            geologicalStages.length > 0
+              ? `<p style="font-size:10px;color:#666;margin-top:4px">${geologicalStages.join(", ")}</p>`
+              : "";
+          const loc = localities.find((l) => l.name === name);
+          const coordsHtml = loc
+            ? `<p style="font-size:10px;color:#888;margin-top:3px">Lat ${loc.latitude.toFixed(3)}° · Lon ${loc.longitude.toFixed(3)}°</p>`
+            : "";
+
+          marker.bindPopup(
+            `<div style="min-width:140px"><strong style="font-size:13px">${name}</strong>${coordsHtml}${periodsHtml}${stagesHtml}</div>`,
+            { maxWidth: 220, closeButton: true },
+          );
+
+          marker.on("click", () => {
+            if (onLocalitySelect) onLocalitySelect(name);
+            marker.openPopup();
+          });
+
+          layerGroup.addLayer(marker);
+        }
+      });
+    };
+
+    updateClustersRef.current = doUpdate;
+    map.on("moveend", doUpdate);
+    map.on("zoomend", doUpdate);
+    doUpdate();
+
+    return () => {
+      map.off("moveend", doUpdate);
+      map.off("zoomend", doUpdate);
+      if (clusterLayerRef.current) {
+        map.removeLayer(clusterLayerRef.current);
+        clusterLayerRef.current = null;
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapInstance, localities]);
 
   // Charger Leaflet dynamiquement côté client uniquement
   useEffect(() => {
@@ -360,7 +513,6 @@ export default function ProductMap({
       popupAnchor: [0, -44],
     });
 
-  const localityFeatures = createLocalityFeatures(localities);
 
   const mapCenter: [number, number] =
     localities.length > 0 && !centerLat && !centerLon
@@ -415,6 +567,7 @@ export default function ProductMap({
         </div>
 
         <MapContainer
+          ref={(map: any) => { if (map) { mapRef.current = map; setMapInstance(map); } }}
           center={mapCenter}
           zoom={zoom}
           style={{ width: "100%", height: "100%" }}
@@ -544,144 +697,7 @@ export default function ProductMap({
                 </Marker>
               ))}
 
-          {/* Polygones GeoJSON pour les localités */}
-          {localityFeatures.length > 0 && (
-            <GeoJSON
-              data={
-                {
-                  type: "FeatureCollection",
-                  features: localityFeatures,
-                } as FeatureCollection<Geometry, LocalityFeatureProperties>
-              }
-              style={(
-                feature: Feature<Geometry, LocalityFeatureProperties>,
-              ) => ({
-                color: feature?.properties?.color || "#808080",
-                weight: 2,
-                fillOpacity: 0.3,
-                opacity: 0.8,
-              })}
-              onEachFeature={(
-                feature: Feature<Geometry, LocalityFeatureProperties>,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                layer: any,
-              ) => {
-                if (feature.properties) {
-                  const {
-                    name,
-                    latitude,
-                    longitude,
-                    geologicalPeriods,
-                    geologicalStages,
-                  } = feature.properties;
-
-                  layer.on({
-                    mouseover: (
-                      e: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      any,
-                    ) => {
-                      const layer = e.target;
-                      layer.setStyle({
-                        weight: 3,
-                        fillOpacity: 0.5,
-                        opacity: 1,
-                      });
-                    },
-                    mouseout: (
-                      e: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      any,
-                    ) => {
-                      const layer = e.target;
-                      layer.setStyle({
-                        weight: 2,
-                        fillOpacity: 0.3,
-                        opacity: 0.8,
-                      });
-                    },
-                    click: (
-                      e: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      any,
-                    ) => {
-                      const map = e.target._map;
-                      if (map) {
-                        const currentZoom = map.getZoom();
-                        if (currentZoom < 8) {
-                          map.setView(
-                            [latitude, longitude],
-                            Math.min(currentZoom + 1, 8),
-                            {
-                              animate: true,
-                              duration: 0.5,
-                            },
-                          );
-                        }
-                      }
-                    },
-                  });
-
-                  layer.bindPopup(
-                    `
-                    <div class="compact-popup-content overflow-hidden rounded-lg shadow-sm" style="margin: -13px -20px; padding: 0; min-width: 180px; max-width: 220px;">
-                      <div class="p-3 pb-2" style="background-color: ${geologicalPeriods.length > 0 ? GEOLOGICAL_COLORS[geologicalPeriods[0]] || "#808080" : "#808080"}">
-                        <h3 class="font-bold text-white truncate text-base flex items-center gap-2 drop-shadow-md">
-                          ${name}
-                        </h3>
-                      </div>
-                      <div class="px-4 py-3 bg-white space-y-3">
-                        <div class="text-slate-600 bg-slate-50 rounded-md p-2 border border-slate-100">
-                          <p class="font-bold text-slate-400 text-[9px] uppercase tracking-[0.1em] mb-1">${mapDict.coordinates}</p>
-                          <div class="flex gap-4 text-[10px] font-medium text-slate-700">
-                            <span><span class="text-slate-400 font-normal">Lat:</span> ${latitude.toFixed(3)}°</span>
-                            <span><span class="text-slate-400 font-normal">Lon:</span> ${longitude.toFixed(3)}°</span>
-                          </div>
-                        </div>
-
-                        ${
-                          geologicalPeriods.length > 0
-                            ? `
-                          <div>
-                            <p class="font-bold text-slate-400 text-[9px] uppercase tracking-[0.1em] mb-1.5">${mapDict.geologicalPeriods}</p>
-                            <div class="flex flex-wrap gap-1.5">
-                              ${geologicalPeriods
-                                .map(
-                                  (period: GeologicalPeriod) =>
-                                    `<span style="background-color: ${GEOLOGICAL_COLORS[period] || "#808080"}; color: #fff; font-size: 9px; padding: 3px 8px; border-radius: 12px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">${period}</span>`,
-                                )
-                                .join("")}
-                            </div>
-                          </div>
-                        `
-                            : ""
-                        }
-
-                        ${
-                          geologicalStages.length > 0
-                            ? `
-                          <div>
-                            <p class="font-bold text-slate-400 text-[9px] uppercase tracking-[0.1em] mb-1.5">${mapDict.geologicalStages}</p>
-                            <div class="text-[10px] font-medium text-slate-700 bg-slate-50 border border-slate-100 rounded px-2 py-1.5">
-                              ${geologicalStages.join(", ")}
-                            </div>
-                          </div>
-                        `
-                            : ""
-                        }
-                      </div>
-                    </div>
-                  `,
-                    {
-                      closeButton: true,
-                      autoClose: true,
-                      closeOnEscapeKey: true,
-                      maxWidth: 200,
-                      minWidth: 160,
-                    },
-                  );
-                }
-              }}
-            />
-          )}
-        </MapContainer>
+                      </MapContainer>
       </div>
 
       {/* Légende optionnelle */}

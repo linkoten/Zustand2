@@ -46,7 +46,8 @@ export default async function FossilesPage({
   const filterOptionsRaw = await getFilterOptions();
   const filterOptions = {
     ...filterOptionsRaw,
-    localities: filterOptionsRaw.localities.map((loc) => loc.name),
+    localities: filterOptionsRaw.localityObjects?.map((loc) => loc.name) ?? [],
+    localityObjects: filterOptionsRaw.localityObjects,
   };
 
   return (

@@ -14,10 +14,12 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, Filter, X, Sparkles } from "lucide-react";
+import { Search, Filter, X, Sparkles, SlidersHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FilterOptions } from "@/types/productType";
 import { useFossilStore } from "@/stores/fossilStore";
+import { Slider } from "@/components/ui/slider";
+import { AdvancedFiltersModal } from "./advanced-filters/advanced-filters-modal";
 
 interface FossilesFiltersProps {
   filterOptions: FilterOptions;
@@ -32,7 +34,8 @@ export default function FossilesFilters({
 }: FossilesFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { facets } = useFossilStore();
+  const { facets, catalogIndex } = useFossilStore();
+  const catalogReady = catalogIndex.length > 0;
 
   const parseArray = (str: string | null) => {
     if (!str || str === "all") return [];
@@ -58,12 +61,37 @@ export default function FossilesFilters({
     parseArray(searchParams.get("geologicalStage")),
   );
 
+  const PRICE_STEP = 10;
+  const defaultMinPrice =
+    Math.floor((filterOptions.minPrice || 0) / PRICE_STEP) * PRICE_STEP;
+  const defaultMaxPrice =
+    Math.ceil((filterOptions.maxPrice || 1000) / PRICE_STEP) * PRICE_STEP ||
+    1000;
+  const initialMinPrice = searchParams.get("minPrice")
+    ? Number(searchParams.get("minPrice"))
+    : defaultMinPrice;
+  const initialMaxPrice = searchParams.get("maxPrice")
+    ? Number(searchParams.get("maxPrice"))
+    : defaultMaxPrice;
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    initialMinPrice,
+    initialMaxPrice,
+  ]);
+
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+  const [debouncedPriceRange, setDebouncedPriceRange] = useState<
+    [number, number]
+  >([initialMinPrice, initialMaxPrice]);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchTerm), 600);
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedPriceRange(priceRange), 600);
+    return () => clearTimeout(timer);
+  }, [priceRange]);
 
   // Handle dynamic apply whenever filters change
   useEffect(() => {
@@ -76,6 +104,7 @@ export default function FossilesFilters({
     selectedPeriods,
     selectedStages,
     debouncedSearch,
+    debouncedPriceRange,
   ]);
   const toggleFilter = (
     setState: React.Dispatch<React.SetStateAction<string[]>>,
@@ -87,13 +116,50 @@ export default function FossilesFilters({
     );
   };
 
-  const activeFiltersCount =
-    selectedCategories.length +
-    selectedCountries.length +
-    selectedLocalities.length +
-    selectedPeriods.length +
-    selectedStages.length +
-    (searchTerm.trim() !== "" ? 1 : 0);
+  const isPriceFiltered =
+    priceRange[0] !== defaultMinPrice || priceRange[1] !== defaultMaxPrice;
+
+  const activeFilterTags: { label: string; group: string; remove: () => void }[] = [
+    ...selectedCategories.map((v) => ({
+      label: v,
+      group: "Cat.",
+      remove: () => setSelectedCategories((p) => p.filter((x) => x !== v)),
+    })),
+    ...selectedCountries.map((v) => ({
+      label: v,
+      group: "Pays",
+      remove: () => setSelectedCountries((p) => p.filter((x) => x !== v)),
+    })),
+    ...selectedLocalities.map((v) => ({
+      label: v,
+      group: "Loc.",
+      remove: () => setSelectedLocalities((p) => p.filter((x) => x !== v)),
+    })),
+    ...selectedPeriods.map((v) => ({
+      label: v,
+      group: "Pér.",
+      remove: () => setSelectedPeriods((p) => p.filter((x) => x !== v)),
+    })),
+    ...selectedStages.map((v) => ({
+      label: v,
+      group: "Ét.",
+      remove: () => setSelectedStages((p) => p.filter((x) => x !== v)),
+    })),
+    ...(searchTerm.trim()
+      ? [{ label: searchTerm.trim(), group: "Rech.", remove: () => setSearchTerm("") }]
+      : []),
+    ...(isPriceFiltered
+      ? [
+          {
+            label: `${priceRange[0]}–${priceRange[1]} €`,
+            group: "Prix",
+            remove: () => setPriceRange([defaultMinPrice, defaultMaxPrice]),
+          },
+        ]
+      : []),
+  ];
+
+  const activeFiltersCount = activeFilterTags.length;
 
   const applyFilters = () => {
     const params = new URLSearchParams();
@@ -104,6 +170,20 @@ export default function FossilesFilters({
       newFilters.search = debouncedSearch.trim();
     } else {
       newFilters.search = undefined;
+    }
+
+    if (debouncedPriceRange[0] !== defaultMinPrice) {
+      params.set("minPrice", debouncedPriceRange[0].toString());
+      newFilters.minPrice = debouncedPriceRange[0].toString();
+    } else {
+      newFilters.minPrice = undefined;
+    }
+
+    if (debouncedPriceRange[1] !== defaultMaxPrice) {
+      params.set("maxPrice", debouncedPriceRange[1].toString());
+      newFilters.maxPrice = debouncedPriceRange[1].toString();
+    } else {
+      newFilters.maxPrice = undefined;
     }
 
     if (selectedCategories.length > 0) {
@@ -164,6 +244,7 @@ export default function FossilesFilters({
     setSelectedPeriods([]);
     setSelectedStages([]);
     setSearchTerm("");
+    setPriceRange([defaultMinPrice, defaultMaxPrice]);
 
     useFossilStore.getState().resetFilters();
     window.history.pushState(null, "", `/${lang}/fossiles`);
@@ -231,10 +312,52 @@ export default function FossilesFilters({
             </div>
 
             {/* Séparateur visuel */}
-            <div className="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
+            <div className="h-px bg-gradient-to-r from-transparent via-[var(--parchemin)]/20 to-transparent"></div>
+
+            {/* Filtres Avancés Modal */}
+            <div className="mb-6">
+              <AdvancedFiltersModal
+                filterOptions={filterOptions}
+                selectedPeriods={selectedPeriods}
+                setSelectedPeriods={setSelectedPeriods}
+                selectedStages={selectedStages}
+                setSelectedStages={setSelectedStages}
+                selectedLocalities={selectedLocalities}
+                setSelectedLocalities={setSelectedLocalities}
+                triggerSearch={applyFilters}
+              />
+            </div>
 
             {/* Filtres avec design amélioré */}
-            <div className="space-y-5">
+            <div className="space-y-6">
+              {/* Price Range */}
+              <div className="space-y-4">
+                <Label className="text-sm font-semibold text-[var(--parchemin)]/80 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-[var(--terracotta)] rounded-full"></div>
+                  {dict?.fossils?.priceRangeLabel || "Prix (€)"}
+                </Label>
+                <div className="px-2 pt-2 pb-4">
+                  <Slider
+                    min={filterOptions.minPrice || 0}
+                    max={filterOptions.maxPrice || 1000}
+                    step={10}
+                    value={priceRange}
+                    onValueChange={(val: [number, number]) =>
+                      setPriceRange(val)
+                    }
+                    className="py-4"
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs font-medium text-[var(--parchemin)]/70 bg-[var(--parchemin)]/10 py-1 px-2 rounded-md">
+                      {priceRange[0]} €
+                    </span>
+                    <span className="text-xs font-medium text-[var(--parchemin)]/70 bg-[var(--parchemin)]/10 py-1 px-2 rounded-md">
+                      {priceRange[1]} €
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               {/* Catégorie */}
               <div className="space-y-3">
                 <Label className="text-sm font-semibold text-[var(--parchemin)]/80 flex items-center gap-2">
@@ -244,7 +367,7 @@ export default function FossilesFilters({
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                   {filterOptions.categories.map((option) => {
                     const count = facets?.categories[option] || 0;
-                    if (count === 0 && !selectedCategories.includes(option))
+                    if (catalogReady && count === 0 && !selectedCategories.includes(option))
                       return null;
                     return (
                       <div key={option} className="flex items-start space-x-3">
@@ -289,7 +412,7 @@ export default function FossilesFilters({
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                   {filterOptions.countries.map((option) => {
                     const count = facets?.countries[option] || 0;
-                    if (count === 0 && !selectedCountries.includes(option))
+                    if (catalogReady && count === 0 && !selectedCountries.includes(option))
                       return null;
                     return (
                       <div key={option} className="flex items-start space-x-3">
@@ -334,7 +457,7 @@ export default function FossilesFilters({
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                   {filterOptions.localities.map((option) => {
                     const count = facets?.localities[option] || 0;
-                    if (count === 0 && !selectedLocalities.includes(option))
+                    if (catalogReady && count === 0 && !selectedLocalities.includes(option))
                       return null;
                     return (
                       <div key={option} className="flex items-start space-x-3">
@@ -379,7 +502,7 @@ export default function FossilesFilters({
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                   {filterOptions.geologicalPeriods.map((option) => {
                     const count = facets?.periods[option] || 0;
-                    if (count === 0 && !selectedPeriods.includes(option))
+                    if (catalogReady && count === 0 && !selectedPeriods.includes(option))
                       return null;
                     return (
                       <div key={option} className="flex items-start space-x-3">
@@ -424,7 +547,7 @@ export default function FossilesFilters({
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                   {filterOptions.geologicalStages.map((option) => {
                     const count = facets?.stages[option] || 0;
-                    if (count === 0 && !selectedStages.includes(option))
+                    if (catalogReady && count === 0 && !selectedStages.includes(option))
                       return null;
                     return (
                       <div key={option} className="flex items-start space-x-3">
@@ -464,8 +587,23 @@ export default function FossilesFilters({
         </ScrollArea>
       </div>
 
-      {/* Footer fixe - hauteur définie */}
-      <CardFooter className="flex flex-col gap-3 p-6 border-t border-[var(--parchemin)]/10 bg-[var(--silex)] flex-shrink-0 h-20">
+      {/* Footer - active filters + clear button */}
+      <CardFooter className="flex flex-col gap-3 p-4 border-t border-[var(--parchemin)]/10 bg-[var(--silex)] flex-shrink-0">
+        {activeFilterTags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 w-full max-h-28 overflow-y-auto custom-scrollbar">
+            {activeFilterTags.map((tag) => (
+              <button
+                key={`${tag.group}-${tag.label}`}
+                onClick={tag.remove}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--terracotta)]/15 border border-[var(--terracotta)]/30 text-[var(--parchemin)]/90 hover:bg-[var(--terracotta)]/30 hover:border-[var(--terracotta)]/60 transition-colors cursor-pointer"
+              >
+                <span className="text-[var(--parchemin)]/50 text-[10px] leading-none">{tag.group}</span>
+                <span className="text-xs">{tag.label}</span>
+                <X className="w-2.5 h-2.5 opacity-60 flex-shrink-0" />
+              </button>
+            ))}
+          </div>
+        )}
         {activeFiltersCount > 0 && (
           <Button
             variant="outline"
