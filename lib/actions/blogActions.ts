@@ -7,7 +7,7 @@ import {
   UserRole,
 } from "@/lib/generated/prisma";
 import prisma from "@/lib/prisma";
-import { BlogFilters, BlogResult, CreateArticleData } from "@/types/blogType";
+import { BlogFilters, BlogResult, CreateArticleData, UpdateArticleData } from "@/types/blogType";
 import { BlogListItem } from "@/types/type";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
@@ -165,6 +165,8 @@ export async function getBlogPost(slug: string) {
       createdAt: post.createdAt.toISOString(),
       updatedAt: post.updatedAt.toISOString(),
       tags: post.tags.map((tag) => tag.name), // ✅ Extraire les noms des tags
+      tagIds: post.tags.map((tag) => tag.id),
+      structuredData: post.structuredData ?? undefined,
     };
   } catch (error) {
     console.error("Erreur lors de la récupération de l'article:", error);
@@ -243,6 +245,7 @@ export async function getBlogArticleBySlug(slug: string) {
         color: tag.color || undefined,
         createdAt: tag.createdAt.toISOString(),
       })),
+      structuredData: article.structuredData ?? undefined,
     };
   } catch (error) {
     console.error("Erreur lors de la récupération de l'article:", error);
@@ -479,6 +482,9 @@ export async function createBlogArticle(data: CreateArticleData) {
         readTime: data.readTime || undefined,
         seoTitle: data.seoTitle || undefined,
         seoDescription: data.seoDescription || undefined,
+        structuredData: data.structuredData
+          ? (data.structuredData as unknown as Prisma.InputJsonValue)
+          : undefined,
         authorId: user.id,
         tags: {
           connect: data.tagIds.map((id) => ({ id })),
@@ -518,6 +524,64 @@ export async function createBlogArticle(data: CreateArticleData) {
     return { success: true, article };
   } catch (error) {
     console.error("❌ Erreur création article:", error);
+    throw error;
+  }
+}
+
+export async function updateBlogArticle(id: string, data: UpdateArticleData) {
+  try {
+    const { userId } = await auth();
+
+    if (!userId) throw new Error("Utilisateur non connecté");
+
+    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
+
+    if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.MODERATOR)) {
+      throw new Error("Accès non autorisé");
+    }
+
+    // Vérifier slug unique (sauf pour l'article lui-même)
+    if (data.slug) {
+      const existing = await prisma.articleBlog.findFirst({
+        where: { slug: data.slug, NOT: { id } },
+      });
+      if (existing) throw new Error("Ce slug est déjà utilisé par un autre article.");
+    }
+
+    const article = await prisma.articleBlog.update({
+      where: { id },
+      data: {
+        title: data.title,
+        slug: data.slug,
+        excerpt: data.excerpt ?? undefined,
+        content: data.content,
+        featuredImage: data.featuredImage ?? undefined,
+        imageAlt: data.imageAlt ?? undefined,
+        category: data.category,
+        status: data.status,
+        publishedAt:
+          data.status === BlogStatus.PUBLISHED
+            ? data.publishedAt || new Date()
+            : undefined,
+        seoTitle: data.seoTitle ?? undefined,
+        seoDescription: data.seoDescription ?? undefined,
+        structuredData: data.structuredData
+          ? (data.structuredData as unknown as Prisma.InputJsonValue)
+          : Prisma.JsonNull,
+        tags: {
+          set: [],
+          connect: data.tagIds.map((id) => ({ id })),
+        },
+      },
+    });
+
+    revalidatePath("/blog");
+    revalidatePath(`/blog/${article.slug}`);
+    revalidatePath("/admin/blog");
+
+    return { success: true, article };
+  } catch (error) {
+    console.error("❌ Erreur mise à jour article:", error);
     throw error;
   }
 }

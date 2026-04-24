@@ -36,6 +36,7 @@ model User {
   orders        Order[]   @relation("UserOrders")
 
   Notification Notification[]
+  collection   UserCollection[]
 }
 
 model Product {
@@ -77,6 +78,10 @@ model Product {
   owner   User?   @relation("UserProductsOwned", fields: [ownerId], references: [id])
 
   OrderItem OrderItem[]
+
+  // Collection Pokédex (lien optionnel vers une espèce du catalogue)
+  fossilSpeciesId String?
+  fossilSpecies   FossilSpecies? @relation(fields: [fossilSpeciesId], references: [id])
 }
 
 model UserFavorite {
@@ -148,6 +153,7 @@ model Locality {
   geologicalPeriods GeologicalPeriod[] // Plusieurs périodes possibles
   geologicalStages  String[] // Plusieurs étages possibles (en string, ou crée un enum si tu veux)
   products          Product[] // Relation inverse
+  fossilSpecies     FossilSpecies[]
 
   // Ajoute d'autres champs si besoin (description, pays, etc)
 }
@@ -208,6 +214,7 @@ model ArticleBlog {
   seoTitle       String? // Titre SEO personnalisé
   seoDescription String? // Description SEO
   tags           BlogTag[] // Tags associés
+  structuredData Json? // Données structurées selon la catégorie (ex: GisementsData)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   ratings        Rating[]
@@ -328,7 +335,12 @@ enum Category {
   TRILOBITE
   AMMONITE
   DENT
-  COQUILLAGE
+  ECHINODERME
+  POISSON
+  VERTEBRE
+  GASTROPODE
+  AUTRE_ARTHROPODE
+  AUTRES
 }
 
 enum GeologicalPeriod {
@@ -355,14 +367,11 @@ enum ProductStatus {
 
 // ✅ Nouveaux enums pour le blog
 enum BlogCategory {
-  PALEONTOLOGIE // Articles sur la paléontologie en général
-  DECOUVERTE // Nouvelles découvertes
-  GUIDE_COLLECTION // Guides pour collectionneurs
-  HISTOIRE_GEOLOGIQUE // Histoire de la Terre
-  ACTUALITE // Actualités du domaine
-  TECHNIQUE // Techniques de fouille, préparation
-  EXPOSITION // Expositions et événements
-  PORTRAIT // Portraits de paléontologues
+  GISEMENTS // Gisements et sites paléontologiques
+  COLLECTIONS // Collections et acquisitions
+  PALEONTOLOGIE // Paléontologie générale
+  ACTIVITES_PALEOLITHO // Activités Paleolitho
+  AUTRES // Autres sujets
 }
 
 enum BlogStatus {
@@ -370,4 +379,55 @@ enum BlogStatus {
   PUBLISHED // Publié
   ARCHIVED // Archivé
   SCHEDULED // Programmé pour publication
+}
+
+enum CollectionStatus {
+  OWNED
+  WISHLIST
+}
+
+enum FossilRarity {
+  COMMUN
+  PEU_COMMUN
+  RARE
+  TRES_RARE
+  EXCEPTIONNEL
+}
+
+model FossilSpecies {
+  id               String           @id @default(cuid())
+  genus            String
+  species          String
+  commonName       String?
+  description      String?          @db.Text
+  localityId       Int
+  locality         Locality         @relation(fields: [localityId], references: [id])
+  geologicalPeriod GeologicalPeriod
+  geologicalStage  String
+  category         Category
+  countryOfOrigin  String
+  rarity           FossilRarity?
+  photos           String[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  userCollection UserCollection[]
+  products       Product[]
+
+  @@unique([genus, species, localityId])
+}
+
+model UserCollection {
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fossilSpeciesId String
+  fossilSpecies   FossilSpecies    @relation(fields: [fossilSpeciesId], references: [id], onDelete: Cascade)
+  status          CollectionStatus
+  acquiredAt      DateTime?
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([userId, fossilSpeciesId])
 }

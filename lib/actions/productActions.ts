@@ -408,9 +408,7 @@ export async function getFossils(
     if (filters.countryOfOrigin) {
       const countries = filters.countryOfOrigin.split(",").filter(Boolean);
       whereConditions.countryOfOrigin =
-        countries.length === 1
-          ? countries[0]
-          : { in: countries };
+        countries.length === 1 ? countries[0] : { in: countries };
     }
     if (filters.locality) {
       const localityNames = filters.locality.split(",").filter(Boolean);
@@ -533,6 +531,57 @@ export async function getFossils(
       currentPage: 1,
     };
   }
+}
+
+export interface BlogProductResult {
+  id: number;
+  title: string;
+  price: number;
+  category: string;
+  photo?: string;
+}
+
+export async function searchProductsForBlog(
+  query: string,
+): Promise<BlogProductResult[]> {
+  const q = query.trim();
+  const where: Prisma.ProductWhereInput = {
+    status: ProductStatus.AVAILABLE,
+    ...(q
+      ? {
+          OR: [
+            { title: { contains: q, mode: "insensitive" } },
+            { genre: { contains: q, mode: "insensitive" } },
+            { species: { contains: q, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  };
+
+  const products = await prisma.product.findMany({
+    where,
+    orderBy: { title: "asc" },
+    take: 20,
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      category: true,
+      images: {
+        orderBy: { order: "asc" },
+        take: 1,
+        select: { imageUrl: true },
+      },
+    },
+  });
+
+  return products.map((p) => ({
+    id: p.id,
+    title: p.title,
+    price: p.price.toNumber(),
+    category: p.category,
+    photo: p.images[0]?.imageUrl,
+  }));
 }
 
 export async function getProduct(

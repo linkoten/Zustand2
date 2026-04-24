@@ -19,14 +19,11 @@ import { EditableBlogPost } from "@/types/blogType";
 
 // ✅ Categories du schéma Prisma
 const categories = [
+  { value: "GISEMENTS", label: "Gisements" },
+  { value: "COLLECTIONS", label: "Collections" },
   { value: "PALEONTOLOGIE", label: "Paléontologie" },
-  { value: "DECOUVERTE", label: "Découverte" },
-  { value: "GUIDE_COLLECTION", label: "Guide Collection" },
-  { value: "HISTOIRE_GEOLOGIQUE", label: "Histoire Géologique" },
-  { value: "ACTUALITE", label: "Actualité" },
-  { value: "TECHNIQUE", label: "Technique" },
-  { value: "EXPOSITION", label: "Exposition" },
-  { value: "PORTRAIT", label: "Portrait" },
+  { value: "ACTIVITES_PALEOLITHO", label: "Activités Paleolitho" },
+  { value: "AUTRES", label: "Autres" },
 ];
 
 // ✅ Status du schéma Prisma

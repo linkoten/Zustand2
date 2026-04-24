@@ -41,36 +41,26 @@ export default function BlogCard({ article, lang, dict }: BlogCardProps) {
 
   const getCategoryColor = (category: BlogCategory) => {
     const colors = {
+      [BlogCategory.GISEMENTS]: "from-amber-500 to-orange-600",
+      [BlogCategory.COLLECTIONS]: "from-purple-500 to-violet-600",
       [BlogCategory.PALEONTOLOGIE]: "from-blue-500 to-cyan-600",
-      [BlogCategory.DECOUVERTE]: "from-green-500 to-emerald-600",
-      [BlogCategory.GUIDE_COLLECTION]: "from-purple-500 to-violet-600",
-      [BlogCategory.HISTOIRE_GEOLOGIQUE]: "from-amber-500 to-orange-600",
-      [BlogCategory.ACTUALITE]: "from-red-500 to-pink-600",
-      [BlogCategory.TECHNIQUE]: "from-gray-500 to-slate-600",
-      [BlogCategory.EXPOSITION]: "from-pink-500 to-rose-600",
-      [BlogCategory.PORTRAIT]: "from-indigo-500 to-blue-600",
+      [BlogCategory.ACTIVITES_PALEOLITHO]: "from-orange-500 to-red-600",
+      [BlogCategory.AUTRES]: "from-gray-500 to-slate-600",
     };
     return colors[category] || "from-gray-500 to-slate-600";
   };
 
   const getCategoryLabel = (category: BlogCategory) => {
     const map: Record<string, string> = {
+      [BlogCategory.GISEMENTS]:
+        dict.blog?.blogFilters?.categoryGisements || "Gisements",
+      [BlogCategory.COLLECTIONS]:
+        dict.blog?.blogFilters?.categoryCollections || "Collections",
       [BlogCategory.PALEONTOLOGIE]:
         dict.blog?.blogFilters?.categoryPaleontology || "Paléontologie",
-      [BlogCategory.DECOUVERTE]:
-        dict.blog?.blogFilters?.categoryDiscovery || "Découvertes",
-      [BlogCategory.GUIDE_COLLECTION]:
-        dict.blog?.blogFilters?.categoryGuides || "Guides",
-      [BlogCategory.HISTOIRE_GEOLOGIQUE]:
-        dict.blog?.blogFilters?.categoryHistory || "Histoire",
-      [BlogCategory.ACTUALITE]:
-        dict.blog?.blogFilters?.categoryActualite || "Actualité",
-      [BlogCategory.TECHNIQUE]:
-        dict.blog?.blogFilters?.categoryTechnique || "Technique",
-      [BlogCategory.EXPOSITION]:
-        dict.blog?.blogFilters?.categoryExposition || "Exposition",
-      [BlogCategory.PORTRAIT]:
-        dict.blog?.blogFilters?.categoryPortrait || "Portrait",
+      [BlogCategory.ACTIVITES_PALEOLITHO]:
+        dict.blog?.blogFilters?.categoryActivites || "Activités Paleolitho",
+      [BlogCategory.AUTRES]: dict.blog?.blogFilters?.categoryAutres || "Autres",
     };
     return map[category] || category;
   };

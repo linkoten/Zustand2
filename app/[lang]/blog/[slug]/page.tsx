@@ -17,10 +17,15 @@ import {
   MessageCircle,
   Heart,
   Bookmark,
+  Pencil,
 } from "lucide-react";
 import { BlogCategory } from "@/lib/generated/prisma";
+import type { GisementsData, ActivitesData } from "@/types/blogType";
+import { isAdmin } from "@/lib/auth";
 import ShareButtons from "@/components/blog/shareButtons";
 import BlogContent from "@/components/blog/blogContent";
+import GisementsContent from "@/components/blog/gisementsContent";
+import ActivitesContent from "@/components/blog/activitesContent";
 import RelatedArticles from "@/components/blog/relatedArticles";
 import {
   getBlogArticleBySlug,
@@ -99,6 +104,7 @@ export default async function BlogArticlePage(props: BlogArticlePageProps) {
   const { lang, slug } = resolvedParams;
   const dict = await getDictionary(lang);
   const article = await getBlogArticleBySlug(slug);
+  const admin = await isAdmin();
 
   if (!article) {
     notFound();
@@ -114,28 +120,23 @@ export default async function BlogArticlePage(props: BlogArticlePageProps) {
 
   const getCategoryColor = (category: BlogCategory) => {
     const colors = {
+      [BlogCategory.GISEMENTS]: "from-amber-500 to-orange-600",
+      [BlogCategory.COLLECTIONS]: "from-purple-500 to-violet-600",
       [BlogCategory.PALEONTOLOGIE]: "from-blue-500 to-cyan-600",
-      [BlogCategory.DECOUVERTE]: "from-green-500 to-emerald-600",
-      [BlogCategory.GUIDE_COLLECTION]: "from-purple-500 to-violet-600",
-      [BlogCategory.HISTOIRE_GEOLOGIQUE]: "from-amber-500 to-orange-600",
-      [BlogCategory.ACTUALITE]: "from-red-500 to-pink-600",
-      [BlogCategory.TECHNIQUE]: "from-gray-500 to-slate-600",
-      [BlogCategory.EXPOSITION]: "from-pink-500 to-rose-600",
-      [BlogCategory.PORTRAIT]: "from-indigo-500 to-blue-600",
+      [BlogCategory.ACTIVITES_PALEOLITHO]: "from-orange-500 to-red-600",
+      [BlogCategory.AUTRES]: "from-gray-500 to-slate-600",
     };
     return colors[category] || "from-gray-500 to-slate-600";
   };
 
   const getCategoryLabel = (category: BlogCategory) => {
     const map: Record<string, string> = {
+      [BlogCategory.GISEMENTS]: dict.blog.blogFilters.categoryGisements,
+      [BlogCategory.COLLECTIONS]: dict.blog.blogFilters.categoryCollections,
       [BlogCategory.PALEONTOLOGIE]: dict.blog.blogFilters.categoryPaleontology,
-      [BlogCategory.DECOUVERTE]: dict.blog.blogFilters.categoryDiscovery,
-      [BlogCategory.GUIDE_COLLECTION]: dict.blog.blogFilters.categoryGuides,
-      [BlogCategory.HISTOIRE_GEOLOGIQUE]: dict.blog.blogFilters.categoryHistory,
-      [BlogCategory.ACTUALITE]: dict.blog.blogFilters.categoryActualite,
-      [BlogCategory.TECHNIQUE]: dict.blog.blogFilters.categoryTechnique,
-      [BlogCategory.EXPOSITION]: dict.blog.blogFilters.categoryExposition,
-      [BlogCategory.PORTRAIT]: dict.blog.blogFilters.categoryPortrait,
+      [BlogCategory.ACTIVITES_PALEOLITHO]:
+        dict.blog.blogFilters.categoryActivites,
+      [BlogCategory.AUTRES]: dict.blog.blogFilters.categoryAutres,
     };
     return map[category] || category;
   };
@@ -144,7 +145,7 @@ export default async function BlogArticlePage(props: BlogArticlePageProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       <div className="container mx-auto px-4 py-8">
         {/* Navigation de retour ultra moderne */}
-        <div className="mb-8">
+        <div className="mb-8 flex items-center gap-3">
           <Button
             variant="ghost"
             asChild
@@ -161,6 +162,22 @@ export default async function BlogArticlePage(props: BlogArticlePageProps) {
               </span>
             </Link>
           </Button>
+
+          {admin && (
+            <Button
+              variant="outline"
+              asChild
+              className="group bg-white/80 backdrop-blur-sm border border-slate-200 hover:bg-white hover:shadow-lg transition-all duration-300 rounded-xl px-5 py-3"
+            >
+              <Link
+                href={`/${lang}/blog/${article.slug}/edit`}
+                className="flex items-center gap-2"
+              >
+                <Pencil className="w-4 h-4" />
+                <span className="font-semibold">Modifier</span>
+              </Link>
+            </Button>
+          )}
         </div>
 
         {/* Article principal avec design premium */}
@@ -367,7 +384,20 @@ export default async function BlogArticlePage(props: BlogArticlePageProps) {
           <div className="relative mb-16">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-transparent rounded-3xl" />
             <div className="relative prose prose-lg prose-slate max-w-none">
-              <BlogContent content={article.content} />
+              {article.category === BlogCategory.GISEMENTS &&
+              article.structuredData ? (
+                <GisementsContent
+                  data={article.structuredData as unknown as GisementsData}
+                />
+              ) : article.category === BlogCategory.ACTIVITES_PALEOLITHO &&
+                article.structuredData ? (
+                <ActivitesContent
+                  data={article.structuredData as unknown as ActivitesData}
+                  lang={lang}
+                />
+              ) : (
+                <BlogContent content={article.content} />
+              )}
             </div>
           </div>
 

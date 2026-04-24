@@ -30,17 +30,18 @@ import {
 } from "@/lib/actions/blogActions";
 
 const categories = [
+  { value: BlogCategory.GISEMENTS, label: "Gisements" },
+  { value: BlogCategory.COLLECTIONS, label: "Collections" },
   { value: BlogCategory.PALEONTOLOGIE, label: "Paléontologie" },
-  { value: BlogCategory.DECOUVERTE, label: "Découverte" },
-  { value: BlogCategory.GUIDE_COLLECTION, label: "Guide Collection" },
-  { value: BlogCategory.HISTOIRE_GEOLOGIQUE, label: "Histoire Géologique" },
-  { value: BlogCategory.ACTUALITE, label: "Actualité" },
-  { value: BlogCategory.TECHNIQUE, label: "Technique" },
-  { value: BlogCategory.EXPOSITION, label: "Exposition" },
-  { value: BlogCategory.PORTRAIT, label: "Portrait" },
+  { value: BlogCategory.ACTIVITES_PALEOLITHO, label: "Activités Paleolitho" },
+  { value: BlogCategory.AUTRES, label: "Autres" },
 ];
 
-export default function CreateArticleForm() {
+export default function CreateArticleForm({
+  defaultCategory,
+}: {
+  defaultCategory?: BlogCategory;
+}) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [availableTags, setAvailableTags] = useState<BlogTag[]>([]);
@@ -57,7 +58,7 @@ export default function CreateArticleForm() {
     content: "",
     featuredImage: "",
     imageAlt: "",
-    category: "" as BlogCategory | "",
+    category: (defaultCategory ?? "") as BlogCategory | "",
     status: BlogStatus.DRAFT,
     publishedAt: "",
     seoTitle: "",
@@ -179,7 +180,7 @@ export default function CreateArticleForm() {
 
       if (result.success) {
         toast.success(
-          `Article ${status === BlogStatus.PUBLISHED ? "publié" : "sauvegardé"} avec succès`
+          `Article ${status === BlogStatus.PUBLISHED ? "publié" : "sauvegardé"} avec succès`,
         );
         router.push(`/blog/${result.article.slug}`);
       }
@@ -409,6 +410,7 @@ export default function CreateArticleForm() {
               <Select
                 value={formData.category}
                 onValueChange={(value) => handleInputChange("category", value)}
+                disabled={!!defaultCategory}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Choisir une catégorie" />
@@ -421,6 +423,11 @@ export default function CreateArticleForm() {
                   ))}
                 </SelectContent>
               </Select>
+              {defaultCategory && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Catégorie fixée par le type d&apos;article sélectionné.
+                </p>
+              )}
             </CardContent>
           </Card>
 

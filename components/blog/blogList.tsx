@@ -104,29 +104,24 @@ export default function BlogList({
   // Fonction pour obtenir la couleur de la catégorie
   const getCategoryColor = (category: BlogCategory) => {
     const colors = {
+      [BlogCategory.GISEMENTS]: "from-amber-500 to-orange-600",
+      [BlogCategory.COLLECTIONS]: "from-purple-500 to-violet-600",
       [BlogCategory.PALEONTOLOGIE]: "from-blue-500 to-cyan-600",
-      [BlogCategory.DECOUVERTE]: "from-green-500 to-emerald-600",
-      [BlogCategory.GUIDE_COLLECTION]: "from-purple-500 to-violet-600",
-      [BlogCategory.HISTOIRE_GEOLOGIQUE]: "from-amber-500 to-orange-600",
-      [BlogCategory.ACTUALITE]: "from-red-500 to-pink-600",
-      [BlogCategory.TECHNIQUE]: "from-gray-500 to-slate-600",
-      [BlogCategory.EXPOSITION]: "from-pink-500 to-rose-600",
-      [BlogCategory.PORTRAIT]: "from-indigo-500 to-blue-600",
+      [BlogCategory.ACTIVITES_PALEOLITHO]: "from-orange-500 to-red-600",
+      [BlogCategory.AUTRES]: "from-gray-500 to-slate-600",
     };
     return colors[category] || "from-gray-500 to-slate-600";
   };
 
   // Fonction pour obtenir le label de la catégorie (i18n)
   const getCategoryLabel = (category: BlogCategory) => {
-    const labels = {
+    const labels: Record<string, string | undefined> = {
+      [BlogCategory.GISEMENTS]: dict.blog?.blogList?.categoryGisements,
+      [BlogCategory.COLLECTIONS]: dict.blog?.blogList?.categoryCollections,
       [BlogCategory.PALEONTOLOGIE]: dict.blog?.blogList?.categoryPaleontology,
-      [BlogCategory.DECOUVERTE]: dict.blog?.blogList?.categoryDiscovery,
-      [BlogCategory.GUIDE_COLLECTION]: dict.blog?.blogList?.categoryGuides,
-      [BlogCategory.HISTOIRE_GEOLOGIQUE]: dict.blog?.blogList?.categoryHistory,
-      [BlogCategory.ACTUALITE]: dict.blog?.blogList?.categoryActualite,
-      [BlogCategory.TECHNIQUE]: dict.blog?.blogList?.categoryTechnique,
-      [BlogCategory.EXPOSITION]: dict.blog?.blogList?.categoryExposition,
-      [BlogCategory.PORTRAIT]: dict.blog?.blogList?.categoryPortrait,
+      [BlogCategory.ACTIVITES_PALEOLITHO]:
+        dict.blog?.blogList?.categoryActivites,
+      [BlogCategory.AUTRES]: dict.blog?.blogList?.categoryAutres,
     };
     return labels[category] || category;
   };

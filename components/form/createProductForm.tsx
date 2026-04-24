@@ -19,7 +19,17 @@ import ImageInfoFields from "./imageInfoFields";
 // ✅ Schema de validation avec weight
 const productSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
-  category: z.enum(["TRILOBITE", "AMMONITE", "DENT", "COQUILLAGE"]),
+  category: z.enum([
+    "TRILOBITE",
+    "AMMONITE",
+    "DENT",
+    "ECHINODERME",
+    "POISSON",
+    "VERTEBRE",
+    "GASTROPODE",
+    "AUTRE_ARTHROPODE",
+    "AUTRES",
+  ]),
   genre: z.string().min(1, "Le genre est requis"),
   species: z.string().min(1, "L'espèce est requise"),
   price: z.number().min(0.01, "Le prix doit être supérieur à 0"),
@@ -49,12 +59,12 @@ const productSchema = z.object({
       z.object({
         url: z.string().min(1, "URL requise").url("URL invalide"),
         altText: z.string().optional().or(z.literal("")),
-      })
+      }),
     )
     .min(1, "Au moins une image est requise")
     .refine(
       (images) => images.some((img) => img.url.trim()),
-      "Au moins une image valide est requise"
+      "Au moins une image valide est requise",
     ),
 });
 

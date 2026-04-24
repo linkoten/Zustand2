@@ -33,14 +33,11 @@ interface BlogFiltersProps {
 }
 
 const categories = [
+  { value: BlogCategory.GISEMENTS, labelKey: "categoryGisements" },
+  { value: BlogCategory.COLLECTIONS, labelKey: "categoryCollections" },
   { value: BlogCategory.PALEONTOLOGIE, labelKey: "categoryPaleontology" },
-  { value: BlogCategory.DECOUVERTE, labelKey: "categoryDiscovery" },
-  { value: BlogCategory.GUIDE_COLLECTION, labelKey: "categoryGuides" },
-  { value: BlogCategory.HISTOIRE_GEOLOGIQUE, labelKey: "categoryHistory" },
-  { value: BlogCategory.ACTUALITE, labelKey: "categoryActualite" },
-  { value: BlogCategory.TECHNIQUE, labelKey: "categoryTechnique" },
-  { value: BlogCategory.EXPOSITION, labelKey: "categoryExposition" },
-  { value: BlogCategory.PORTRAIT, labelKey: "categoryPortrait" },
+  { value: BlogCategory.ACTIVITES_PALEOLITHO, labelKey: "categoryActivites" },
+  { value: BlogCategory.AUTRES, labelKey: "categoryAutres" },
 ];
 
 export default function BlogFilters({ lang, dict }: BlogFiltersProps) {

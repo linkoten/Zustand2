@@ -12,6 +12,7 @@ import {
   BookOpen,
   LayoutDashboard,
   Sparkles,
+  Layers,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CartSidebar } from "@/components/cart/cart-sidebar";
@@ -80,6 +81,12 @@ export default function Navbar({ lang, dict }: NavbarProps) {
       label: dict.navbar.blog,
       icon: BookOpen,
       gradient: "from-green-600 to-emerald-600",
+    },
+    {
+      href: `/${lang}/collection`,
+      label: dict.navbar.collection ?? "Collection",
+      icon: Layers,
+      gradient: "from-violet-600 to-purple-600",
     },
   ];
 

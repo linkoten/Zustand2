@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      process.env.STRIPE_WEBHOOK_SECRET!,
     );
 
     console.log("🔵 Stripe webhook:", event.type);
@@ -87,7 +87,7 @@ async function handleProductCreated(product: StripeProduct) {
     const localityName = product.metadata.locality;
     if (!localityName) {
       throw new Error(
-        "Aucune localité renseignée dans les métadonnées Stripe."
+        "Aucune localité renseignée dans les métadonnées Stripe.",
       );
     }
 
@@ -97,7 +97,7 @@ async function handleProductCreated(product: StripeProduct) {
 
     if (!locality) {
       throw new Error(
-        `Localité "${localityName}" introuvable en BDD. Crée-la d'abord dans l'admin.`
+        `Localité "${localityName}" introuvable en BDD. Crée-la d'abord dans l'admin.`,
       );
     }
 
@@ -181,7 +181,7 @@ async function handleProductUpdated(product: StripeProduct) {
         });
         if (!locality) {
           throw new Error(
-            `Localité "${product.metadata.locality}" introuvable en BDD. Crée-la d'abord dans l'admin.`
+            `Localité "${product.metadata.locality}" introuvable en BDD. Crée-la d'abord dans l'admin.`,
           );
         }
         updateData.locality = {
@@ -302,7 +302,7 @@ async function handleCustomerCreated(customer: StripeCustomer) {
     } else {
       console.log(
         "ℹ️ Aucun utilisateur trouvé avec cet email:",
-        customer.email
+        customer.email,
       );
     }
 
@@ -372,7 +372,7 @@ async function handleCheckoutCompleted(session: StripeSession) {
       });
 
       console.log(
-        `✅ ${productIds.length} produit(s) marqué(s) comme vendu(s)`
+        `✅ ${productIds.length} produit(s) marqué(s) comme vendu(s)`,
       );
     }
 
@@ -409,7 +409,7 @@ async function handleCheckoutCompleted(session: StripeSession) {
 // 🔧 FONCTION HELPER POUR VALIDER LES MÉTADONNÉES
 function validateProductMetadata(
   metadata: Record<string, string>,
-  isActive: boolean
+  isActive: boolean,
 ): {
   validCategory: Category;
   validGeologicalPeriod: GeologicalPeriod;
@@ -419,15 +419,15 @@ function validateProductMetadata(
   // Valider Category
   const categoryValue = metadata.category?.toUpperCase();
   const validCategory = Object.values(Category).includes(
-    categoryValue as Category
+    categoryValue as Category,
   )
     ? (categoryValue as Category)
-    : Category.COQUILLAGE; // Valeur par défaut
+    : Category.TRILOBITE; // Valeur par défaut
 
   // Valider GeologicalPeriod
   const periodValue = metadata.geologicalPeriod?.toUpperCase();
   const validGeologicalPeriod = Object.values(GeologicalPeriod).includes(
-    periodValue as GeologicalPeriod
+    periodValue as GeologicalPeriod,
   )
     ? (periodValue as GeologicalPeriod)
     : GeologicalPeriod.QUATERNAIRE; // Valeur par défaut

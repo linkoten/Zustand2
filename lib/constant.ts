@@ -2,7 +2,12 @@ export const categoryLabels: Record<string, string> = {
   TRILOBITE: "Trilobite",
   AMMONITE: "Ammonite",
   DENT: "Dent",
-  COQUILLAGE: "Coquillage",
+  ECHINODERME: "Échinoderme",
+  POISSON: "Poisson",
+  VERTEBRE: "Vertébré",
+  GASTROPODE: "Gastéropode",
+  AUTRE_ARTHROPODE: "Autre arthropode",
+  AUTRES: "Autres",
 };
 
 export const geologicalPeriodLabels: Record<string, string> = {
@@ -24,7 +29,12 @@ export const categories = [
   { value: "TRILOBITE", label: "Trilobite" },
   { value: "AMMONITE", label: "Ammonite" },
   { value: "DENT", label: "Dent" },
-  { value: "COQUILLAGE", label: "COQUILLAGE" },
+  { value: "ECHINODERME", label: "Échinoderme" },
+  { value: "POISSON", label: "Poisson" },
+  { value: "VERTEBRE", label: "Vertébré" },
+  { value: "GASTROPODE", label: "Gastéropode" },
+  { value: "AUTRE_ARTHROPODE", label: "Autre arthropode" },
+  { value: "AUTRES", label: "Autres" },
 ];
 
 export const geologicalPeriods = [

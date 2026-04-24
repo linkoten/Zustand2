@@ -55,7 +55,9 @@ export function AdvancedFiltersModal({
   const { catalogIndex } = useFossilStore();
 
   const [localitySearch, setLocalitySearch] = useState("");
-  const [flyToLocality, setFlyToLocality] = useState<string | undefined>(undefined);
+  const [flyToLocality, setFlyToLocality] = useState<string | undefined>(
+    undefined,
+  );
   // (Cela évite des requêtes trop fréquentes)
   const [tempPeriods, setTempPeriods] = useState<string[]>(selectedPeriods);
   const [tempStages, setTempStages] = useState<string[]>(selectedStages);
@@ -86,8 +88,9 @@ export function AdvancedFiltersModal({
       : [
           ...new Set(
             catalogIndex
-              .filter((p: { geologicalPeriod: string; geologicalStage: string }) =>
-                tempPeriods.includes(p.geologicalPeriod),
+              .filter(
+                (p: { geologicalPeriod: string; geologicalStage: string }) =>
+                  tempPeriods.includes(p.geologicalPeriod),
               )
               .map((p: { geologicalStage: string }) => p.geologicalStage)
               .filter(Boolean),
@@ -163,35 +166,34 @@ export function AdvancedFiltersModal({
             />
 
             {/* Sélecteur d'étage (Stages) sous la frise */}
-            {tempPeriods.length > 0 &&
-              stagesForSelectedPeriods.length > 0 && (
-                <div className="p-4 bg-black/20 rounded-lg border border-terracotta/10 mt-6">
-                  <h4 className="text-sm font-semibold text-terracotta mb-3">
-                    Étages correspondants ({stagesForSelectedPeriods.length})
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {stagesForSelectedPeriods.map((stage) => (
-                      <button
-                        key={stage}
-                        onClick={() =>
-                          setTempStages((prev) =>
-                            prev.includes(stage)
-                              ? prev.filter((s) => s !== stage)
-                              : [...prev, stage],
-                          )
-                        }
-                        className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                          tempStages.includes(stage)
-                            ? "bg-terracotta text-parchemin border-terracotta"
-                            : "bg-transparent text-parchemin/60 border-terracotta/30 hover:border-terracotta/70"
-                        }`}
-                      >
-                        {stage}
-                      </button>
-                    ))}
-                  </div>
+            {tempPeriods.length > 0 && stagesForSelectedPeriods.length > 0 && (
+              <div className="p-4 bg-black/20 rounded-lg border border-terracotta/10 mt-6">
+                <h4 className="text-sm font-semibold text-terracotta mb-3">
+                  Étages correspondants ({stagesForSelectedPeriods.length})
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {stagesForSelectedPeriods.map((stage) => (
+                    <button
+                      key={stage}
+                      onClick={() =>
+                        setTempStages((prev) =>
+                          prev.includes(stage)
+                            ? prev.filter((s) => s !== stage)
+                            : [...prev, stage],
+                        )
+                      }
+                      className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                        tempStages.includes(stage)
+                          ? "bg-terracotta text-parchemin border-terracotta"
+                          : "bg-transparent text-parchemin/60 border-terracotta/30 hover:border-terracotta/70"
+                      }`}
+                    >
+                      {stage}
+                    </button>
+                  ))}
                 </div>
-              )}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent

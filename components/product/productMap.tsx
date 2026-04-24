@@ -191,7 +191,6 @@ const GEOLOGICAL_COLORS: Record<string, string> = {
   QUATERNAIRE: "#F9F97F",
 };
 
-
 interface ProductMapProps {
   localities: LocalityData[];
   centerLat?: number;
@@ -276,7 +275,12 @@ export default function ProductMap({
 
     // Index Supercluster
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sc = new Supercluster<{ id: number; name: string; geologicalPeriods: string[]; geologicalStages: string[] }>({ radius: 70, maxZoom: 14, minPoints: 2 });
+    const sc = new Supercluster<{
+      id: number;
+      name: string;
+      geologicalPeriods: string[];
+      geologicalStages: string[];
+    }>({ radius: 70, maxZoom: 14, minPoints: 2 });
     sc.load(
       localities.map((loc) => ({
         type: "Feature" as const,
@@ -327,7 +331,9 @@ export default function ProductMap({
           const marker = L.marker([lat, lng], { icon });
           marker.on("click", () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const expansion = sc.getClusterExpansionZoom((props as any).cluster_id);
+            const expansion = sc.getClusterExpansionZoom(
+              (props as any).cluster_id,
+            );
             map.flyTo([lat, lng], expansion, { animate: true, duration: 0.5 });
           });
           layerGroup.addLayer(marker);
@@ -407,7 +413,7 @@ export default function ProductMap({
         clusterLayerRef.current = null;
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapInstance, localities]);
 
   // Charger Leaflet dynamiquement côté client uniquement
@@ -513,7 +519,6 @@ export default function ProductMap({
       popupAnchor: [0, -44],
     });
 
-
   const mapCenter: [number, number] =
     localities.length > 0 && !centerLat && !centerLon
       ? [
@@ -567,7 +572,12 @@ export default function ProductMap({
         </div>
 
         <MapContainer
-          ref={(map: any) => { if (map) { mapRef.current = map; setMapInstance(map); } }}
+          ref={(map: any) => {
+            if (map) {
+              mapRef.current = map;
+              setMapInstance(map);
+            }
+          }}
           center={mapCenter}
           zoom={zoom}
           style={{ width: "100%", height: "100%" }}
@@ -696,8 +706,7 @@ export default function ProductMap({
                   </Popup>
                 </Marker>
               ))}
-
-                      </MapContainer>
+        </MapContainer>
       </div>
 
       {/* Légende optionnelle */}

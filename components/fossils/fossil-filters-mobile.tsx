@@ -216,7 +216,11 @@ export default function FossilesFiltersMobile({
   const isPriceFiltered =
     priceRange[0] !== defaultMinPrice || priceRange[1] !== defaultMaxPrice;
 
-  const activeFilterTags: { label: string; group: string; remove: () => void }[] = [
+  const activeFilterTags: {
+    label: string;
+    group: string;
+    remove: () => void;
+  }[] = [
     ...selectedCategories.map((v) => ({
       label: v,
       group: "Cat.",
@@ -243,7 +247,13 @@ export default function FossilesFiltersMobile({
       remove: () => setSelectedStages((p) => p.filter((x) => x !== v)),
     })),
     ...(searchTerm.trim()
-      ? [{ label: searchTerm.trim(), group: "Rech.", remove: () => setSearchTerm("") }]
+      ? [
+          {
+            label: searchTerm.trim(),
+            group: "Rech.",
+            remove: () => setSearchTerm(""),
+          },
+        ]
       : []),
     ...(isPriceFiltered
       ? [
@@ -402,7 +412,11 @@ export default function FossilesFiltersMobile({
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                   {filterOptions.categories.map((option) => {
                     const count = facets?.categories[option] || 0;
-                    if (catalogReady && count === 0 && !selectedCategories.includes(option))
+                    if (
+                      catalogReady &&
+                      count === 0 &&
+                      !selectedCategories.includes(option)
+                    )
                       return null;
                     return (
                       <div key={option} className="flex items-start space-x-3">
@@ -447,7 +461,11 @@ export default function FossilesFiltersMobile({
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                   {filterOptions.countries.map((option) => {
                     const count = facets?.countries[option] || 0;
-                    if (catalogReady && count === 0 && !selectedCountries.includes(option))
+                    if (
+                      catalogReady &&
+                      count === 0 &&
+                      !selectedCountries.includes(option)
+                    )
                       return null;
                     return (
                       <div key={option} className="flex items-start space-x-3">
@@ -492,7 +510,11 @@ export default function FossilesFiltersMobile({
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                   {filterOptions.localities.map((option) => {
                     const count = facets?.localities[option] || 0;
-                    if (catalogReady && count === 0 && !selectedLocalities.includes(option))
+                    if (
+                      catalogReady &&
+                      count === 0 &&
+                      !selectedLocalities.includes(option)
+                    )
                       return null;
                     return (
                       <div key={option} className="flex items-start space-x-3">
@@ -537,7 +559,11 @@ export default function FossilesFiltersMobile({
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                   {filterOptions.geologicalPeriods.map((option) => {
                     const count = facets?.periods[option] || 0;
-                    if (catalogReady && count === 0 && !selectedPeriods.includes(option))
+                    if (
+                      catalogReady &&
+                      count === 0 &&
+                      !selectedPeriods.includes(option)
+                    )
                       return null;
                     return (
                       <div key={option} className="flex items-start space-x-3">
@@ -582,7 +608,11 @@ export default function FossilesFiltersMobile({
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                   {filterOptions.geologicalStages.map((option) => {
                     const count = facets?.stages[option] || 0;
-                    if (catalogReady && count === 0 && !selectedStages.includes(option))
+                    if (
+                      catalogReady &&
+                      count === 0 &&
+                      !selectedStages.includes(option)
+                    )
                       return null;
                     return (
                       <div key={option} className="flex items-start space-x-3">
@@ -629,7 +659,9 @@ export default function FossilesFiltersMobile({
                     onClick={tag.remove}
                     className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--terracotta)]/15 border border-[var(--terracotta)]/30 text-[var(--parchemin)]/90 hover:bg-[var(--terracotta)]/30 hover:border-[var(--terracotta)]/60 transition-colors cursor-pointer"
                   >
-                    <span className="text-[var(--parchemin)]/50 text-[10px] leading-none">{tag.group}</span>
+                    <span className="text-[var(--parchemin)]/50 text-[10px] leading-none">
+                      {tag.group}
+                    </span>
                     <span className="text-xs">{tag.label}</span>
                     <X className="w-2.5 h-2.5 opacity-60 flex-shrink-0" />
                   </button>
