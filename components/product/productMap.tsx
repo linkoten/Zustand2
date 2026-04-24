@@ -329,9 +329,8 @@ export default function ProductMap({
           });
           const marker = L.marker([lat, lng], { icon });
           marker.on("click", () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const expansion = sc.getClusterExpansionZoom(
-              (props as any).cluster_id,
+              (props as { cluster_id: number }).cluster_id,
             );
             map.flyTo([lat, lng], expansion, { animate: true, duration: 0.5 });
           });
