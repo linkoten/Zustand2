@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { MapPin, Globe, Layers } from "lucide-react";
 import type { FeatureCollection, Feature, Geometry } from "geojson";
+import type { Map as LeafletMap, LayerGroup } from "leaflet";
 import { GeologicalPeriod } from "@/lib/generated/prisma";
 
 // Import dynamique des modules Leaflet
@@ -230,11 +231,9 @@ export default function ProductMap({
   );
 
   const selectedLocalitiesRef = useRef<string[]>(selectedLocalities);
-  const mapRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mapInstance, setMapInstance] = useState<any>(null);
-  const clusterLayerRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapRef = useRef<LeafletMap | null>(null);
+  const [mapInstance, setMapInstance] = useState<LeafletMap | null>(null);
+  const clusterLayerRef = useRef<LayerGroup | null>(null);
   const updateClustersRef = useRef<() => void>(() => {});
 
   // Vérifier si on est côté client
@@ -572,7 +571,7 @@ export default function ProductMap({
         </div>
 
         <MapContainer
-          ref={(map: any) => {
+          ref={(map: LeafletMap | null) => {
             if (map) {
               mapRef.current = map;
               setMapInstance(map);
