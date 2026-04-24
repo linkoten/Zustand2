@@ -113,7 +113,7 @@ export default function CollectionFilters({
   // ── Cascading: for filter X, apply all OTHER active filters ───────────────
   function compatible(
     exclude: "locality" | "country" | "period" | "stage",
-  ): SpeciesFacet[] {
+  ): EnrichedSpeciesFacet[] {
     return facets.filter((f) => {
       if (
         exclude !== "locality" &&
