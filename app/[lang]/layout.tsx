@@ -26,10 +26,10 @@ const playfair = Playfair_Display({
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ lang: "fr" | "en" }>; // ✅ Corriger le nom du paramètre
+  params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
-  const { lang } = await params; // ✅ Utiliser 'lang' au lieu de 'locale'
-  const dict = await getDictionary(lang);
+  const { lang } = await params;
+  const dict = await getDictionary(lang as "fr" | "en");
   return {
     title: dict.home.siteTitle,
     description: dict.home.siteDescription,
@@ -41,9 +41,10 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ lang: "fr" | "en" }>; // ✅ Corriger le nom du paramètre
+  params: Promise<{ lang: string }>;
 }>) {
-  const { lang } = await params; // ✅ Utiliser 'lang' au lieu de 'locale'
+  const { lang: rawLang } = await params;
+  const lang = rawLang as "fr" | "en";
   const dict = await getDictionary(lang);
 
   return (
