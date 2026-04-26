@@ -31,6 +31,7 @@ interface FossilesClientProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
   userId?: string | null;
+  catalogData?: Record<string, string | null>[];
 }
 
 // Composant animé pour chaque fossil card
@@ -90,6 +91,7 @@ export default function FossilesClient({
   lang = "fr",
   dict,
   userId,
+  catalogData,
 }: FossilesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -113,7 +115,7 @@ export default function FossilesClient({
       });
       setFossilData(initialData);
       setUserId(userId || null);
-      loadCatalogIndex();
+      loadCatalogIndex(catalogData);
       isInitialized.current = true;
     }
   }, [
@@ -124,6 +126,7 @@ export default function FossilesClient({
     setUserId,
     userId,
     loadCatalogIndex,
+    catalogData,
   ]);
 
   const currentData = isInitialized.current ? fossilData : initialData;

@@ -26,7 +26,7 @@ interface FossilState {
     periods: Record<string, number>;
     stages: Record<string, number>;
   };
-  loadCatalogIndex: () => Promise<void>;
+  loadCatalogIndex: (preloaded?: Record<string, string | null>[]) => Promise<void>;
   fossilData: FossilData;
   isLoading: boolean;
   filters: FossilFilters;
@@ -53,9 +53,9 @@ export const useFossilStore = create<FossilState>((set, get) => ({
     periods: {},
     stages: {},
   },
-  loadCatalogIndex: async () => {
+  loadCatalogIndex: async (preloaded?) => {
     try {
-      const index = await getFossilCatalogIndex();
+      const index = preloaded ?? await getFossilCatalogIndex();
       set({ catalogIndex: index });
       // Trigger facet recomputation with current filters safely
       get().updateFilters({});

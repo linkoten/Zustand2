@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +36,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   ECHINODERME: "Échinoderme",
   POISSON: "Poisson",
   VERTEBRE: "Vertébré",
-  GASTROPODE: "Gastéropode",
+  GASTEROPODE: "Gastéropode",
   AUTRE_ARTHROPODE: "Autre arthropode",
   AUTRES: "Autres",
 };
@@ -47,7 +47,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   ECHINODERME: "bg-green-500/20 text-green-300 border-green-500/30",
   POISSON: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
   VERTEBRE: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  GASTROPODE: "bg-pink-500/20 text-pink-300 border-pink-500/30",
+  GASTEROPODE: "bg-pink-500/20 text-pink-300 border-pink-500/30",
   AUTRE_ARTHROPODE: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
   AUTRES: "bg-zinc-500/20 text-zinc-300 border-zinc-500/30",
 };

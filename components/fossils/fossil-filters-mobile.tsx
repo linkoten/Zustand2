@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -311,7 +311,7 @@ export default function FossilesFiltersMobile({
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-md w-[95vw] max-h-[90vh] bg-gradient-to-b from-white to-slate-50/50 border-0 rounded-2xl shadow-2xl">
+        <DialogContent className="sm:max-w-md w-[95vw] max-h-[90vh] bg-white border-0 rounded-2xl shadow-2xl">
           <DialogHeader className="pb-4 border-b border-slate-200">
             <DialogTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent flex items-center gap-2">
               <SlidersHorizontal className="w-5 h-5 text-amber-600" />
@@ -439,7 +439,7 @@ export default function FossilesFiltersMobile({
                           {option}
                         </Label>
                         <span className="text-xs text-slate-400">
-                          ({count})
+                          {catalogReady ? `(${count})` : "-"}
                         </span>
                       </div>
                     );
@@ -488,7 +488,7 @@ export default function FossilesFiltersMobile({
                           {option}
                         </Label>
                         <span className="text-xs text-slate-400">
-                          ({count})
+                          {catalogReady ? `(${count})` : "-"}
                         </span>
                       </div>
                     );
@@ -537,7 +537,7 @@ export default function FossilesFiltersMobile({
                           {option}
                         </Label>
                         <span className="text-xs text-slate-400">
-                          ({count})
+                          {catalogReady ? `(${count})` : "-"}
                         </span>
                       </div>
                     );
@@ -586,7 +586,7 @@ export default function FossilesFiltersMobile({
                           {option}
                         </Label>
                         <span className="text-xs text-slate-400">
-                          ({count})
+                          {catalogReady ? `(${count})` : "-"}
                         </span>
                       </div>
                     );
@@ -599,54 +599,70 @@ export default function FossilesFiltersMobile({
                 </div>
               </div>
 
-              {/* Étage géologique */}
-              <div className="space-y-3">
-                <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                  {dict?.fossils?.stageLabel || "Étage géologique"}
-                </Label>
-                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-                  {filterOptions.geologicalStages.map((option) => {
-                    const count = facets?.stages[option] || 0;
-                    if (
-                      catalogReady &&
-                      count === 0 &&
-                      !selectedStages.includes(option)
-                    )
-                      return null;
-                    return (
-                      <div key={option} className="flex items-start space-x-3">
-                        <Checkbox
-                          id={`stages-${option}`}
-                          checked={selectedStages.includes(option)}
-                          onCheckedChange={(c) =>
-                            toggleFilter(
-                              setSelectedStages,
-                              option,
-                              c as boolean,
-                            )
-                          }
-                          className="mt-0.5 border-orange-500 data-[state=checked]:bg-orange-500"
-                        />
-                        <Label
-                          htmlFor={`stages-${option}`}
-                          className="flex-1 text-sm font-medium leading-none cursor-pointer text-slate-700"
-                        >
-                          {option}
-                        </Label>
-                        <span className="text-xs text-slate-400">
-                          ({count})
-                        </span>
-                      </div>
-                    );
-                  })}
-                  {filterOptions.geologicalStages.length === 0 && (
-                    <div className="text-sm text-slate-400 italic">
-                      Aucune option
+              {/* Étage géologique — visible uniquement après sélection d'une période */}
+              {selectedPeriods.length > 0 && (() => {
+                const stagesForPeriods: string[] = catalogReady
+                  ? [
+                      ...new Set(
+                        catalogIndex
+                          .filter((p: { geologicalPeriod: string; geologicalStage: string }) =>
+                            selectedPeriods.includes(p.geologicalPeriod),
+                          )
+                          .map((p: { geologicalStage: string }) => p.geologicalStage)
+                          .filter(Boolean),
+                      ),
+                    ]
+                  : filterOptions.geologicalStages;
+                return (
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                      {dict?.fossils?.stageLabel || "Étage géologique"}
+                    </Label>
+                    <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                      {stagesForPeriods.map((option) => {
+                        const count = facets?.stages[option] || 0;
+                        if (
+                          catalogReady &&
+                          count === 0 &&
+                          !selectedStages.includes(option)
+                        )
+                          return null;
+                        return (
+                          <div key={option} className="flex items-start space-x-3">
+                            <Checkbox
+                              id={`stages-${option}`}
+                              checked={selectedStages.includes(option)}
+                              onCheckedChange={(c) =>
+                                toggleFilter(
+                                  setSelectedStages,
+                                  option,
+                                  c as boolean,
+                                )
+                              }
+                              className="mt-0.5 border-orange-500 data-[state=checked]:bg-orange-500"
+                            />
+                            <Label
+                              htmlFor={`stages-${option}`}
+                              className="flex-1 text-sm font-medium leading-none cursor-pointer text-slate-700"
+                            >
+                              {option}
+                            </Label>
+                            <span className="text-xs text-slate-400">
+                              {catalogReady ? `(${count})` : "-"}
+                            </span>
+                          </div>
+                        );
+                      })}
+                      {stagesForPeriods.length === 0 && (
+                        <div className="text-sm text-slate-400 italic">
+                          Aucune option
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                );
+              })()}
             </div>
           </ScrollArea>
 

@@ -1,11 +1,11 @@
-export const categoryLabels: Record<string, string> = {
+﻿export const categoryLabels: Record<string, string> = {
   TRILOBITE: "Trilobite",
   AMMONITE: "Ammonite",
   DENT: "Dent",
   ECHINODERME: "Échinoderme",
   POISSON: "Poisson",
   VERTEBRE: "Vertébré",
-  GASTROPODE: "Gastéropode",
+  GASTEROPODE: "Gastéropode",
   AUTRE_ARTHROPODE: "Autre arthropode",
   AUTRES: "Autres",
 };
@@ -32,7 +32,7 @@ export const categories = [
   { value: "ECHINODERME", label: "Échinoderme" },
   { value: "POISSON", label: "Poisson" },
   { value: "VERTEBRE", label: "Vertébré" },
-  { value: "GASTROPODE", label: "Gastéropode" },
+  { value: "GASTEROPODE", label: "Gastéropode" },
   { value: "AUTRE_ARTHROPODE", label: "Autre arthropode" },
   { value: "AUTRES", label: "Autres" },
 ];

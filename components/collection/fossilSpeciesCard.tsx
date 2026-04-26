@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,7 @@ const CATEGORY_COLORS = {
   ECHINODERME: "bg-green-500/20 text-green-300 border-green-500/30",
   POISSON: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
   VERTEBRE: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  GASTROPODE: "bg-pink-500/20 text-pink-300 border-pink-500/30",
+  GASTEROPODE: "bg-pink-500/20 text-pink-300 border-pink-500/30",
   AUTRE_ARTHROPODE: "bg-orange-500/20 text-orange-300 border-orange-500/30",
   AUTRES: "bg-zinc-500/20 text-zinc-300 border-zinc-500/30",
 } as const;

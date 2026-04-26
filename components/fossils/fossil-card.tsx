@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   Card,
@@ -62,7 +62,7 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
       ECHINODERME: "bg-green-900/40 text-green-300 border border-green-700/30",
       POISSON: "bg-blue-900/40 text-blue-300 border border-blue-700/30",
       VERTEBRE: "bg-purple-900/40 text-purple-300 border border-purple-700/30",
-      GASTROPODE: "bg-pink-900/40 text-pink-300 border border-pink-700/30",
+      GASTEROPODE: "bg-pink-900/40 text-pink-300 border border-pink-700/30",
       AUTRE_ARTHROPODE:
         "bg-orange-900/40 text-orange-300 border border-orange-700/30",
       AUTRES: "bg-zinc-800 text-zinc-300 border border-zinc-700",

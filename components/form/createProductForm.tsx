@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -26,7 +26,7 @@ const productSchema = z.object({
     "ECHINODERME",
     "POISSON",
     "VERTEBRE",
-    "GASTROPODE",
+    "GASTEROPODE",
     "AUTRE_ARTHROPODE",
     "AUTRES",
   ]),

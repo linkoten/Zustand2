@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -22,7 +22,7 @@ const CATEGORIES = [
   { value: "ECHINODERME", label: "Échinoderme" },
   { value: "POISSON", label: "Poisson" },
   { value: "VERTEBRE", label: "Vertébré" },
-  { value: "GASTROPODE", label: "Gastéropode" },
+  { value: "GASTEROPODE", label: "Gastéropode" },
   { value: "AUTRE_ARTHROPODE", label: "Autre arthropode" },
   { value: "AUTRES", label: "Autres" },
 ] as const;

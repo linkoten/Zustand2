@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -404,7 +404,7 @@ export default function FossilesFilters({
                           {option}
                         </Label>
                         <span className="text-xs text-[var(--parchemin)]/50">
-                          ({count})
+                          {catalogReady ? `(${count})` : "-"}
                         </span>
                       </div>
                     );
@@ -453,7 +453,7 @@ export default function FossilesFilters({
                           {option}
                         </Label>
                         <span className="text-xs text-[var(--parchemin)]/50">
-                          ({count})
+                          {catalogReady ? `(${count})` : "-"}
                         </span>
                       </div>
                     );
@@ -502,7 +502,7 @@ export default function FossilesFilters({
                           {option}
                         </Label>
                         <span className="text-xs text-[var(--parchemin)]/50">
-                          ({count})
+                          {catalogReady ? `(${count})` : "-"}
                         </span>
                       </div>
                     );
@@ -551,7 +551,7 @@ export default function FossilesFilters({
                           {option}
                         </Label>
                         <span className="text-xs text-[var(--parchemin)]/50">
-                          ({count})
+                          {catalogReady ? `(${count})` : "-"}
                         </span>
                       </div>
                     );
@@ -564,54 +564,70 @@ export default function FossilesFilters({
                 </div>
               </div>
 
-              {/* Étage géologique */}
-              <div className="space-y-3">
-                <Label className="text-sm font-semibold text-[var(--parchemin)]/80 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-[var(--terracotta)] rounded-full"></div>
-                  {dict?.fossils?.stageLabel || "Étage géologique"}
-                </Label>
-                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-                  {filterOptions.geologicalStages.map((option) => {
-                    const count = facets?.stages[option] || 0;
-                    if (
-                      catalogReady &&
-                      count === 0 &&
-                      !selectedStages.includes(option)
-                    )
-                      return null;
-                    return (
-                      <div key={option} className="flex items-start space-x-3">
-                        <Checkbox
-                          id={`selectedStages-${option}`}
-                          checked={selectedStages.includes(option)}
-                          onCheckedChange={(c) =>
-                            toggleFilter(
-                              setSelectedStages,
-                              option,
-                              c as boolean,
-                            )
-                          }
-                          className="mt-0.5 border-[var(--terracotta)]/50 data-[state=checked]:bg-[var(--terracotta)]"
-                        />
-                        <Label
-                          htmlFor={`selectedStages-${option}`}
-                          className="flex-1 text-sm font-medium leading-none cursor-pointer text-[var(--parchemin)]/90"
-                        >
-                          {option}
-                        </Label>
-                        <span className="text-xs text-[var(--parchemin)]/50">
-                          ({count})
-                        </span>
-                      </div>
-                    );
-                  })}
-                  {filterOptions.geologicalStages.length === 0 && (
-                    <div className="text-sm text-[var(--parchemin)]/50 italic">
-                      Aucune option
+              {/* Étage géologique — visible uniquement après sélection d'une période */}
+              {selectedPeriods.length > 0 && (() => {
+                const stagesForPeriods: string[] = catalogReady
+                  ? [
+                      ...new Set(
+                        catalogIndex
+                          .filter((p: { geologicalPeriod: string; geologicalStage: string }) =>
+                            selectedPeriods.includes(p.geologicalPeriod),
+                          )
+                          .map((p: { geologicalStage: string }) => p.geologicalStage)
+                          .filter(Boolean),
+                      ),
+                    ]
+                  : filterOptions.geologicalStages;
+                return (
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold text-[var(--parchemin)]/80 flex items-center gap-2">
+                      <div className="w-2 h-2 bg-[var(--terracotta)] rounded-full"></div>
+                      {dict?.fossils?.stageLabel || "Étage géologique"}
+                    </Label>
+                    <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                      {stagesForPeriods.map((option) => {
+                        const count = facets?.stages[option] || 0;
+                        if (
+                          catalogReady &&
+                          count === 0 &&
+                          !selectedStages.includes(option)
+                        )
+                          return null;
+                        return (
+                          <div key={option} className="flex items-start space-x-3">
+                            <Checkbox
+                              id={`selectedStages-${option}`}
+                              checked={selectedStages.includes(option)}
+                              onCheckedChange={(c) =>
+                                toggleFilter(
+                                  setSelectedStages,
+                                  option,
+                                  c as boolean,
+                                )
+                              }
+                              className="mt-0.5 border-[var(--terracotta)]/50 data-[state=checked]:bg-[var(--terracotta)]"
+                            />
+                            <Label
+                              htmlFor={`selectedStages-${option}`}
+                              className="flex-1 text-sm font-medium leading-none cursor-pointer text-[var(--parchemin)]/90"
+                            >
+                              {option}
+                            </Label>
+                            <span className="text-xs text-[var(--parchemin)]/50">
+                              {catalogReady ? `(${count})` : "-"}
+                            </span>
+                          </div>
+                        );
+                      })}
+                      {stagesForPeriods.length === 0 && (
+                        <div className="text-sm text-[var(--parchemin)]/50 italic">
+                          Aucune option
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                );
+              })()}
             </div>
           </CardContent>
         </ScrollArea>

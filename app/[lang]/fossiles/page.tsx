@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import FossilesClient from "@/components/fossils/fossilesClient";
-import { getFilterOptions, getFossils } from "@/lib/actions/productActions";
+import { getFilterOptions, getFossils, getFossilCatalogIndex } from "@/lib/actions/productActions";
 import { SearchParams } from "@/types/productType";
 import { getUserData, getOrSyncUser } from "@/lib/actions/dashboardActions";
 import UserProvider from "@/components/provider/userProvider";
@@ -37,13 +37,11 @@ export default async function FossilesPage({
   const limit = 20;
 
   // ✅ Passer userId à getFossils pour inclure les infos favoris avec pagination
-  const fossilsData = await getFossils(
-    resolvedSearchParams,
-    userId,
-    currentPage,
-    limit,
-  );
-  const filterOptionsRaw = await getFilterOptions();
+  const [fossilsData, filterOptionsRaw, catalogData] = await Promise.all([
+    getFossils(resolvedSearchParams, userId, currentPage, limit),
+    getFilterOptions(),
+    getFossilCatalogIndex(),
+  ]);
   const filterOptions = {
     ...filterOptionsRaw,
     localities: filterOptionsRaw.localityObjects?.map((loc) => loc.name) ?? [],
@@ -113,6 +111,7 @@ export default async function FossilesPage({
             lang={lang}
             dict={dict}
             userId={userId}
+            catalogData={catalogData}
           />
         </div>
       </div>

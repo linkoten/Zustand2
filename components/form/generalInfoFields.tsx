@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/input";
+﻿import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -25,7 +25,7 @@ const categories = [
   { value: "ECHINODERME", label: "Échinoderme" },
   { value: "POISSON", label: "Poisson" },
   { value: "VERTEBRE", label: "Vertébré" },
-  { value: "GASTROPODE", label: "Gastéropode" },
+  { value: "GASTEROPODE", label: "Gastéropode" },
   { value: "AUTRE_ARTHROPODE", label: "Autre arthropode" },
   { value: "AUTRES", label: "Autres" },
 ];
