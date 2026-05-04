@@ -27,11 +27,10 @@ import BlogContent from "@/components/blog/blogContent";
 import GisementsContent from "@/components/blog/gisementsContent";
 import ActivitesContent from "@/components/blog/activitesContent";
 import RelatedArticles from "@/components/blog/relatedArticles";
-import {
-  getBlogArticleBySlug,
-  getBlogArticles,
-} from "@/lib/actions/blogActions";
+import { getBlogArticleBySlug } from "@/lib/actions/blogActions";
 import { getDictionary } from "../../dictionaries";
+
+export const dynamic = "force-dynamic";
 
 interface BlogArticlePageProps {
   params: Promise<{ slug: string; lang: "en" | "fr" }>;
@@ -80,23 +79,6 @@ export async function generateMetadata({
       images: article.featuredImage ? [article.featuredImage] : [],
     },
   };
-}
-
-// Générer les pages statiques (ISR)
-export async function generateStaticParams() {
-  try {
-    const { articles } = await getBlogArticles({ limit: 50 });
-
-    return articles.map((article) => ({
-      slug: article.slug,
-    }));
-  } catch (error) {
-    console.error(
-      "Erreur lors de la génération des paramètres statiques:",
-      error,
-    );
-    return [];
-  }
 }
 
 export default async function BlogArticlePage(props: BlogArticlePageProps) {

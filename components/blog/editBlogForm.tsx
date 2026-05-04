@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import RichTextEditor from "./richTextEditor";
 import {
   Select,
   SelectContent,
@@ -238,13 +239,9 @@ export default function EditBlogForm({ post }: EditBlogFormProps) {
 
       <div>
         <Label htmlFor="content">Contenu *</Label>
-        <Textarea
-          id="content"
-          value={formData.content}
-          onChange={(e) => handleInputChange("content", e.target.value)}
-          rows={12}
-          required
-          placeholder="Contenu de l'article en Markdown..."
+        <RichTextEditor
+          content={formData.content}
+          onChange={(value) => handleInputChange("content", value)}
         />
       </div>
 
