@@ -287,10 +287,10 @@ export default function AdminStats({
                   )}
                 />
                 <Tooltip
-                  formatter={(value: number) => [
-                    `${value} vente${value > 1 ? "s" : ""}`,
-                    "Quantité",
-                  ]}
+                  formatter={(value) => {
+                    const n = Number(value ?? 0);
+                    return [`${n} vente${n > 1 ? "s" : ""}`, "Quantité"];
+                  }}
                   contentStyle={{
                     backgroundColor: "#1e293b",
                     border: "1px solid #334155",
