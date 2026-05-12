@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ProductStatus } from "@/lib/generated/prisma";
-import { Eye, Edit, Trash2, AlertTriangle, ShoppingCart } from "lucide-react";
+import { Eye, Edit, Trash2, AlertTriangle, ShoppingCart, Lock, XCircle, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import Link from "next/link";
@@ -73,6 +73,35 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
   };
 
   const isAvailable = fossil.status === ProductStatus.AVAILABLE;
+  const isReserved = fossil.status === ProductStatus.RESERVED;
+  const isSold = fossil.status === ProductStatus.SOLD;
+  const isInactive = fossil.status === ProductStatus.INACTIVE;
+
+  const getStatusBadge = () => {
+    if (isReserved)
+      return (
+        <Badge className="bg-orange-500/90 text-white border-0 text-xs font-bold flex items-center gap-1 shadow-md">
+          <Lock className="w-3 h-3" />
+          {dict?.fossils?.statusReserved || "Réservé"}
+        </Badge>
+      );
+    if (isSold)
+      return (
+        <Badge className="bg-red-600/90 text-white border-0 text-xs font-bold flex items-center gap-1 shadow-md">
+          <XCircle className="w-3 h-3" />
+          {dict?.fossils?.statusSold || "Vendu"}
+        </Badge>
+      );
+    if (isInactive)
+      return (
+        <Badge className="bg-zinc-600/90 text-white border-0 text-xs font-bold flex items-center gap-1 shadow-md">
+          <EyeOff className="w-3 h-3" />
+          {dict?.fossils?.statusInactive || "Indisponible"}
+        </Badge>
+      );
+    return null;
+  };
+
   const { handleAddToCart, isAdding } = useHandleAddToCart();
 
   const handleDelete = async (productId: number) => {
@@ -128,6 +157,13 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
 
             {/* Overlay gradient pour que les badges / boutons lisent bien */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent opacity-60 pointer-events-none" />
+
+            {/* Badge de statut (RESERVED / SOLD / INACTIVE) */}
+            {!isAvailable && (
+              <div className="absolute bottom-3 left-3 z-10">
+                {getStatusBadge()}
+              </div>
+            )}
           </div>
         </Link>
 
@@ -284,6 +320,8 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
               {dict?.fossils?.viewDetails || "Voir les détails"}
             </Link>
           </Button>
+
+
         </div>
       </CardFooter>
     </Card>

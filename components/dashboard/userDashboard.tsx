@@ -19,6 +19,8 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { DashboardUser, UserDashboardData } from "@/types/dashboardType";
+import { CollectionShareWidget } from "@/components/dashboard/collectionShareWidget";
+import { getMyShareToken } from "@/lib/actions/collectionShareActions";
 
 const statusColors = {
   PENDING: "bg-terracotta/10 text-terracotta border-terracotta/30",
@@ -49,6 +51,9 @@ export default async function UserDashboard({
   dict,
   lang,
 }: UserDashboardProps) {
+  const { token: initialShareToken } = await getMyShareToken();
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://paleolitho.com";
+
   return (
     <div className="relative">
       {/* Background décoratif supprimé ici car maintenant inclus globalement dans page.tsx pour être persistant mais propre */}
@@ -481,6 +486,16 @@ export default async function UserDashboard({
               )}
             </CardContent>
           </Card>
+        </div>
+
+        {/* Partage de collection */}
+        <div className="mt-12 max-w-xl">
+          <CollectionShareWidget
+            initialToken={initialShareToken}
+            lang={lang}
+            dict={dict}
+            appUrl={appUrl}
+          />
         </div>
       </div>
     </div>

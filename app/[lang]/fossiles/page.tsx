@@ -32,13 +32,9 @@ export default async function FossilesPage({
     redirect(`/${lang}/sign-in`);
   }
 
-  // Pagination
-  const currentPage = parseInt(resolvedSearchParams.page || "1", 10);
-  const limit = 20;
-
-  // ✅ Passer userId à getFossils pour inclure les infos favoris avec pagination
+  // ✅ Passer userId à getFossils pour inclure les infos favoris (cursor-based, page 1 initiale)
   const [fossilsData, filterOptionsRaw, catalogData] = await Promise.all([
-    getFossils(resolvedSearchParams, userId, currentPage, limit),
+    getFossils(resolvedSearchParams, userId),
     getFilterOptions(),
     getFossilCatalogIndex(),
   ]);
@@ -73,7 +69,7 @@ export default async function FossilesPage({
                 <p className="text-parchemin/70 max-w-2xl text-lg">
                   {(dict as { fossils?: { description?: string } })?.fossils
                     ?.description ||
-                    "Parcourez notre collection d'artefacts paléontologiques, soigneusement préservés pour traverser les âges."}
+                    "Parcourez notre collection de fossiles."}
                 </p>
               </div>
 

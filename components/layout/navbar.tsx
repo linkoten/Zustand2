@@ -190,7 +190,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <div className="hidden lg:flex items-center space-x-4 flex-shrink-0">
               {isLoaded && user && (
                 <div className="relative">
-                  <NotificationButton userId={user.id} dict={dict} />
+                  <NotificationButton userId={user.id} dict={dict} lang={lang} />
                 </div>
               )}
 
@@ -252,7 +252,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
               {/* Notifications uniquement si connecté */}
               {isLoaded && user && (
                 <div className="relative">
-                  <NotificationButton userId={user.id} dict={dict} />
+                  <NotificationButton userId={user.id} dict={dict} lang={lang} />
                 </div>
               )}
 

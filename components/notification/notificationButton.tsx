@@ -97,6 +97,11 @@ export function NotificationButton({
     });
   };
 
+  const resolveText = (text: string) => {
+    const parts = text.split("||");
+    return lang === "en" && parts.length > 1 ? parts[1].trim() : parts[0].trim();
+  };
+
   const getNotificationIcon = (type?: string) => {
     switch (type) {
       case "ORDER":
@@ -146,7 +151,7 @@ export function NotificationButton({
             <h4
               className={`font-medium text-slate-900 line-clamp-1 text-xs sm:text-sm`}
             >
-              {notif.title}
+              {resolveText(notif.title)}
             </h4>
             {!notif.isRead && (
               <Badge
@@ -161,7 +166,7 @@ export function NotificationButton({
           <p
             className={`text-slate-600 line-clamp-2 mb-1.5 text-xs leading-relaxed`}
           >
-            {notif.message}
+            {resolveText(notif.message)}
           </p>
 
           <div className="flex items-center justify-between">

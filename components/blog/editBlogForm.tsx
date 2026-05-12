@@ -55,9 +55,10 @@ export default function EditBlogForm({ post }: EditBlogFormProps) {
     readTime: post.readTime?.toString() || "5",
     seoTitle: post.seoTitle || "",
     seoDescription: post.seoDescription || "",
+    featured: (post as { featured?: boolean }).featured ?? false,
   });
 
-  const handleInputChange = (field: keyof typeof formData, value: string) => {
+  const handleInputChange = (field: keyof typeof formData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -83,6 +84,7 @@ export default function EditBlogForm({ post }: EditBlogFormProps) {
           excerpt: formData.excerpt || null,
           seoTitle: formData.seoTitle || null,
           seoDescription: formData.seoDescription || null,
+          featured: formData.featured,
         }),
       });
 
@@ -245,7 +247,22 @@ export default function EditBlogForm({ post }: EditBlogFormProps) {
         />
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-4 items-center">
+        {/* Article à la une toggle */}
+        <div className="flex items-center gap-2 mr-auto">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={formData.featured}
+            onClick={() => handleInputChange("featured", !formData.featured)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${formData.featured ? "bg-terracotta" : "bg-muted"}`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${formData.featured ? "translate-x-6" : "translate-x-1"}`}
+            />
+          </button>
+          <span className="text-sm text-muted-foreground">Article à la une</span>
+        </div>
         <Button type="submit" disabled={isLoading}>
           {isLoading ? (
             <>

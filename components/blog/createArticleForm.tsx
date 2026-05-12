@@ -64,6 +64,7 @@ export default function CreateArticleForm({
     seoTitle: "",
     seoDescription: "",
     selectedTags: [] as string[],
+    featured: false,
   });
 
   // Auto-génération du slug
@@ -113,7 +114,7 @@ export default function CreateArticleForm({
     };
   }, [isFullscreen]);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -174,6 +175,7 @@ export default function CreateArticleForm({
         seoTitle: formData.seoTitle || undefined,
         seoDescription: formData.seoDescription || undefined,
         tagIds: formData.selectedTags,
+        featured: formData.featured,
       };
 
       const result = await createBlogArticle(articleData);
@@ -398,6 +400,25 @@ export default function CreateArticleForm({
                 <Eye className="w-4 h-4 mr-2" />
                 Publier l&apos;article
               </Button>
+
+              {/* Article à la une */}
+              <div className="flex items-center justify-between pt-2 border-t border-border/40">
+                <div>
+                  <p className="text-sm font-medium">Article à la une</p>
+                  <p className="text-xs text-muted-foreground">Affiché en haut du blog</p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={formData.featured}
+                  onClick={() => handleInputChange("featured", !formData.featured)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${formData.featured ? "bg-terracotta" : "bg-muted"}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${formData.featured ? "translate-x-6" : "translate-x-1"}`}
+                  />
+                </button>
+              </div>
             </CardContent>
           </Card>
 

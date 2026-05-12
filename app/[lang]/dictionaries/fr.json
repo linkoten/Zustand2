@@ -177,7 +177,9 @@
     "page": "Page",
     "previous": "Précédent",
     "next": "Suivant",
-    "emptyDescription": "Aucun fossile ne correspond à vos critères de recherche."
+    "emptyDescription": "Aucun fossile ne correspond à vos critères de recherche.",
+    "title": "La Galerie des Temps Anciens",
+    "description": "Parcourez notre collection de fossiles."
   },
   "navbar": {
     "home": "Accueil",
@@ -696,7 +698,16 @@
     "watchPricesDesc": "Les prix des fossiles peuvent varier. Vos favoris vous permettent de suivre les évolutions tarifaires.",
     "shareCollection": "Partagez votre collection",
     "shareCollectionDesc": "Montrez vos fossiles favoris à d'autres passionnés de paléontologie et échangez vos découvertes.",
-    "fossilsSaved": "Fossiles sauvegardés"
+    "fossilsSaved": "Fossiles sauvegardés",
+    "generateShareLink": "Générer un lien de partage",
+    "copyShareLink": "Copier le lien",
+    "linkCopied": "Lien copié !",
+    "disableSharing": "Désactiver le partage",
+    "sharingActive": "Partage actif",
+    "sharingInactive": "Partage désactivé",
+    "viewPublicCollection": "Voir la collection publique",
+    "publicCollectionOf": "Collection de",
+    "noFavoritesPublic": "Cette collection est vide pour l'instant."
     },
   "checkoutReturn": {
       "successTitle": "Paiement réussi !",
@@ -738,6 +749,29 @@
         "empty": "Aucune notification",
         "markAsRead": "Marquer comme lue",
         "see": "Voir",
-        "dateLocale": "fr-FR"
-      }
+        "dateLocale": "fr-FR",
+        "new": "Nouveau",
+        "unread": "non lues",
+        "allRead": "Tout lu",
+        "markAllAsRead": "Tout marquer comme lu",
+        "emptyDescription": "Vous recevrez ici toutes vos notifications importantes",
+        "viewAll": "Voir toutes les notifications"
+      },
+  "collection": {
+    "title": "Encyclopédie des Faunes Fossiles",
+    "subtitle": "référencées dans nos gisements",
+    "species": "espèce",
+    "speciesPlural": "espèces",
+    "noResults": "Aucune espèce ne correspond à vos filtres",
+    "results": "résultat",
+    "resultsPlural": "résultats",
+    "myProgress": "Ma progression",
+    "owned": "possédés",
+    "wishlist": "liste de souhaits",
+    "byLocality": "Par gisement",
+    "loginPrompt": "Connectez-vous pour suivre votre collection",
+    "login": "Se connecter",
+    "previous": "Précédent",
+    "next": "Suivant"
+  }
 }

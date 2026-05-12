@@ -351,13 +351,13 @@ export async function deleteProductAction(
 export async function getFossils(
   filters: SearchParams & { search?: string } = {},
   userId?: string | null,
-  page: number = 1,
+  cursor?: number | null,
   limit: number = 20,
 ): Promise<{
   fossils: SerializedProduct[];
   totalCount: number;
-  totalPages: number;
-  currentPage: number;
+  nextCursor: number | null;
+  hasNextPage: boolean;
 }> {
   try {
     const whereConditions: Prisma.ProductWhereInput = {
@@ -435,10 +435,7 @@ export async function getFossils(
       where: whereConditions,
     });
 
-    const totalPages = Math.ceil(totalCount / limit);
-    const skip = (page - 1) * limit;
-
-    // ✅ Récupérer les produits avec pagination
+    // ✅ Récupérer les produits avec pagination (cursor-based)
     const fossils = await prisma.product.findMany({
       where: whereConditions,
       include: {
@@ -460,19 +457,23 @@ export async function getFossils(
       },
       orderBy:
         filters.sort === "name_asc"
-          ? { title: "asc" }
+          ? [{ title: "asc" as const }, { id: "asc" as const }]
           : filters.sort === "name_desc"
-            ? { title: "desc" }
+            ? [{ title: "desc" as const }, { id: "desc" as const }]
             : filters.sort === "price_asc"
-              ? { price: "asc" }
+              ? [{ price: "asc" as const }, { id: "asc" as const }]
               : filters.sort === "price_desc"
-                ? { price: "desc" }
-                : { createdAt: "desc" },
-      skip,
-      take: limit,
+                ? [{ price: "desc" as const }, { id: "desc" as const }]
+                : [{ createdAt: "desc" as const }, { id: "desc" as const }],
+      ...(cursor != null ? { cursor: { id: cursor }, skip: 1 } : {}),
+      take: limit + 1,
     });
 
-    const serializedFossils = fossils.map((fossil) => {
+    const hasNextPage = fossils.length > limit;
+    const items = hasNextPage ? fossils.slice(0, limit) : fossils;
+    const nextCursor = items.length > 0 ? items[items.length - 1].id : null;
+
+    const serializedFossils = items.map((fossil) => {
       // ✅ Calculer les statistiques de notation
       const ratings = fossil.ratings;
       const averageRating =
@@ -519,16 +520,16 @@ export async function getFossils(
     return {
       fossils: serializedFossils,
       totalCount,
-      totalPages,
-      currentPage: page,
+      nextCursor,
+      hasNextPage,
     };
   } catch (error) {
     console.error("Erreur lors de la récupération des fossiles:", error);
     return {
       fossils: [],
       totalCount: 0,
-      totalPages: 0,
-      currentPage: 1,
+      nextCursor: null,
+      hasNextPage: false,
     };
   }
 }

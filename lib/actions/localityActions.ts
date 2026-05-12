@@ -12,13 +12,23 @@ export async function getLocalitiesForMap() {
         longitude: true,
         geologicalPeriods: true,
         geologicalStages: true,
+        _count: {
+          select: {
+            products: {
+              where: { status: "AVAILABLE" },
+            },
+          },
+        },
       },
       orderBy: {
         name: "asc",
       },
     });
 
-    return localities;
+    return localities.map((loc) => ({
+      ...loc,
+      availableProductCount: loc._count.products,
+    }));
   } catch (error) {
     console.error("Erreur lors de la récupération des localités:", error);
     return [];

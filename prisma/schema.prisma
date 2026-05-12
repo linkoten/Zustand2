@@ -37,6 +37,9 @@ model User {
 
   Notification Notification[]
   collection   UserCollection[]
+
+  // 🆕 Token de partage de collection publique
+  collectionShareToken String? @unique
 }
 
 model Product {
@@ -82,6 +85,10 @@ model Product {
   // Collection Pokédex (lien optionnel vers une espèce du catalogue)
   fossilSpeciesId String?
   fossilSpecies   FossilSpecies? @relation(fields: [fossilSpeciesId], references: [id])
+
+  @@index([status, category])
+  @@index([status, geologicalPeriod])
+  @@index([status, countryOfOrigin])
 }
 
 model UserFavorite {
@@ -213,6 +220,7 @@ model ArticleBlog {
   views          Int          @default(0) // Nombre de vues
   seoTitle       String? // Titre SEO personnalisé
   seoDescription String? // Description SEO
+  featured       Boolean      @default(false) // Article mis en avant sur la page blog
   tags           BlogTag[] // Tags associés
   structuredData Json? // Données structurées selon la catégorie (ex: GisementsData)
   createdAt      DateTime     @default(now())
@@ -224,6 +232,7 @@ model ArticleBlog {
   author   User   @relation(fields: [authorId], references: [id])
 
   @@index([status, publishedAt])
+  @@index([status, featured])
   @@index([category])
   @@index([slug])
   @@index([authorId])
@@ -384,6 +393,17 @@ enum BlogStatus {
 enum CollectionStatus {
   OWNED
   WISHLIST
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  lang      String   @default("fr") // "fr" | "en"
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("newsletter_subscribers")
 }
 
 enum FossilRarity {

@@ -347,3 +347,107 @@ export async function getUserFavorites(
     return [];
   }
 }
+
+// ─── Admin stats for charts ────────────────────────────────────────────────
+
+const MONTH_LABELS_FR = [
+  "Jan", "Fév", "Mar", "Avr", "Mai", "Jun",
+  "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc",
+];
+
+export async function getAdminStats() {
+  try {
+    const now = new Date();
+    const twelveMonthsAgo = new Date(now);
+    twelveMonthsAgo.setMonth(now.getMonth() - 11);
+    twelveMonthsAgo.setDate(1);
+    twelveMonthsAgo.setHours(0, 0, 0, 0);
+
+    // ── Monthly revenue (completed payments) ──────────────────────────
+    const payments = await prisma.payment.findMany({
+      where: {
+        status: "COMPLETED",
+        createdAt: { gte: twelveMonthsAgo },
+      },
+      select: { amount: true, createdAt: true },
+    });
+
+    const revenueByMonth: Record<string, number> = {};
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(now);
+      d.setMonth(now.getMonth() - (11 - i));
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      revenueByMonth[key] = 0;
+    }
+    for (const p of payments) {
+      const key = `${p.createdAt.getFullYear()}-${String(p.createdAt.getMonth() + 1).padStart(2, "0")}`;
+      if (key in revenueByMonth) {
+        revenueByMonth[key] += p.amount.toNumber();
+      }
+    }
+    const monthlyRevenue = Object.entries(revenueByMonth).map(([key, total]) => {
+      const [year, month] = key.split("-");
+      return {
+        month: `${MONTH_LABELS_FR[parseInt(month) - 1]} ${year}`,
+        total: Math.round(total),
+      };
+    });
+
+    // ── Sales by category ────────────────────────────────────────────
+    const orderItems = await prisma.orderItem.findMany({
+      include: { product: { select: { category: true } } },
+    });
+
+    const categoryMap: Record<string, number> = {};
+    for (const item of orderItems) {
+      const cat = item.product.category as string;
+      categoryMap[cat] = (categoryMap[cat] ?? 0) + item.quantity;
+    }
+    const salesByCategory = Object.entries(categoryMap)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 8);
+
+    // ── Top articles by views ────────────────────────────────────────
+    const topArticles = await prisma.articleBlog.findMany({
+      where: { status: "PUBLISHED" },
+      orderBy: { views: "desc" },
+      take: 5,
+      select: { id: true, title: true, views: true, slug: true },
+    });
+
+    // ── Monthly orders ───────────────────────────────────────────────
+    const orders = await prisma.order.findMany({
+      where: { createdAt: { gte: twelveMonthsAgo } },
+      select: { createdAt: true },
+    });
+
+    const ordersByMonth: Record<string, number> = {};
+    for (const key of Object.keys(revenueByMonth)) {
+      ordersByMonth[key] = 0;
+    }
+    for (const o of orders) {
+      const key = `${o.createdAt.getFullYear()}-${String(o.createdAt.getMonth() + 1).padStart(2, "0")}`;
+      if (key in ordersByMonth) {
+        ordersByMonth[key] += 1;
+      }
+    }
+    const monthlyOrders = Object.entries(ordersByMonth).map(([key, count]) => {
+      const [year, month] = key.split("-");
+      return {
+        month: `${MONTH_LABELS_FR[parseInt(month) - 1]} ${year}`,
+        count,
+      };
+    });
+
+    return { monthlyRevenue, salesByCategory, topArticles, monthlyOrders };
+  } catch (error) {
+    console.error("❌ getAdminStats:", error);
+    return {
+      monthlyRevenue: [],
+      salesByCategory: [],
+      topArticles: [],
+      monthlyOrders: [],
+    };
+  }
+}

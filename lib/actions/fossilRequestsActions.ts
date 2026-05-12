@@ -234,7 +234,7 @@ export async function updateFossilRequest(
     // 👉 Notification pour l'utilisateur concerné
     const fossilRequestInDb = await prisma.fossilRequest.findUnique({
       where: { id },
-      select: { clerkUserId: true },
+      select: { clerkUserId: true, email: true, name: true, fossilType: true },
     });
 
     if (fossilRequestInDb?.clerkUserId) {
@@ -243,11 +243,31 @@ export async function updateFossilRequest(
       await createNotification({
         userId: fossilRequestInDb.clerkUserId, // 👈 ici on utilise l'id interne
         type: "FOSSIL_REQUEST_UPDATE",
-        title: "Mise à jour de votre demande",
+        title: "Mise à jour de votre demande||Your request has been updated",
         message:
-          "Votre demande de recherche de fossile a été mise à jour par l'équipe.",
+          "Votre demande de recherche de fossile a été mise à jour par l'équipe.||Your fossil search request has been updated by our team.",
         link: `/dashboard/requests/user/${id}`,
       });
+    }
+
+    // 👉 Email de notification si statut ou message changé
+    if (
+      (data.status !== undefined || data.responseMessage !== undefined) &&
+      fossilRequestInDb?.email
+    ) {
+      const { sendFossilRequestStatusEmail } = await import(
+        "@/components/resend/sendFossilRequestStatusEmail"
+      );
+      await sendFossilRequestStatusEmail({
+        customerEmail: fossilRequestInDb.email,
+        customerName: fossilRequestInDb.name,
+        fossilType: fossilRequestInDb.fossilType,
+        newStatus: updatedRequest.status,
+        responseMessage: updatedRequest.responseMessage,
+        requestId: id,
+      }).catch((err) =>
+        console.error("❌ Email statut fossile non envoyé:", err),
+      );
     }
 
     return {

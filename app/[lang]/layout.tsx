@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import Navbar from "@/components/layout/navbar";
 import { getDictionary } from "./dictionaries";
+import { NewsletterForm } from "@/components/layout/newsletterForm";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,9 +69,24 @@ export default async function RootLayout({
             <div className="absolute bottom-20 right-1/3 w-36 h-36 bg-[var(--terracotta)]/6 rounded-full blur-[100px] animate-pulse delay-500"></div>
           </div>
           <main className="flex-1">{children}</main>
-          <footer className="border-t border-border/40 bg-zinc-950/50 py-6 mt-12 backdrop-blur-sm">
-            <div className="container mx-auto px-4 text-center text-sm text-foreground/60">
-              <p>© 2025 Paleolitho. {dict.home.footerCopyright}</p>
+          <footer className="border-t border-border/40 bg-zinc-950/70 py-10 mt-12 backdrop-blur-sm">
+            <div className="container mx-auto px-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                {/* Brand */}
+                <div>
+                  <p className="text-lg font-bold text-parchemin mb-2">Paleolitho</p>
+                  <p className="text-sm text-foreground/50 max-w-xs">
+                    Fossiles authentiques sélectionnés par des passionnés. Livraison soignée, collection exclusive.
+                  </p>
+                </div>
+                {/* Newsletter */}
+                <div>
+                  <NewsletterForm lang={lang} />
+                </div>
+              </div>
+              <div className="border-t border-border/20 pt-6 text-center text-sm text-foreground/40">
+                <p>© 2025 Paleolitho. {dict.home.footerCopyright}</p>
+              </div>
             </div>
           </footer>
           <Toaster position="bottom-right" />

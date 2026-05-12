@@ -9,6 +9,7 @@ import { getDictionary } from "../../dictionaries";
 import { auth } from "@clerk/nextjs/server";
 import { getUserData } from "@/lib/actions/dashboardActions";
 import UserProvider from "@/components/provider/userProvider";
+import { buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/jsonld";
 
 // ✅ Générer les métadonnées SEO améliorées
 export async function generateMetadata({
@@ -83,8 +84,38 @@ export default async function ProductPage({
     getSimilarProducts(product.id, product.category),
   ]);
 
+  const productJsonLd = buildProductJsonLd({
+    id: product.id,
+    lang,
+    title: product.title,
+    description: product.description,
+    price: product.price,
+    images: product.images,
+    species: product.species,
+    category: product.category,
+    geologicalPeriod: product.geologicalPeriod,
+    countryOfOrigin: product.countryOfOrigin,
+    averageRating: ratingStats.averageRating,
+    totalRatings: ratingStats.totalRatings,
+    status: product.status,
+  });
+
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Accueil", url: `${process.env.NEXT_PUBLIC_APP_URL || "https://paleolitho.com"}/${lang}` },
+    { name: "Fossiles", url: `${process.env.NEXT_PUBLIC_APP_URL || "https://paleolitho.com"}/${lang}/fossiles` },
+    { name: product.title, url: `${process.env.NEXT_PUBLIC_APP_URL || "https://paleolitho.com"}/${lang}/fossiles/${product.id}` },
+  ]);
+
   return (
     <UserProvider user={user}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/20 to-stone-50">
         <ProductPageClient
           product={product}

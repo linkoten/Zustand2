@@ -144,6 +144,7 @@ export interface CreateArticleData {
   seoTitle?: string;
   seoDescription?: string;
   tagIds: string[];
+  featured?: boolean;
   structuredData?: GisementsData | ActivitesData;
 }
 
@@ -160,6 +161,7 @@ export interface UpdateArticleData {
   seoTitle?: string | null;
   seoDescription?: string | null;
   tagIds: string[];
+  featured?: boolean;
   structuredData?: GisementsData | ActivitesData | null;
 }
 

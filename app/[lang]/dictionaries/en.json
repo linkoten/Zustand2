@@ -177,7 +177,9 @@
     "page": "Page",
     "previous": "Previous", 
     "next": "Next",
-    "emptyDescription": "No fossils match your search criteria."
+    "emptyDescription": "No fossils match your search criteria.",
+    "title": "The Gallery of Ancient Times",
+    "description": "Browse our fossil collection."
   },
   "navbar": {
     "home": "Home",
@@ -696,7 +698,16 @@
     "watchPricesDesc": "Fossil prices can vary. Your favorites allow you to track price changes.",
     "shareCollection": "Share your collection",
     "shareCollectionDesc": "Show your favorite fossils to other paleontology enthusiasts and share your discoveries.",
-    "fossilsSaved": "Fossils saved"
+    "fossilsSaved": "Fossils saved",
+    "generateShareLink": "Generate a share link",
+    "copyShareLink": "Copy link",
+    "linkCopied": "Link copied!",
+    "disableSharing": "Disable sharing",
+    "sharingActive": "Sharing active",
+    "sharingInactive": "Sharing disabled",
+    "viewPublicCollection": "View public collection",
+    "publicCollectionOf": "Collection of",
+    "noFavoritesPublic": "This collection is empty for now."
     },
   "checkoutReturn": {
       "successTitle": "Payment successful!",
@@ -738,6 +749,29 @@
         "empty": "No notifications",
         "markAsRead": "Mark as read",
         "see": "See",
-        "dateLocale": "en-US"
-      }
+        "dateLocale": "en-US",
+        "new": "New",
+        "unread": "unread",
+        "allRead": "All caught up",
+        "markAllAsRead": "Mark all as read",
+        "emptyDescription": "You'll receive all your important notifications here",
+        "viewAll": "View all notifications"
+      },
+  "collection": {
+    "title": "Fossil Fauna Encyclopedia",
+    "subtitle": "referenced from our fossil sites",
+    "species": "species",
+    "speciesPlural": "species",
+    "noResults": "No species match your filters",
+    "results": "result",
+    "resultsPlural": "results",
+    "myProgress": "My progress",
+    "owned": "owned",
+    "wishlist": "wishlist",
+    "byLocality": "By fossil site",
+    "loginPrompt": "Sign in to track your collection",
+    "login": "Sign in",
+    "previous": "Previous",
+    "next": "Next"
+  }
 }

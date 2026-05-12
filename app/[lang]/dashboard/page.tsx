@@ -7,7 +7,9 @@ import {
   getAdminDashboardData,
   getUserDashboardData,
   getOrSyncUser,
+  getAdminStats,
 } from "@/lib/actions/dashboardActions";
+import { getNewsletterSubscribers } from "@/lib/actions/newsletterActions";
 import { getDictionary } from "../dictionaries";
 
 export default async function DashboardPage({
@@ -32,12 +34,23 @@ export default async function DashboardPage({
 
   // Charger les données selon le rôle
   if (user.role === UserRole.ADMIN) {
-    const adminData = await getAdminDashboardData();
+    const [adminData, adminStats, newsletterData] = await Promise.all([
+      getAdminDashboardData(),
+      getAdminStats(),
+      getNewsletterSubscribers(),
+    ]);
     return (
       <div className="min-h-screen bg-silex relative overflow-hidden">
         {/* Décors administratifs */}
         <div className="absolute top-0 right-0 w-[50vh] h-[50vh] bg-cyan-900/10 rounded-full blur-[120px] pointer-events-none animate-float" />
-        <AdminDashboard user={user} data={adminData} dict={dict} lang={lang} />
+        <AdminDashboard
+          user={user}
+          data={adminData}
+          dict={dict}
+          lang={lang}
+          adminStats={adminStats}
+          newsletterData={newsletterData}
+        />
       </div>
     );
   } else {

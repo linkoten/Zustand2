@@ -29,6 +29,8 @@ import ActivitesContent from "@/components/blog/activitesContent";
 import RelatedArticles from "@/components/blog/relatedArticles";
 import { getBlogArticleBySlug } from "@/lib/actions/blogActions";
 import { getDictionary } from "../../dictionaries";
+import ViewTracker from "@/components/blog/viewTracker";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/lib/jsonld";
 
 export const dynamic = "force-dynamic";
 
@@ -123,8 +125,37 @@ export default async function BlogArticlePage(props: BlogArticlePageProps) {
     return map[category] || category;
   };
 
+  const articleJsonLd = buildArticleJsonLd({
+    slug: article.slug,
+    lang,
+    title: article.title,
+    excerpt: article.excerpt,
+    featuredImage: article.featuredImage,
+    imageAlt: article.imageAlt,
+    authorName: article.author.name || article.author.email,
+    publishedAt: article.publishedAt,
+    updatedAt: article.updatedAt,
+    tags: article.tags.map((t) => t.name),
+    readTime: article.readTime,
+  });
+
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Accueil", url: `${process.env.NEXT_PUBLIC_APP_URL || "https://paleolitho.com"}/${lang}` },
+    { name: "Blog", url: `${process.env.NEXT_PUBLIC_APP_URL || "https://paleolitho.com"}/${lang}/blog` },
+    { name: article.title, url: `${process.env.NEXT_PUBLIC_APP_URL || "https://paleolitho.com"}/${lang}/blog/${article.slug}` },
+  ]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <ViewTracker slug={slug} />
       <div className="container mx-auto px-4 py-8">
         {/* Navigation de retour ultra moderne */}
         <div className="mb-8 flex items-center gap-3">

@@ -208,12 +208,6 @@ export async function getBlogArticleBySlug(slug: string) {
 
     if (!article) return null;
 
-    // Incrémenter le nombre de vues
-    await prisma.articleBlog.update({
-      where: { id: article.id },
-      data: { views: { increment: 1 } },
-    });
-
     return {
       id: article.id,
       title: article.title,
@@ -482,6 +476,7 @@ export async function createBlogArticle(data: CreateArticleData) {
         readTime: data.readTime || undefined,
         seoTitle: data.seoTitle || undefined,
         seoDescription: data.seoDescription || undefined,
+        featured: data.featured ?? false,
         structuredData: data.structuredData
           ? (data.structuredData as unknown as Prisma.InputJsonValue)
           : undefined,
@@ -508,8 +503,8 @@ export async function createBlogArticle(data: CreateArticleData) {
         createNotification({
           userId: user.clerkId,
           type: "BLOG",
-          title: "Nouvel article publié",
-          message: `Un nouvel article "${article.title}" vient d'être publié sur le blog.`,
+          title: "Nouvel article publié||New article published",
+          message: `Un nouvel article "${article.title}" vient d'être publié sur le blog.||A new article "${article.title}" has been published on the blog.`,
           link: `/blog/${article.slug}`,
         })
       )
@@ -565,6 +560,7 @@ export async function updateBlogArticle(id: string, data: UpdateArticleData) {
             : undefined,
         seoTitle: data.seoTitle ?? undefined,
         seoDescription: data.seoDescription ?? undefined,
+        featured: data.featured ?? false,
         structuredData: data.structuredData
           ? (data.structuredData as unknown as Prisma.InputJsonValue)
           : Prisma.JsonNull,
@@ -655,5 +651,68 @@ export async function getAllBlogTags() {
   }
 }
 
+export async function getFeaturedArticle() {
+  try {
+    return await prisma.articleBlog.findFirst({
+      where: { status: BlogStatus.PUBLISHED, featured: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        featuredImage: true,
+        category: true,
+        publishedAt: true,
+        readTime: true,
+        author: { select: { name: true } },
+        tags: { select: { name: true, color: true } },
+      },
+      orderBy: { publishedAt: "desc" },
+    });
+  } catch (error) {
+    console.error("❌ Erreur récupération article à la une:", error);
+    return null;
+  }
+}
 
+export async function toggleFeaturedArticle(id: string, featured: boolean) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Utilisateur non connecté");
 
+    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
+    if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.MODERATOR)) {
+      throw new Error("Accès non autorisé");
+    }
+
+    // Désactiver l'article actuellement à la une si on en active un nouveau
+    if (featured) {
+      await prisma.articleBlog.updateMany({
+        where: { featured: true, NOT: { id } },
+        data: { featured: false },
+      });
+    }
+
+    await prisma.articleBlog.update({
+      where: { id },
+      data: { featured },
+    });
+
+    revalidatePath("/blog");
+    return { success: true };
+  } catch (error) {
+    console.error("❌ Erreur toggle featured:", error);
+    throw error;
+  }
+}
+
+export async function incrementArticleViews(slug: string) {
+  try {
+    await prisma.articleBlog.update({
+      where: { slug },
+      data: { views: { increment: 1 } },
+    });
+  } catch {
+    // Silent — ne pas bloquer le rendu si l'incrément échoue
+  }
+}

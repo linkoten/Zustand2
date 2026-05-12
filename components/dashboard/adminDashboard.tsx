@@ -17,10 +17,13 @@ import {
   Crown,
   Shield,
   BarChart3,
+  Mail,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AdminDashboardData, DashboardUser } from "@/types/dashboardType";
+import AdminNewsletter from "./adminNewsletter";
+import AdminStats from "./adminStats";
 
 const statusColors = {
   PENDING:
@@ -58,12 +61,18 @@ interface AdminDashboardProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any;
   lang: "fr" | "en";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  adminStats: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  newsletterData: any;
 }
 
 export default function AdminDashboard({
   data,
   dict,
   lang,
+  adminStats,
+  newsletterData,
 }: AdminDashboardProps) {
   return (
     <div className="relative">
@@ -483,6 +492,43 @@ export default function AdminDashboard({
             </Card>
           </div>
         </div>
+
+        {/* ── Stats graphiques ──────────────────────────────────────── */}
+        <div className="mt-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-xl shadow-lg">
+              <BarChart3 className="h-5 w-5 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-parchemin">
+              Statistiques & Analytiques
+            </h2>
+          </div>
+          <AdminStats
+            monthlyRevenue={adminStats.monthlyRevenue}
+            salesByCategory={adminStats.salesByCategory}
+            topArticles={adminStats.topArticles}
+            monthlyOrders={adminStats.monthlyOrders}
+            lang={lang}
+          />
+        </div>
+
+        {/* ── Newsletter ───────────────────────────────────────────── */}
+        <div className="mt-12 mb-4">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-gradient-to-br from-terracotta to-orange-600 rounded-xl shadow-lg">
+              <Mail className="h-5 w-5 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-parchemin">
+              Newsletter
+            </h2>
+          </div>
+          <AdminNewsletter
+            initialSubscribers={newsletterData.subscribers}
+            initialTotal={newsletterData.total}
+            initialActive={newsletterData.active}
+          />
+        </div>
+
       </div>
     </div>
   );

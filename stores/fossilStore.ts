@@ -6,15 +6,13 @@ import {
 import { SerializedProduct } from "@/types/type";
 import { SearchParams } from "@/types/productType";
 
-export interface FossilFilters extends SearchParams {
-  page?: string; // string per searchParams spec
-}
+export interface FossilFilters extends SearchParams {}
 
 interface FossilData {
   fossils: SerializedProduct[];
   totalCount: number;
-  totalPages: number;
-  currentPage: number;
+  nextCursor: number | null;
+  hasNextPage: boolean;
 }
 
 interface FossilState {
@@ -40,8 +38,12 @@ interface FossilState {
   loadFossilData: (
     filters: FossilFilters,
     userId?: string | null,
+    cursor?: number | null,
   ) => Promise<void>;
   resetFilters: () => void;
+  goToNextPage: () => void;
+  goToPrevPage: () => void;
+  cursorHistory: (number | null)[];
 }
 
 export const useFossilStore = create<FossilState>((set, get) => ({
@@ -66,9 +68,10 @@ export const useFossilStore = create<FossilState>((set, get) => ({
   fossilData: {
     fossils: [],
     totalCount: 0,
-    totalPages: 0,
-    currentPage: 1,
+    nextCursor: null,
+    hasNextPage: false,
   },
+  cursorHistory: [null],
   isLoading: false,
   filters: {},
   userId: null,
@@ -83,13 +86,10 @@ export const useFossilStore = create<FossilState>((set, get) => ({
     const currentFilters = get().filters;
     const updatedFilters = { ...currentFilters, ...newFilters };
 
-    // Reset page to 1 when changing filters (except if explicitly updating page, and skip for empty updates triggered by index load)
-    if (
+    // Reset cursor history when filters change (not during navigation)
+    const isFilterChange =
       Object.keys(newFilters).length > 0 &&
-      Object.keys(newFilters).some((key) => key !== "page")
-    ) {
-      updatedFilters.page = "1";
-    }
+      Object.keys(newFilters).some((key) => key !== "page");
 
     // Compute facets
     const idx = get().catalogIndex;
@@ -158,24 +158,24 @@ export const useFossilStore = create<FossilState>((set, get) => ({
           (newFacets.stages[p.geologicalStage] || 0) + 1;
     });
 
-    set({ filters: updatedFilters, facets: newFacets });
+    set({
+      filters: updatedFilters,
+      facets: newFacets,
+      ...(isFilterChange ? { cursorHistory: [null] } : {}),
+    });
 
     if (Object.keys(newFilters).length > 0) {
       const userId = get().userId;
-      // Auto-load data with new filters but ONLY if filters really changed
+      // Auto-load data with new filters (cursor reset to page 1)
       get().loadFossilData(updatedFilters, userId);
     }
   },
 
-  loadFossilData: async (filters, userId) => {
+  loadFossilData: async (filters, userId, cursor) => {
     set({ isLoading: true });
 
     try {
-      const page = parseInt(filters.page || "1", 10);
-      const limit = 20;
-
-      const data = await getFossils(filters, userId, page, limit);
-
+      const data = await getFossils(filters, userId, cursor, 20);
       set({ fossilData: data, isLoading: false });
     } catch (error) {
       console.error("Failed to load fossil data", error);
@@ -184,9 +184,26 @@ export const useFossilStore = create<FossilState>((set, get) => ({
   },
 
   resetFilters: () => {
-    const newFilters = { page: "1" };
-    set({ filters: newFilters });
+    const newFilters = {};
+    set({ filters: newFilters, cursorHistory: [null] });
     const userId = get().userId;
     get().loadFossilData(newFilters, userId);
+  },
+
+  goToNextPage: () => {
+    const { fossilData, filters, userId, cursorHistory } = get();
+    if (!fossilData.hasNextPage || fossilData.nextCursor == null) return;
+    const newHistory = [...cursorHistory, fossilData.nextCursor];
+    set({ cursorHistory: newHistory });
+    get().loadFossilData(filters, userId, fossilData.nextCursor);
+  },
+
+  goToPrevPage: () => {
+    const { cursorHistory, filters, userId } = get();
+    if (cursorHistory.length <= 1) return;
+    const newHistory = cursorHistory.slice(0, -1);
+    const prevCursor = newHistory[newHistory.length - 1];
+    set({ cursorHistory: newHistory });
+    get().loadFossilData(filters, userId, prevCursor ?? undefined);
   },
 }));

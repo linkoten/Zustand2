@@ -23,8 +23,8 @@ interface FossilesClientProps {
   fossilsData: {
     fossils: SerializedProduct[];
     totalCount: number;
-    totalPages: number;
-    currentPage: number;
+    nextCursor: number | null;
+    hasNextPage: boolean;
   };
   filterOptions: FilterOptions;
   lang?: "en" | "fr";
@@ -98,7 +98,7 @@ export default function FossilesClient({
 
   const { setFossilData, setInitialFilters, setUserId, loadCatalogIndex } =
     useFossilStore();
-  const { fossilData, isLoading } = useFossilStore();
+  const { fossilData, isLoading, cursorHistory, goToNextPage, goToPrevPage } = useFossilStore();
 
   const isInitialized = useRef(false);
 
@@ -111,7 +111,6 @@ export default function FossilesClient({
         locality: searchParams.get("locality") || undefined,
         geologicalPeriod: searchParams.get("geologicalPeriod") || undefined,
         geologicalStage: searchParams.get("geologicalStage") || undefined,
-        page: searchParams.get("page") || "1",
       });
       setFossilData(initialData);
       setUserId(userId || null);
@@ -130,7 +129,9 @@ export default function FossilesClient({
   ]);
 
   const currentData = isInitialized.current ? fossilData : initialData;
-  const { fossils, totalCount, totalPages, currentPage } = currentData;
+  const { fossils, totalCount, hasNextPage } = currentData;
+  const currentPage = cursorHistory.length;
+  const estimatedTotalPages = totalCount > 0 ? Math.ceil(totalCount / 20) : 1;
 
   // Compter les filtres actifs pour le badge
   const activeFiltersCount = Array.from(searchParams.entries()).filter(
@@ -149,17 +150,6 @@ export default function FossilesClient({
       return true;
     },
   ).length;
-
-  const handlePageChange = (page: number) => {
-    useFossilStore.getState().updateFilters({ page: page.toString() });
-    const params = new URLSearchParams(window.location.search);
-    params.set("page", page.toString());
-    window.history.pushState(
-      null,
-      "",
-      `/${lang}/fossiles?${params.toString()}`,
-    );
-  };
 
   const clearAllFilters = () => {
     useFossilStore.getState().resetFilters();
@@ -180,38 +170,6 @@ export default function FossilesClient({
       "",
       `/${lang}/fossiles?${params.toString()}`,
     );
-  };
-
-  const renderPaginationButtons = () => {
-    const buttons = [];
-    const maxVisiblePages = 5;
-
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      buttons.push(
-        <Button
-          key={i}
-          variant={currentPage === i ? "default" : "outline"}
-          size="sm"
-          onClick={() => handlePageChange(i)}
-          className={
-            currentPage === i
-              ? "bg-[var(--terracotta)] hover:bg-[var(--terracotta)]/90 border-0 text-white shadow-md transform hover:scale-105 transition-all duration-200"
-              : "border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 transition-all duration-200"
-          }
-        >
-          {i}
-        </Button>,
-      );
-    }
-
-    return buttons;
   };
 
   return (
@@ -390,31 +348,29 @@ export default function FossilesClient({
           </div>
 
           {/* Grille des fossiles desktop */}
-          {fossils.length > 0 ? (
-            <>
-              {isLoading && (
-                <div className="col-span-full grid grid-cols-2 gap-4 lg:gap-8 w-full z-10 relative mb-4">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className="flex flex-col bg-[#1a2321] border border-[var(--parchemin)]/10 rounded-xl overflow-hidden animate-pulse shadow-md"
-                    >
-                      <div className="w-full aspect-[4/3] bg-white/5"></div>
-                      <div className="p-4 lg:p-5 space-y-4">
-                        <div className="flex justify-between items-start">
-                          <div className="h-6 bg-white/5 rounded-md w-2/5"></div>
-                          <div className="h-5 bg-white/5 rounded-md w-1/4"></div>
-                        </div>
-                        <div className="h-4 bg-white/5 rounded-md w-3/4"></div>
-                        <div className="h-10 bg-white/5 rounded-md w-full mt-4"></div>
-                      </div>
+          {isLoading ? (
+            <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-8 w-full">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col bg-[#1a2321] border border-[var(--parchemin)]/10 rounded-xl overflow-hidden animate-pulse shadow-md"
+                >
+                  <div className="w-full aspect-[4/3] bg-white/5"></div>
+                  <div className="p-4 lg:p-5 space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div className="h-6 bg-white/5 rounded-md w-2/5"></div>
+                      <div className="h-5 bg-white/5 rounded-md w-1/4"></div>
                     </div>
-                  ))}
+                    <div className="h-4 bg-white/5 rounded-md w-3/4"></div>
+                    <div className="h-4 bg-white/5 rounded-md w-1/2"></div>
+                    <div className="h-10 bg-white/5 rounded-md w-full mt-4"></div>
+                  </div>
                 </div>
-              )}
-              <div
-                className={`grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-8 transition-opacity duration-300 ${isLoading ? "hidden pointer-events-none" : "opacity-100"}`}
-              >
+              ))}
+            </div>
+          ) : fossils.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-8">
                 {fossils.map((fossil, index) => (
                   <AnimatedFossilCard
                     key={fossil.id}
@@ -425,43 +381,40 @@ export default function FossilesClient({
                   />
                 ))}
               </div>
-
-              {/* Pagination desktop */}
-              {totalPages > 1 && (
                 <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-8 shadow-xl backdrop-blur-sm">
                   <div className="flex items-center justify-between">
                     <div className="text-[var(--parchemin)]/60 font-medium">
                       {dict?.fossils?.page || "Page"}{" "}
                       <span className="font-bold text-[var(--terracotta)]">
                         {currentPage}
-                      </span>{" "}
-                      {dict?.fossils?.of || "sur"}{" "}
-                      <span className="font-bold text-[var(--parchemin)]">
-                        {totalPages}
                       </span>
+                      {estimatedTotalPages > 1 && (
+                        <>
+                          {" "}{dict?.fossils?.of || "sur"}{" "}
+                          <span className="font-bold text-[var(--parchemin)]">
+                            ~{estimatedTotalPages}
+                          </span>
+                        </>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-3">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
+                        onClick={goToPrevPage}
+                        disabled={cursorHistory.length <= 1}
                         className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200 transform hover:scale-105"
                       >
                         <ChevronLeft className="w-4 h-4 mr-1" />
                         {dict?.fossils?.previous || "Précédent"}
                       </Button>
 
-                      <div className="flex gap-2">
-                        {renderPaginationButtons()}
-                      </div>
-
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
+                        onClick={goToNextPage}
+                        disabled={!hasNextPage}
                         className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200 transform hover:scale-105"
                       >
                         {dict?.fossils?.next || "Suivant"}
@@ -470,7 +423,6 @@ export default function FossilesClient({
                     </div>
                   </div>
                 </div>
-              )}
             </>
           ) : (
             /* État vide desktop */
@@ -506,31 +458,28 @@ export default function FossilesClient({
       {/* Contenu principal mobile - SANS SIDEBAR */}
       <div className="lg:hidden space-y-4 sm:space-y-6">
         {/* Grille des fossiles mobile avec marges */}
-        {fossils.length > 0 ? (
-          <>
-            {isLoading && (
-              <div className="col-span-full grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0 w-full z-10 relative mb-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="flex flex-col bg-[#1a2321] border border-[var(--parchemin)]/10 rounded-xl overflow-hidden animate-pulse shadow-md"
-                  >
-                    <div className="w-full aspect-square bg-white/5"></div>
-                    <div className="p-3 space-y-3">
-                      <div className="flex justify-between items-start">
-                        <div className="h-4 bg-white/5 rounded-md w-1/2"></div>
-                        <div className="h-3 bg-white/5 rounded-md w-1/4"></div>
-                      </div>
-                      <div className="h-3 bg-white/5 rounded-md w-3/4"></div>
-                      <div className="h-8 bg-white/5 rounded-md w-full mt-2"></div>
-                    </div>
+        {isLoading ? (
+          <div className="grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0 w-full">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex flex-col bg-[#1a2321] border border-[var(--parchemin)]/10 rounded-xl overflow-hidden animate-pulse shadow-md"
+              >
+                <div className="w-full aspect-square bg-white/5"></div>
+                <div className="p-3 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div className="h-4 bg-white/5 rounded-md w-1/2"></div>
+                    <div className="h-3 bg-white/5 rounded-md w-1/4"></div>
                   </div>
-                ))}
+                  <div className="h-3 bg-white/5 rounded-md w-3/4"></div>
+                  <div className="h-8 bg-white/5 rounded-md w-full mt-2"></div>
+                </div>
               </div>
-            )}
-            <div
-              className={`grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0 transition-opacity duration-300 ${isLoading ? "hidden pointer-events-none" : "opacity-100"}`}
-            >
+            ))}
+          </div>
+        ) : fossils.length > 0 ? (
+          <>
+            <div className="grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0">
               {fossils.map((fossil, index) => (
                 <AnimatedFossilCard
                   key={fossil.id}
@@ -543,26 +492,22 @@ export default function FossilesClient({
             </div>
 
             {/* Pagination mobile compacte */}
-            {totalPages > 1 && (
+            {(cursorHistory.length > 1 || hasNextPage) && (
               <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm mx-2 sm:mx-0">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
-                  <div className="text-[var(--parchemin)]/60 font-medium text-sm sm:text-base text-center sm:text-left">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="text-[var(--parchemin)]/60 font-medium text-sm">
                     {dict?.fossils?.page || "Page"}{" "}
                     <span className="font-bold text-[var(--terracotta)]">
                       {currentPage}
-                    </span>{" "}
-                    {dict?.fossils?.of || "sur"}{" "}
-                    <span className="font-bold text-[var(--parchemin)]">
-                      {totalPages}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-center gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
+                      onClick={goToPrevPage}
+                      disabled={cursorHistory.length <= 1}
                       className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200"
                     >
                       <ChevronLeft className="w-4 h-4 sm:mr-1" />
@@ -571,21 +516,15 @@ export default function FossilesClient({
                       </span>
                     </Button>
 
-                    {/* Indicateur simple sur mobile */}
-                    <div className="sm:hidden px-3 py-1 bg-[var(--terracotta)]/20 rounded-lg text-sm font-medium text-[var(--terracotta)]">
-                      {currentPage}/{totalPages}
-                    </div>
-
-                    {/* Pagination complète sur tablet */}
-                    <div className="hidden sm:flex gap-2">
-                      {renderPaginationButtons()}
+                    <div className="px-3 py-1 bg-[var(--terracotta)]/20 rounded-lg text-sm font-medium text-[var(--terracotta)]">
+                      {currentPage}
                     </div>
 
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
+                      onClick={goToNextPage}
+                      disabled={!hasNextPage}
                       className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200"
                     >
                       <span className="hidden sm:inline">

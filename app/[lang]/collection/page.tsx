@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { getDictionary } from "../dictionaries";
 import {
   getFossilSpecies,
   getUserCollectionStats,
@@ -39,6 +40,8 @@ export default async function CollectionPage({
   const { lang } = await params;
   const sp = await searchParams;
   const { userId: clerkId } = await auth();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dict = await getDictionary(lang) as any;
 
   const page = Number(sp.page ?? 1);
 
@@ -94,12 +97,14 @@ export default async function CollectionPage({
         {/* Header */}
         <div>
           <h1 className="text-4xl font-bold text-parchemin font-playfair">
-            Pokédex Fossiles
+            {dict.collection?.title ?? "Encyclopédie des Faunes Fossiles"}
           </h1>
           <p className="text-parchemin/60 mt-2">
-            {enrichedFacets.length} espèce
-            {enrichedFacets.length !== 1 ? "s" : ""} cataloguées — marque celles
-            que tu possèdes ou souhaites
+            {enrichedFacets.length}{" "}
+            {enrichedFacets.length !== 1
+              ? (dict.collection?.speciesPlural ?? "espèces")
+              : (dict.collection?.species ?? "espèce")}{" "}
+            {dict.collection?.subtitle ?? "référencées dans nos gisements"}
           </p>
         </div>
 
@@ -122,20 +127,20 @@ export default async function CollectionPage({
               {stats && (stats.totalOwned > 0 || stats.totalWishlist > 0) && (
                 <div className="space-y-3">
                   <h2 className="text-parchemin font-semibold text-sm uppercase tracking-wider">
-                    Ma progression
+                    {dict.collection?.myProgress ?? "Ma progression"}
                   </h2>
                   <div className="flex gap-4 text-sm">
                     <div className="bg-green-900/20 border border-green-500/30 rounded-lg px-3 py-2 flex-1">
                       <p className="text-green-300 font-bold text-xl">
                         {stats.totalOwned}
                       </p>
-                      <p className="text-parchemin/50 text-xs">possédés</p>
+                      <p className="text-parchemin/50 text-xs">{dict.collection?.owned ?? "possédés"}</p>
                     </div>
                     <div className="bg-amber-900/20 border border-amber-500/30 rounded-lg px-3 py-2 flex-1">
                       <p className="text-amber-300 font-bold text-xl">
                         {stats.totalWishlist}
                       </p>
-                      <p className="text-parchemin/50 text-xs">wishlist</p>
+                      <p className="text-parchemin/50 text-xs">{dict.collection?.wishlist ?? "liste de souhaits"}</p>
                     </div>
                   </div>
 
@@ -144,7 +149,7 @@ export default async function CollectionPage({
                   ).length > 0 && (
                     <div className="space-y-2">
                       <p className="text-parchemin/50 text-xs uppercase tracking-wider">
-                        Par gisement
+                        {dict.collection?.byLocality ?? "Par gisement"}
                       </p>
                       {stats.byLocality
                         .filter((l) => l.ownedCount > 0 || l.wishlistCount > 0)
@@ -162,14 +167,14 @@ export default async function CollectionPage({
               {!clerkId && (
                 <div className="bg-terracotta/10 border border-terracotta/30 rounded-xl p-4 text-center space-y-2">
                   <p className="text-parchemin/70 text-sm">
-                    Connecte-toi pour suivre ta collection
+                    {dict.collection?.loginPrompt ?? "Connectez-vous pour suivre votre collection"}
                   </p>
                   <Button
                     asChild
                     size="sm"
                     className="bg-terracotta hover:bg-terracotta/90 text-primary-foreground"
                   >
-                    <Link href={`/${lang}/sign-in`}>Se connecter</Link>
+                    <Link href={`/${lang}/sign-in`}>{dict.collection?.login ?? "Se connecter"}</Link>
                   </Button>
                 </div>
               )}
@@ -180,12 +185,12 @@ export default async function CollectionPage({
               {items.length === 0 ? (
                 <div className="text-center py-20 text-parchemin/40">
                   <p className="text-5xl mb-4">🦴</p>
-                  <p>Aucune espèce ne correspond à tes filtres</p>
+                  <p>{dict.collection?.noResults ?? "Aucune espèce ne correspond à vos filtres"}</p>
                 </div>
               ) : (
                 <>
                   <p className="text-parchemin/50 text-sm">
-                    {total} résultat{total !== 1 ? "s" : ""}
+                    {total}{" "}{total !== 1 ? (dict.collection?.resultsPlural ?? "résultats") : (dict.collection?.results ?? "résultat")}
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
                     {items.map((s) => (
@@ -207,7 +212,7 @@ export default async function CollectionPage({
                           className="border-silex/30 text-parchemin/70 hover:text-parchemin"
                         >
                           <Link href={buildPageUrl(page - 1)}>
-                            <ChevronLeft className="w-4 h-4 mr-1" /> Précédent
+                            <ChevronLeft className="w-4 h-4 mr-1" /> {dict.collection?.previous ?? "Précédent"}
                           </Link>
                         </Button>
                       )}
@@ -222,7 +227,7 @@ export default async function CollectionPage({
                           className="border-silex/30 text-parchemin/70 hover:text-parchemin"
                         >
                           <Link href={buildPageUrl(page + 1)}>
-                            Suivant <ChevronRight className="w-4 h-4 ml-1" />
+                            {dict.collection?.next ?? "Suivant"} <ChevronRight className="w-4 h-4 ml-1" />
                           </Link>
                         </Button>
                       )}

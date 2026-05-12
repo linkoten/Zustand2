@@ -1,74 +1,58 @@
-import ProductMap from "@/components/product/productMap";
 import { getLocalitiesForMap } from "@/lib/actions/localityActions";
+import { getDictionary } from "@/app/[lang]/dictionaries";
+import RealMapClient from "@/components/product/realMapClient";
+import { MapPin, Layers } from "lucide-react";
 
-export default async function RealMapPage() {
-  const localities = await getLocalitiesForMap();
+export default async function RealMapPage({
+  params,
+}: {
+  params: Promise<{ lang: "en" | "fr" }>;
+}) {
+  const { lang } = await params;
+  const [localities, dict] = await Promise.all([
+    getLocalitiesForMap(),
+    getDictionary(lang),
+  ]);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Carte géologique des localités</h1>
-        <p className="text-gray-600">
-          Cette carte affiche les vraies localités de votre base de données avec
-          leurs périodes géologiques.
-        </p>
-      </div>
-
-      {localities.length > 0 ? (
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">
-            Toutes les localités ({localities.length} trouvées)
-          </h2>
-          <ProductMap localities={localities} />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-            {localities.map((locality) => (
-              <div
-                key={locality.id}
-                className="p-4 bg-white rounded-lg border shadow-sm"
-              >
-                <h3 className="font-semibold text-lg mb-2">{locality.name}</h3>
-                <div className="text-sm text-gray-600 space-y-1">
-                  <p>Latitude: {locality.latitude.toFixed(4)}°</p>
-                  <p>Longitude: {locality.longitude.toFixed(4)}°</p>
-                  {locality.geologicalPeriods.length > 0 && (
-                    <div className="mt-2">
-                      <p className="font-medium">Périodes:</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {locality.geologicalPeriods.map((period) => (
-                          <span
-                            key={period}
-                            className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800"
-                          >
-                            {period}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {locality.geologicalStages.length > 0 && (
-                    <div className="mt-2">
-                      <p className="font-medium">Étages:</p>
-                      <p className="text-xs text-gray-500">
-                        {locality.geologicalStages.join(", ")}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+    <div className="min-h-screen bg-gradient-to-br from-silex via-silex/95 to-silex/90">
+      <div className="container mx-auto px-4 py-12">
+        {/* Header */}
+        <div className="mb-10 text-center">
+          <div className="inline-flex items-center gap-3 bg-silex border border-parchemin/10 px-6 py-3 rounded-full shadow-xl mb-6">
+            <Layers className="w-5 h-5 text-terracotta" />
+            <span className="text-sm font-semibold text-parchemin">
+              {lang === "fr" ? "Carte géologique" : "Geological map"}
+            </span>
           </div>
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">
-            Aucune localité trouvée dans la base de données.
+          <h1 className="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-parchemin via-terracotta to-parchemin bg-clip-text text-transparent">
+            {lang === "fr"
+              ? "Carte des sites fossilifères"
+              : "Fossil site map"}
+          </h1>
+          <p className="text-parchemin/60 text-lg max-w-2xl mx-auto">
+            {lang === "fr"
+              ? "Explorez les localités de notre base de données, filtrez par période géologique et découvrez les fossiles disponibles."
+              : "Explore localities from our database, filter by geological period and discover available fossils."}
           </p>
-          <p className="text-sm text-gray-400 mt-2">
-            Vous pouvez créer des localités via le dashboard admin.
-          </p>
         </div>
-      )}
+
+        {localities.length === 0 ? (
+          <div className="text-center py-24">
+            <div className="w-24 h-24 bg-parchemin/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <MapPin className="h-12 w-12 text-parchemin/30" />
+            </div>
+            <p className="text-parchemin/50 text-lg">
+              {lang === "fr"
+                ? "Aucune localité dans la base de données."
+                : "No locality found in database."}
+            </p>
+          </div>
+        ) : (
+          <RealMapClient localities={localities} lang={lang} dict={dict} />
+        )}
+      </div>
     </div>
   );
 }
+

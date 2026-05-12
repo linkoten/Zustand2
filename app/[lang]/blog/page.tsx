@@ -1,4 +1,4 @@
-import { getBlogPosts, getBlogCategories } from "@/lib/actions/blogActions";
+import { getBlogPosts, getBlogCategories, getFeaturedArticle } from "@/lib/actions/blogActions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -58,15 +58,11 @@ export default async function BlogPage({
   const category = resolvedSearchParams.category;
   const tag = resolvedSearchParams.tag;
 
-  // Récupérer les données initiales du blog
-  const categories = await getBlogCategories();
-
-  // Récupérer les données initiales du blog
-  const initialBlogData = await getBlogPosts(page, {
-    search,
-    category,
-    tag,
-  });
+  const [categories, initialBlogData, featuredArticle] = await Promise.all([
+    getBlogCategories(),
+    getBlogPosts(page, { search, category, tag }),
+    getFeaturedArticle(),
+  ]);
 
   // Vérifier si l'utilisateur peut créer des articles
   const canCreatePost = user.role === "ADMIN";
@@ -169,6 +165,70 @@ export default async function BlogPage({
             </div>
           </div>
         </div>
+
+        {/* Article à la une */}
+        {featuredArticle && (
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+              <span className="text-sm font-bold uppercase tracking-widest text-amber-400">
+                Article à la une
+              </span>
+            </div>
+            <Link
+              href={`/${lang}/blog/${featuredArticle.slug}`}
+              className="group relative flex flex-col md:flex-row overflow-hidden rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+            >
+              {featuredArticle.featuredImage && (
+                <div className="relative w-full md:w-80 h-56 md:h-auto flex-shrink-0 overflow-hidden">
+                  <img
+                    src={featuredArticle.featuredImage}
+                    alt={featuredArticle.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                </div>
+              )}
+              <div className="flex flex-col justify-center p-6 md:p-8 gap-3">
+                <div className="flex flex-wrap gap-2">
+                  <Badge className="bg-terracotta/20 text-terracotta border-terracotta/30 text-xs">
+                    {featuredArticle.category}
+                  </Badge>
+                  {featuredArticle.tags.slice(0, 2).map((t) => (
+                    <Badge key={t.name} variant="outline" className="text-xs">
+                      {t.name}
+                    </Badge>
+                  ))}
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-parchemin group-hover:text-terracotta transition-colors duration-200 leading-tight">
+                  {featuredArticle.title}
+                </h2>
+                {featuredArticle.excerpt && (
+                  <p className="text-muted-foreground leading-relaxed line-clamp-3">
+                    {featuredArticle.excerpt}
+                  </p>
+                )}
+                <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                  {featuredArticle.author?.name && (
+                    <span>par {featuredArticle.author.name}</span>
+                  )}
+                  {featuredArticle.publishedAt && (
+                    <span>
+                      {new Date(featuredArticle.publishedAt).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-US", { year: "numeric", month: "long", day: "numeric" })}
+                    </span>
+                  )}
+                  {featuredArticle.readTime && (
+                    <span>{featuredArticle.readTime} min de lecture</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 mt-2 text-terracotta font-semibold text-sm group-hover:gap-3 transition-all duration-200">
+                  <span>Lire l&apos;article</span>
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </Link>
+          </div>
+        )}
 
         {/* Section dynamique avec filtres et articles */}
         <div className="mb-12">
