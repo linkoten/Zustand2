@@ -394,27 +394,27 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Styles pour le contenu des articles de blog - Version premium */
 .blog-content {
-  @apply text-slate-700 leading-relaxed;
+  @apply text-parchemin/80 leading-relaxed;
 }
 
 .blog-content h1 {
   @apply text-4xl font-black mt-8 mb-8 tracking-tight;
-  background: linear-gradient(135deg, #0f172a 0%, #475569 100%);
+  background: linear-gradient(135deg, oklch(0.92 0.03 80) 0%, oklch(0.60 0.15 45) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .blog-content h2 {
-  @apply text-3xl font-bold mt-12 mb-6 text-slate-800 tracking-tight;
+  @apply text-3xl font-bold mt-12 mb-6 text-parchemin tracking-tight;
 }
 
 .blog-content h3 {
-  @apply text-2xl font-semibold mt-8 mb-4 text-slate-700;
+  @apply text-2xl font-semibold mt-8 mb-4 text-parchemin/90;
 }
 
 .blog-content p {
-  @apply mb-6 text-lg leading-relaxed text-slate-700;
+  @apply mb-6 text-lg leading-relaxed text-parchemin/80;
 }
 
 .blog-content ul {
@@ -424,12 +424,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .blog-content ul li {
-  @apply text-slate-700 relative pl-8 mb-3;
+  @apply text-parchemin/80 relative pl-8 mb-3;
 }
 
 .blog-content ul li::before {
   content: "→";
-  @apply absolute left-0 text-amber-500 font-bold text-lg;
+  @apply absolute left-0 text-terracotta font-bold text-lg;
 }
 
 .blog-content ol {
@@ -437,24 +437,24 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .blog-content ol li {
-  @apply text-slate-700 pl-2 mb-3;
+  @apply text-parchemin/80 pl-2 mb-3;
 }
 
 .blog-content strong {
-  @apply font-bold text-slate-900;
+  @apply font-bold text-parchemin;
 }
 
 .blog-content em {
-  @apply italic text-slate-600;
+  @apply italic text-parchemin/70;
 }
 
 .blog-content blockquote {
-  @apply border-l-4 border-amber-500 bg-amber-50 rounded-r-xl p-6 my-8 text-amber-800 font-medium italic relative;
+  @apply border-l-4 border-terracotta bg-silex/60 rounded-r-xl p-6 my-8 text-parchemin/90 font-medium italic relative;
 }
 
 .blog-content blockquote::before {
   content: "";
-  @apply absolute left-4 top-2 text-6xl text-amber-500 leading-none;
+  @apply absolute left-4 top-2 text-6xl text-terracotta leading-none;
 }
 
 .blog-content blockquote p {
@@ -462,15 +462,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .blog-content code {
-  @apply bg-slate-100 text-slate-800 px-2 py-1 rounded-lg text-sm font-mono;
+  @apply bg-silex/80 text-parchemin px-2 py-1 rounded-lg text-sm font-mono border border-parchemin/10;
 }
 
 .blog-content pre {
-  @apply bg-slate-900 text-slate-100 rounded-2xl p-6 my-8 overflow-x-auto;
+  @apply bg-silex text-parchemin rounded-2xl p-6 my-8 overflow-x-auto border border-parchemin/10;
 }
 
 .blog-content pre code {
-  @apply bg-transparent text-slate-100 p-0;
+  @apply bg-transparent text-parchemin p-0 border-0;
 }
 
 .blog-content img {
@@ -478,7 +478,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .blog-content a {
-  @apply text-blue-600 font-semibold no-underline hover:text-blue-700 hover:underline transition-all duration-300;
+  @apply text-terracotta font-semibold no-underline hover:text-terracotta/80 hover:underline transition-all duration-300;
 }
 
 .blog-content a[href^="http"]::after {
@@ -521,7 +521,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .blog-content figcaption {
-  @apply mt-4 text-sm text-slate-500 italic bg-slate-50 px-6 py-3 rounded-xl inline-block;
+  @apply mt-4 text-sm text-parchemin/60 italic bg-silex/50 px-6 py-3 rounded-xl inline-block border border-parchemin/10;
 }
 
 /* Styles pour l'éditeur TipTap */
@@ -554,19 +554,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .ProseMirror blockquote {
-  @apply border-l-4 border-gray-300 pl-4 italic text-gray-700 my-4;
+  @apply border-l-4 border-terracotta pl-4 italic text-parchemin/80 my-4;
 }
 
 .ProseMirror code {
-  @apply bg-gray-100 px-2 py-1 rounded text-sm font-mono;
+  @apply bg-silex/80 text-parchemin px-2 py-1 rounded text-sm font-mono border border-parchemin/10;
 }
 
 .ProseMirror pre {
-  @apply bg-gray-900 text-white p-4 rounded-lg overflow-x-auto my-4;
+  @apply bg-silex text-parchemin p-4 rounded-lg overflow-x-auto my-4 border border-parchemin/10;
 }
 
 .ProseMirror pre code {
-  @apply bg-transparent text-white;
+  @apply bg-transparent text-parchemin border-0;
 }
 
 .ProseMirror img {
@@ -574,7 +574,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .ProseMirror a {
-  @apply text-blue-600 hover:text-blue-800 underline;
+  @apply text-terracotta hover:text-terracotta/80 underline;
 }
 
 /* ✅ Styles pour les listes de tâches */

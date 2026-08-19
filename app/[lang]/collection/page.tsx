@@ -15,6 +15,8 @@ import CollectionTabs from "@/components/collection/collectionTabs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { notFound } from "next/navigation";
+import { FEATURES } from "@/lib/config/features";
 
 interface PageProps {
   params: Promise<{ lang: "fr" | "en" }>;
@@ -37,6 +39,10 @@ export default async function CollectionPage({
   params,
   searchParams,
 }: PageProps) {
+  if (!FEATURES.collection) {
+    notFound();
+  }
+
   const { lang } = await params;
   const sp = await searchParams;
   const { userId: clerkId } = await auth();

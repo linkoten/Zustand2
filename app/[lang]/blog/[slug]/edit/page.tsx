@@ -15,12 +15,17 @@ import EditGisementsForm from "@/components/blog/editGisementsForm";
 import EditActivitesForm from "@/components/blog/editActivitesForm";
 import { getBlogPost } from "@/lib/actions/blogActions";
 import { BlogCategory, UserRole } from "@/lib/generated/prisma";
+import { FEATURES } from "@/lib/config/features";
 
 interface EditBlogPageProps {
   params: Promise<{ slug: string; lang: "en" | "fr" }>;
 }
 
 export default async function EditBlogPage({ params }: EditBlogPageProps) {
+  if (!FEATURES.blog) {
+    notFound();
+  }
+
   const { slug, lang } = await params;
 
   const user = await requireAdmin();

@@ -249,10 +249,6 @@ export async function getUserOrders(clerkId: string) {
 export async function getUserFavorites(
   clerkId: string,
 ): Promise<SerializedProduct[]> {
-  // 🔍 Debug
-  console.log("🔍 Debug getUserFavorites:");
-  console.log("- clerkId:", clerkId);
-
   try {
     const favorites = await prisma.userFavorite.findMany({
       where: { userId: clerkId }, // ✅ Utiliser directement le clerkId
@@ -266,18 +262,6 @@ export async function getUserFavorites(
       },
       orderBy: { createdAt: "desc" },
     });
-
-    // 🔍 Debug supplémentaire
-    console.log("- favorites found:", favorites.length);
-    console.log(
-      "- favorites data:",
-      favorites.map((f) => ({
-        id: f.id,
-        userId: f.userId,
-        productId: f.productId,
-        productTitle: f.product?.title,
-      })),
-    );
 
     // Pour chaque favori, on complète tous les champs requis
     const serializedFavorites: SerializedProduct[] = await Promise.all(
@@ -337,7 +321,6 @@ export async function getUserFavorites(
         }),
     );
 
-    console.log("- final serialized favorites:", serializedFavorites.length);
     return serializedFavorites;
   } catch (error) {
     console.error(

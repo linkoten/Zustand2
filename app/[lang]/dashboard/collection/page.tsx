@@ -6,6 +6,7 @@ import {
   getFossilSpecies,
 } from "@/lib/actions/collectionActions";
 import AdminSpeciesManager from "@/components/collection/adminSpeciesManager";
+import { FEATURES } from "@/lib/config/features";
 
 export default async function AdminCollectionPage({
   params,
@@ -13,6 +14,10 @@ export default async function AdminCollectionPage({
   params: Promise<{ lang: "fr" | "en" }>;
 }) {
   const { lang } = await params;
+
+  if (!FEATURES.collection) {
+    redirect(`/${lang}/dashboard`);
+  }
 
   try {
     await requireAdmin();

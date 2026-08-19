@@ -102,8 +102,6 @@ export default function CreateProductForm({
     try {
       setIsLoading(true);
 
-      console.log("📝 Données du formulaire:", data);
-
       // ✅ Nettoyer les données avant envoi
       const selectedLocality =
         localities.find((loc) => loc.id.toString() === data.locality) || null;
@@ -133,12 +131,9 @@ export default function CreateProductForm({
         locality: selectedLocality,
       };
 
-      console.log("📝 Données nettoyées:", cleanData);
-
       const result = await createProductAction(cleanData);
 
       if (result.success) {
-        console.log("✅ Résultat:", result.data);
         toast.success("Produit créé avec succès !");
         router.push("/fossiles");
       } else {

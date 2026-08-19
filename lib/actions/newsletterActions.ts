@@ -142,7 +142,6 @@ export async function sendNewsletterToAll(subject: string, content: string) {
     const sent = results.filter((r) => r.status === "fulfilled").length;
     const failed = results.filter((r) => r.status === "rejected").length;
 
-    console.log(`✅ Newsletter envoyée: ${sent} succès, ${failed} échecs`);
     return {
       success: true,
       message: `Newsletter envoyée à ${sent} abonnés.${failed > 0 ? ` (${failed} échecs)` : ""}`,

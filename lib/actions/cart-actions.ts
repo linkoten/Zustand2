@@ -33,8 +33,6 @@ export async function addToCartAction(
       return { success: false, error: "Vous devez être connecté" };
     }
 
-    console.log("le userId qu'on reçoit", user.id);
-
     // Vérifier que le produit existe et est disponible
     const product = await prisma.product.findUnique({
       where: { id: productId },
@@ -57,7 +55,6 @@ export async function addToCartAction(
       cart = await prisma.cart.create({
         data: { userId: user.id }, // ✅ Corriger cette ligne
       });
-      console.log(`✅ Nouveau panier créé pour: ${user.id}`); // ✅ Corriger cette ligne
     }
 
     // Vérifier si le produit est déjà dans le panier
@@ -76,7 +73,6 @@ export async function addToCartAction(
         where: { id: existingCartItem.id },
         data: { quantity: existingCartItem.quantity + 1 },
       });
-      console.log(`✅ Quantité mise à jour: ${product.title}`);
     } else {
       // Ajouter nouveau produit
       await prisma.cartItem.create({
@@ -86,7 +82,6 @@ export async function addToCartAction(
           quantity: 1,
         },
       });
-      console.log(`✅ Produit ajouté: ${product.title}`);
     }
 
     // Revalider les pages qui affichent le panier
@@ -169,8 +164,6 @@ export async function removeCartItemAction(
     if (!cartItem) {
       return { success: false, error: "Article non trouvé" };
     }
-
-    console.log("Suppression cartItemId:", cartItemId, "pour user:", user.id);
 
     // Supprimer l'article
     await prisma.cartItem.delete({

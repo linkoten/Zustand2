@@ -2,11 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { BlogCategory, BlogStatus, UserRole } from "@/lib/generated/prisma";
+import { FEATURES } from "@/lib/config/features";
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!FEATURES.blog) {
+    return NextResponse.json({ error: "Fonctionnalité désactivée" }, { status: 404 });
+  }
+
   try {
     // ✅ requireAdmin() retourne l'utilisateur de la DB et vérifie déjà qu'il est admin
     const user = await requireAdmin();
@@ -143,6 +148,10 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!FEATURES.blog) {
+    return NextResponse.json({ error: "Fonctionnalité désactivée" }, { status: 404 });
+  }
+
   try {
     // ✅ requireAdmin() fait déjà la vérification du rôle admin
     const user = await requireAdmin();

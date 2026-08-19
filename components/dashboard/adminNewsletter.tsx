@@ -105,9 +105,9 @@ export default function AdminNewsletter({
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <Card className="bg-card/50 border-border/40">
           <CardContent className="p-4 flex items-center gap-3">
-            <Users className="w-8 h-8 text-[var(--terracotta)] flex-shrink-0" />
+            <Users className="w-8 h-8 text-terracotta flex-shrink-0" />
             <div>
-              <p className="text-2xl font-bold text-[var(--parchemin)]">{total}</p>
+              <p className="text-2xl font-bold text-parchemin">{total}</p>
               <p className="text-xs text-muted-foreground">Total abonnés</p>
             </div>
           </CardContent>
@@ -116,7 +116,7 @@ export default function AdminNewsletter({
           <CardContent className="p-4 flex items-center gap-3">
             <CheckCircle className="w-8 h-8 text-emerald-500 flex-shrink-0" />
             <div>
-              <p className="text-2xl font-bold text-[var(--parchemin)]">{active}</p>
+              <p className="text-2xl font-bold text-parchemin">{active}</p>
               <p className="text-xs text-muted-foreground">Actifs</p>
             </div>
           </CardContent>
@@ -125,7 +125,7 @@ export default function AdminNewsletter({
           <CardContent className="p-4 flex items-center gap-3">
             <XCircle className="w-8 h-8 text-red-400 flex-shrink-0" />
             <div>
-              <p className="text-2xl font-bold text-[var(--parchemin)]">{total - active}</p>
+              <p className="text-2xl font-bold text-parchemin">{total - active}</p>
               <p className="text-xs text-muted-foreground">Désabonnés</p>
             </div>
           </CardContent>
@@ -135,8 +135,8 @@ export default function AdminNewsletter({
       {/* Compose */}
       <Card className="border-border/40">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-[var(--parchemin)]">
-            <Mail className="w-5 h-5 text-[var(--terracotta)]" />
+          <CardTitle className="flex items-center gap-2 text-parchemin">
+            <Mail className="w-5 h-5 text-terracotta" />
             Envoyer une newsletter
           </CardTitle>
         </CardHeader>
@@ -196,9 +196,9 @@ export default function AdminNewsletter({
       {/* Subscriber list */}
       <Card className="border-border/40">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between text-[var(--parchemin)]">
+          <CardTitle className="flex items-center justify-between text-parchemin">
             <span className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-[var(--terracotta)]" />
+              <Users className="w-5 h-5 text-terracotta" />
               Liste des abonnés
             </span>
             <div className="flex items-center gap-2">
@@ -236,7 +236,7 @@ export default function AdminNewsletter({
                   className="flex items-center justify-between gap-3 p-3 rounded-lg bg-white/3 border border-border/20 hover:bg-white/5 transition-colors"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-[var(--parchemin)] truncate">
+                    <p className="text-sm font-medium text-parchemin truncate">
                       {sub.email}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">

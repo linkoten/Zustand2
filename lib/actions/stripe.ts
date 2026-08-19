@@ -71,15 +71,10 @@ export async function fetchClientSecret(
       if (product) {
         // ✅ Utiliser le poids réel stocké en base de données
         const itemWeight = product.weight; // Le poids est déjà en grammes
-        console.log(
-          `📏 Poids réel utilisé pour ${product.title}: ${itemWeight}g`
-        );
         return weight + itemWeight * item.quantity;
       }
       return weight;
     }, 0);
-
-    console.log(`📦 Poids total du panier: ${totalWeight}g`);
 
     // ✅ Logique conditionnelle selon si un pays est sélectionné
     let shippingOptions: Stripe.Checkout.SessionCreateParams.ShippingOption[];
@@ -117,12 +112,6 @@ export async function fetchClientSecret(
       allowedCountries = [
         selectedCountry as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry,
       ];
-
-      console.log("✅ Pays sélectionné:", {
-        country: selectedCountry,
-        shippingCost: shipping.cost,
-        service: shipping.service,
-      });
     } else {
       // ✅ Pas de pays sélectionné : utiliser toutes les options existantes
       const shippingFrance = calculateShippingByWeight(
@@ -218,8 +207,6 @@ export async function fetchClientSecret(
       // ✅ Utiliser tous les pays supportés - TYPAGE CORRECT
       allowedCountries =
         ALL_SHIPPING_COUNTRIES as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[];
-
-      console.log("✅ Mode multi-pays activé avec 4 options de livraison");
     }
 
     // Créer la session Stripe Checkout Embedded
@@ -257,17 +244,6 @@ export async function fetchClientSecret(
     if (!session.client_secret) {
       throw new Error("Impossible de créer la session de paiement");
     }
-
-    console.log("✅ Session créée avec succès:", {
-      sessionId: session.id,
-      mode: selectedCountry
-        ? `Pays sélectionné: ${selectedCountry}`
-        : "Multi-pays",
-      subtotal: subtotal,
-      totalWeight: `${totalWeight}g`,
-      shippingOptionsCount: shippingOptions.length,
-      allowedCountriesCount: allowedCountries.length,
-    });
 
     return session.client_secret;
   } catch (error) {

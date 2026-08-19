@@ -31,6 +31,7 @@ import { getBlogArticleBySlug } from "@/lib/actions/blogActions";
 import { getDictionary } from "../../dictionaries";
 import ViewTracker from "@/components/blog/viewTracker";
 import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/lib/jsonld";
+import { FEATURES } from "@/lib/config/features";
 
 export const dynamic = "force-dynamic";
 
@@ -84,6 +85,10 @@ export async function generateMetadata({
 }
 
 export default async function BlogArticlePage(props: BlogArticlePageProps) {
+  if (!FEATURES.blog) {
+    notFound();
+  }
+
   const resolvedParams = await props.params;
   const { lang, slug } = resolvedParams;
   const dict = await getDictionary(lang);

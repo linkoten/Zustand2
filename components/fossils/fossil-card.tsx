@@ -102,7 +102,7 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
     return null;
   };
 
-  const { handleAddToCart, isAdding } = useHandleAddToCart();
+  const { handleAddToCart, isAdding } = useHandleAddToCart(lang);
 
   const handleDelete = async (productId: number) => {
     if (!isAdmin) return;

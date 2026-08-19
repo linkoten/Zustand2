@@ -68,24 +68,24 @@ export function CollectionShareWidget({
   }
 
   return (
-    <Card className="border-0 bg-gradient-to-br from-amber-50 to-orange-50 shadow-xl hover:shadow-2xl transition-all duration-500">
-      <CardHeader className="border-b border-amber-100 bg-gradient-to-r from-amber-50 to-orange-50">
+    <Card className="border border-parchemin/10 bg-silex/80 shadow-xl hover:shadow-2xl transition-all duration-500">
+      <CardHeader className="border-b border-parchemin/10 bg-silex">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl shadow-lg">
-              <Share2 className="h-5 w-5 text-white" />
+            <div className="p-2 bg-terracotta/20 rounded-xl shadow-lg border border-terracotta/30">
+              <Share2 className="h-5 w-5 text-terracotta" />
             </div>
             <span className="text-xl font-bold text-parchemin">
               {dict?.dashboard?.shareCollection || "Partagez votre collection"}
             </span>
           </CardTitle>
           {token ? (
-            <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
+            <Badge className="bg-emerald-900/40 text-emerald-300 border-emerald-700/30">
               <Globe className="w-3 h-3 mr-1" />
               {dict?.dashboard?.sharingActive || "Partage actif"}
             </Badge>
           ) : (
-            <Badge className="bg-zinc-100 text-zinc-500 border-zinc-200">
+            <Badge className="bg-zinc-800 text-zinc-300 border-zinc-700">
               <EyeOff className="w-3 h-3 mr-1" />
               {dict?.dashboard?.sharingInactive || "Privé"}
             </Badge>
@@ -101,7 +101,7 @@ export function CollectionShareWidget({
 
         {/* Lien actif */}
         {shareUrl && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-white border border-amber-200">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-silex/60 border border-parchemin/20">
             <Heart className="w-4 h-4 text-terracotta shrink-0" />
             <p className="text-xs text-parchemin/60 truncate flex-1 font-mono">
               {shareUrl}
@@ -110,25 +110,25 @@ export function CollectionShareWidget({
               <Button
                 size="icon"
                 variant="ghost"
-                className="h-7 w-7 hover:bg-amber-100"
+                className="h-7 w-7 text-parchemin/70 hover:text-parchemin hover:bg-terracotta/10"
                 onClick={handleCopy}
                 title={dict?.dashboard?.copyShareLink || "Copier"}
               >
                 {copied ? (
                   <Check className="w-3.5 h-3.5 text-emerald-500" />
                 ) : (
-                  <LinkIcon className="w-3.5 h-3.5 text-parchemin/60" />
+                  <LinkIcon className="w-3.5 h-3.5" />
                 )}
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
-                className="h-7 w-7 hover:bg-amber-100"
+                className="h-7 w-7 text-parchemin/70 hover:text-parchemin hover:bg-terracotta/10"
                 asChild
                 title={dict?.dashboard?.viewPublicCollection || "Voir"}
               >
                 <Link href={`/${lang}/collection/shared/${token}`} target="_blank">
-                  <ExternalLink className="w-3.5 h-3.5 text-parchemin/60" />
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
               </Button>
             </div>
@@ -151,7 +151,7 @@ export function CollectionShareWidget({
               <Button
                 onClick={handleCopy}
                 variant="outline"
-                className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                className="border-parchemin/30 text-parchemin hover:border-terracotta hover:bg-terracotta/10"
               >
                 {copied ? (
                   <>
@@ -169,7 +169,7 @@ export function CollectionShareWidget({
                 onClick={handleRevoke}
                 disabled={loading}
                 variant="outline"
-                className="border-red-200 text-red-600 hover:bg-red-50"
+                className="border-red-700/40 text-red-300 hover:bg-red-900/30"
               >
                 <X className="w-4 h-4 mr-2" />
                 {dict?.dashboard?.disableSharing || "Désactiver"}

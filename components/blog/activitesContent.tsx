@@ -41,15 +41,15 @@ const CATEGORY_LABELS: Record<string, string> = {
   AUTRES: "Autres",
 };
 const CATEGORY_COLORS: Record<string, string> = {
-  TRILOBITE: "bg-orange-500/20 text-orange-300 border-orange-500/30",
-  AMMONITE: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-  DENT: "bg-red-500/20 text-red-300 border-red-500/30",
-  ECHINODERME: "bg-green-500/20 text-green-300 border-green-500/30",
-  POISSON: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
-  VERTEBRE: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  GASTEROPODE: "bg-pink-500/20 text-pink-300 border-pink-500/30",
-  AUTRE_ARTHROPODE: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
-  AUTRES: "bg-zinc-500/20 text-zinc-300 border-zinc-500/30",
+  TRILOBITE: "bg-terracotta/20 text-terracotta border-terracotta/30",
+  AMMONITE: "bg-terracotta/15 text-terracotta border-terracotta/25",
+  DENT: "bg-red-900/30 text-red-300 border-red-700/30",
+  ECHINODERME: "bg-emerald-900/30 text-emerald-300 border-emerald-700/30",
+  POISSON: "bg-sky-900/30 text-sky-300 border-sky-700/30",
+  VERTEBRE: "bg-zinc-800 text-parchemin/80 border-parchemin/20",
+  GASTEROPODE: "bg-terracotta/10 text-parchemin border-terracotta/20",
+  AUTRE_ARTHROPODE: "bg-terracotta/20 text-terracotta border-terracotta/30",
+  AUTRES: "bg-silex/60 text-parchemin/70 border-parchemin/20",
 };
 
 // ─── Planning status helpers ─────────────────────────────────────────────────
@@ -61,17 +61,17 @@ const PLANNING_STATUS_CONFIG: Record<
   PLANNED: {
     label: "Planifié",
     icon: Circle,
-    className: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+    className: "bg-terracotta/20 text-terracotta border-terracotta/30",
   },
   IN_PROGRESS: {
     label: "En cours",
     icon: Clock,
-    className: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+    className: "bg-parchemin/10 text-parchemin border-parchemin/30",
   },
   DONE: {
     label: "Publié",
     icon: CheckCircle2,
-    className: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+    className: "bg-terracotta/10 text-terracotta border-terracotta/20",
   },
 };
 
@@ -152,9 +152,9 @@ function SalonView({ data, lang }: { data: SalonData; lang: string }) {
   return (
     <div className="space-y-8">
       {/* Event banner */}
-      <div className="rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-600/10 border border-amber-500/20 p-6">
+      <div className="rounded-2xl bg-gradient-to-br from-terracotta/15 to-silex/40 border border-terracotta/20 p-6">
         <div className="flex flex-wrap items-start gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-terracotta to-terracotta/80 flex items-center justify-center shadow-lg shrink-0">
             <Store className="w-7 h-7 text-white" />
           </div>
           <div className="flex-1 min-w-0">
@@ -171,11 +171,11 @@ function SalonView({ data, lang }: { data: SalonData; lang: string }) {
 
         <div className="mt-5 flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2 text-parchemin/80">
-            <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
+            <MapPin className="w-4 h-4 text-terracotta shrink-0" />
             <span>{data.location}</span>
           </div>
           <div className="flex items-center gap-2 text-parchemin/80">
-            <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
+            <Calendar className="w-4 h-4 text-terracotta shrink-0" />
             <span>
               {formatDate(data.dateStart, lang)}
               {data.dateEnd && data.dateEnd !== data.dateStart && (
@@ -185,7 +185,7 @@ function SalonView({ data, lang }: { data: SalonData; lang: string }) {
           </div>
           {data.boothInfo && (
             <div className="flex items-center gap-2 text-parchemin/80">
-              <span className="text-amber-400">📍</span>
+              <span className="text-terracotta">📍</span>
               <span>{data.boothInfo}</span>
             </div>
           )}
@@ -196,7 +196,7 @@ function SalonView({ data, lang }: { data: SalonData; lang: string }) {
       {data.fossils.length > 0 && (
         <div>
           <h3 className="text-lg font-bold text-parchemin mb-4 flex items-center gap-2">
-            <span className="w-1 h-6 bg-amber-500 rounded-full" />
+            <span className="w-1 h-6 bg-terracotta rounded-full" />
             Fossiles présentés ({data.fossils.length})
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -216,9 +216,9 @@ function FouilleView({ data, lang }: { data: FouilleData; lang: string }) {
   return (
     <div className="space-y-8">
       {/* Expedition header */}
-      <div className="rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-600/10 border border-emerald-500/20 p-6">
+      <div className="rounded-2xl bg-gradient-to-br from-terracotta/15 to-silex/40 border border-terracotta/20 p-6">
         <div className="flex items-start gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-terracotta to-terracotta/80 flex items-center justify-center shadow-lg shrink-0">
             <Pickaxe className="w-7 h-7 text-white" />
           </div>
           <div>
@@ -232,13 +232,13 @@ function FouilleView({ data, lang }: { data: FouilleData; lang: string }) {
             </h3>
             <div className="flex flex-wrap gap-4 mt-3 text-sm text-parchemin/70">
               <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-emerald-400" />
+                <Calendar className="w-4 h-4 text-terracotta" />
                 {formatDate(data.dateStart, lang)}
                 {data.dateEnd && <> — {formatDate(data.dateEnd, lang)}</>}
               </div>
               {data.team.length > 0 && (
                 <div className="flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-emerald-400" />
+                  <Users className="w-4 h-4 text-terracotta" />
                   {data.team.length} participant
                   {data.team.length > 1 ? "s" : ""}
                 </div>
@@ -252,7 +252,7 @@ function FouilleView({ data, lang }: { data: FouilleData; lang: string }) {
       {data.summary && (
         <div>
           <h3 className="text-lg font-bold text-parchemin mb-3 flex items-center gap-2">
-            <span className="w-1 h-6 bg-emerald-500 rounded-full" />
+            <span className="w-1 h-6 bg-terracotta rounded-full" />
             Compte rendu
           </h3>
           <p className="text-parchemin/80 leading-relaxed bg-parchemin/5 rounded-xl p-5">
@@ -272,7 +272,7 @@ function FouilleView({ data, lang }: { data: FouilleData; lang: string }) {
             {data.team.map((member, i) => (
               <Badge
                 key={i}
-                className="bg-emerald-500/10 text-emerald-300 border-emerald-500/20 px-4 py-1.5 text-sm"
+                className="bg-terracotta/10 text-terracotta border-terracotta/20 px-4 py-1.5 text-sm"
               >
                 {member}
               </Badge>
@@ -285,7 +285,7 @@ function FouilleView({ data, lang }: { data: FouilleData; lang: string }) {
       {data.findings.length > 0 && (
         <div>
           <h3 className="text-lg font-bold text-parchemin mb-3 flex items-center gap-2">
-            <span className="w-1 h-6 bg-emerald-500 rounded-full" />
+            <span className="w-1 h-6 bg-terracotta rounded-full" />
             Découvertes
           </h3>
           <ul className="space-y-2">
@@ -294,7 +294,7 @@ function FouilleView({ data, lang }: { data: FouilleData; lang: string }) {
                 key={i}
                 className="flex items-start gap-3 text-parchemin/80 bg-parchemin/5 rounded-lg px-4 py-2.5 text-sm"
               >
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-terracotta mt-0.5 shrink-0" />
                 {f}
               </li>
             ))}
@@ -311,9 +311,9 @@ function ArrivageView({ data, lang }: { data: ArrivageData; lang: string }) {
   return (
     <div className="space-y-8">
       {/* Header banner */}
-      <div className="rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-600/10 border border-blue-500/20 p-6">
+      <div className="rounded-2xl bg-gradient-to-br from-terracotta/15 to-silex/40 border border-terracotta/20 p-6">
         <div className="flex items-start gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-terracotta to-terracotta/80 flex items-center justify-center shadow-lg shrink-0">
             <Package className="w-7 h-7 text-white" />
           </div>
           <div>
@@ -322,16 +322,16 @@ function ArrivageView({ data, lang }: { data: ArrivageData; lang: string }) {
             </h3>
             <div className="flex flex-wrap gap-4 mt-2 text-sm text-parchemin/70">
               <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-blue-400" />
+                <Calendar className="w-4 h-4 text-terracotta" />
                 {formatDate(data.arrivedAt, lang)}
               </div>
               {data.origin && (
                 <div className="flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-blue-400" />
+                  <MapPin className="w-4 h-4 text-terracotta" />
                   {data.origin}
                 </div>
               )}
-              <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+              <Badge className="bg-terracotta/20 text-terracotta border-terracotta/30">
                 {data.fossils.length} pièce{data.fossils.length > 1 ? "s" : ""}
               </Badge>
             </div>
@@ -343,7 +343,7 @@ function ArrivageView({ data, lang }: { data: ArrivageData; lang: string }) {
       {data.fossils.length > 0 && (
         <div>
           <h3 className="text-lg font-bold text-parchemin mb-4 flex items-center gap-2">
-            <span className="w-1 h-6 bg-blue-500 rounded-full" />
+            <span className="w-1 h-6 bg-terracotta rounded-full" />
             Disponibles en boutique
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -369,8 +369,8 @@ function PlanningView({ data }: { data: PlanningData }) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-br from-purple-500/10 to-violet-600/10 border border-purple-500/20 p-6 flex items-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-lg shrink-0">
+      <div className="rounded-2xl bg-gradient-to-br from-terracotta/15 to-silex/40 border border-terracotta/20 p-6 flex items-center gap-4">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-terracotta to-terracotta/80 flex items-center justify-center shadow-lg shrink-0">
           <ListTodo className="w-7 h-7 text-white" />
         </div>
         <div>

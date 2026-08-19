@@ -88,7 +88,7 @@ function CountTooltip({ active, payload, label }: any) {
     return (
       <div className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm shadow-xl">
         <p className="text-slate-300 mb-1">{label}</p>
-        <p className="text-blue-400 font-bold">
+        <p className="text-terracotta font-bold">
           {payload[0].value} commande{payload[0].value > 1 ? "s" : ""}
         </p>
       </div>
@@ -163,9 +163,9 @@ export default function AdminStats({
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20">
+        <Card className="bg-gradient-to-br from-terracotta/10 to-terracotta/5 border-terracotta/20">
           <CardContent className="p-4 flex items-center gap-3">
-            <ShoppingCart className="w-8 h-8 text-blue-400 flex-shrink-0" />
+            <ShoppingCart className="w-8 h-8 text-terracotta flex-shrink-0" />
             <div>
               <p className="text-xl font-bold text-parchemin">{totalOrders}</p>
               <p className="text-xs text-muted-foreground">Commandes (12 mois)</p>
@@ -214,7 +214,7 @@ export default function AdminStats({
       <Card className="border-border/40">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-parchemin text-base">
-            <ShoppingCart className="w-4 h-4 text-blue-400" />
+            <ShoppingCart className="w-4 h-4 text-terracotta" />
             Commandes par mois (6 derniers mois)
           </CardTitle>
         </CardHeader>

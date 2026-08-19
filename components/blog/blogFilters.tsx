@@ -65,12 +65,9 @@ export default function BlogFilters({ lang, dict }: BlogFiltersProps) {
       }
     });
 
-    console.log("🔄 Nouveaux filtres appliqués:", newParams);
-
     const newUrl = params.toString()
       ? `/${lang}/blog?${params.toString()}`
       : `/${lang}/blog`;
-    console.log("🔗 URL générée:", newUrl);
 
     window.history.pushState(null, "", newUrl);
     _updateZustandFilters({ ...newParams, page: 1 });
@@ -84,7 +81,6 @@ export default function BlogFilters({ lang, dict }: BlogFiltersProps) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("🔍 Recherche:", searchTerm);
     updateFilters({ search: searchTerm || null });
   };
 
@@ -168,7 +164,6 @@ export default function BlogFilters({ lang, dict }: BlogFiltersProps) {
                 <Select
                   value={currentCategory || undefined}
                   onValueChange={(value) => {
-                    console.log("📂 Catégorie sélectionnée:", value);
                     updateFilters({ category: value === "all" ? null : value });
                   }}
                 >

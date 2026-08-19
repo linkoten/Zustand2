@@ -11,6 +11,7 @@ import {
 } from "@/lib/actions/dashboardActions";
 import { getNewsletterSubscribers } from "@/lib/actions/newsletterActions";
 import { getDictionary } from "../dictionaries";
+import { FEATURES } from "@/lib/config/features";
 
 export default async function DashboardPage({
   params,
@@ -37,7 +38,9 @@ export default async function DashboardPage({
     const [adminData, adminStats, newsletterData] = await Promise.all([
       getAdminDashboardData(),
       getAdminStats(),
-      getNewsletterSubscribers(),
+      FEATURES.newsletterAdmin
+        ? getNewsletterSubscribers()
+        : Promise.resolve({ subscribers: [], total: 0, active: 0, totalPages: 0 }),
     ]);
     return (
       <div className="min-h-screen bg-silex relative overflow-hidden">

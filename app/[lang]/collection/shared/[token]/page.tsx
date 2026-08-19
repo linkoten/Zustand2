@@ -7,12 +7,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Package, Heart, ArrowLeft } from "lucide-react";
+import { FEATURES } from "@/lib/config/features";
 
 export default async function PublicCollectionPage({
   params,
 }: {
   params: Promise<{ lang: "en" | "fr"; token: string }>;
 }) {
+  if (!FEATURES.collectionShare) {
+    notFound();
+  }
+
   const { lang, token } = await params;
   const dict = await getDictionary(lang);
 

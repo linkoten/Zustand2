@@ -7,7 +7,6 @@ import { getFilterOptions, getFossils, getFossilCatalogIndex } from "@/lib/actio
 import { SearchParams } from "@/types/productType";
 import { getUserData, getOrSyncUser } from "@/lib/actions/dashboardActions";
 import UserProvider from "@/components/provider/userProvider";
-import { redirect } from "next/navigation";
 import { getDictionary } from "../dictionaries";
 
 export default async function FossilesPage({
@@ -22,15 +21,9 @@ export default async function FossilesPage({
 
   const dict = await getDictionary(lang);
 
-  // ✅ Récupérer userId AVANT l'appel à getFossils
+  // ✅ Utilisateur optionnel : la navigation/découverte des fossiles ne nécessite pas de connexion
   const { userId } = await auth();
-  if (!userId) {
-    redirect(`/${lang}/sign-in`);
-  }
-  const user = await getOrSyncUser(userId!);
-  if (!user) {
-    redirect(`/${lang}/sign-in`);
-  }
+  const user = userId ? await getOrSyncUser(userId) : null;
 
   // ✅ Passer userId à getFossils pour inclure les infos favoris (cursor-based, page 1 initiale)
   const [fossilsData, filterOptionsRaw, catalogData] = await Promise.all([

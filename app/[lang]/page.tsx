@@ -20,6 +20,7 @@ import {
   Users,
 } from "lucide-react";
 import { getDictionary } from "./dictionaries";
+import { FEATURES } from "@/lib/config/features";
 
 export default async function Home({
   params,
@@ -78,20 +79,22 @@ export default async function Home({
                   <ArrowRight className="w-6 h-6" />
                 </Link>
               </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-2 border-foreground/30 hover:border-foreground hover:bg-foreground/10 text-foreground px-10 py-6 text-xl font-bold tracking-wide transition-all duration-300 rounded-xl shadow-lg backdrop-blur-sm"
-              >
-                <Link
-                  href={`/${lang}/blog`}
-                  className="flex items-center gap-3"
+              {FEATURES.blog && (
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="border-2 border-foreground/30 hover:border-foreground hover:bg-foreground/10 text-foreground px-10 py-6 text-xl font-bold tracking-wide transition-all duration-300 rounded-xl shadow-lg backdrop-blur-sm"
                 >
-                  <BookOpen className="w-6 h-6" />
-                  {dict.home.exploreBlog}
-                </Link>
-              </Button>
+                  <Link
+                    href={`/${lang}/blog`}
+                    className="flex items-center gap-3"
+                  >
+                    <BookOpen className="w-6 h-6" />
+                    {dict.home.exploreBlog}
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -109,7 +112,9 @@ export default async function Home({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div
+            className={`grid grid-cols-1 ${FEATURES.blog ? "md:grid-cols-2" : "max-w-xl mx-auto"} gap-8 mb-16`}
+          >
             {/* Boutique Card - Enhanced */}
             <Card className="-card">
               <CardHeader className="text-center pb-6 relative">
@@ -154,47 +159,49 @@ export default async function Home({
             </Card>
 
             {/* Blog Card - Enhanced */}
-            <Card className="-card">
-              <CardHeader className="text-center pb-6 relative">
-                <div className="absolute inset-0 bg-gradient-to-b from-foreground/5 to-transparent rounded-t-lg"></div>
-                <div className="relative z-10">
-                  <div className="w-24 h-24 bg-card border border-foreground/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-[inset_0_0_15px_rgba(0,0,0,0.5)]">
-                    <BookOpen className="w-10 h-10 text-foreground opacity-80 drop-shadow-md group-hover:opacity-100 transition-opacity" />
+            {FEATURES.blog && (
+              <Card className="-card">
+                <CardHeader className="text-center pb-6 relative">
+                  <div className="absolute inset-0 bg-gradient-to-b from-foreground/5 to-transparent rounded-t-lg"></div>
+                  <div className="relative z-10">
+                    <div className="w-24 h-24 bg-card border border-foreground/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-[inset_0_0_15px_rgba(0,0,0,0.5)]">
+                      <BookOpen className="w-10 h-10 text-foreground opacity-80 drop-shadow-md group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <CardTitle className="text-3xl font-serif font-bold text-foreground">
+                      {dict.home.blogTitle}
+                    </CardTitle>
+                    <CardDescription className="text-lg text-foreground/70 mt-3 h-14 flex items-center justify-center font-light">
+                      {dict.home.blogDesc}
+                    </CardDescription>
                   </div>
-                  <CardTitle className="text-3xl font-serif font-bold text-foreground">
-                    {dict.home.blogTitle}
-                  </CardTitle>
-                  <CardDescription className="text-lg text-foreground/70 mt-3 h-14 flex items-center justify-center font-light">
-                    {dict.home.blogDesc}
-                  </CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="text-center relative">
-                <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
-                  <div className="flex items-center justify-center gap-2 text-foreground/50 font-medium tracking-wide">
-                    <Clock className="w-4 h-4 text-foreground/70" />
-                    <span>{dict.home.updated}</span>
+                </CardHeader>
+                <CardContent className="text-center relative">
+                  <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+                    <div className="flex items-center justify-center gap-2 text-foreground/50 font-medium tracking-wide">
+                      <Clock className="w-4 h-4 text-foreground/70" />
+                      <span>{dict.home.updated}</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-foreground/50 font-medium tracking-wide">
+                      <Users className="w-4 h-4 text-foreground/70" />
+                      <span>{dict.home.community}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-center gap-2 text-foreground/50 font-medium tracking-wide">
-                    <Users className="w-4 h-4 text-foreground/70" />
-                    <span>{dict.home.community}</span>
-                  </div>
-                </div>
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-transparent border border-foreground/30 text-foreground hover:bg-foreground/5 hover:border-foreground/50 w-full font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
-                >
-                  <Link
-                    href={`/${lang}/blog`}
-                    className="flex items-center justify-center gap-3"
+                  <Button
+                    asChild
+                    size="lg"
+                    className="bg-transparent border border-foreground/30 text-foreground hover:bg-foreground/5 hover:border-foreground/50 w-full font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
                   >
-                    {dict.home.blogBtn}
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
+                    <Link
+                      href={`/${lang}/blog`}
+                      className="flex items-center justify-center gap-3"
+                    >
+                      {dict.home.blogBtn}
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </section>
@@ -212,7 +219,9 @@ export default async function Home({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center relative z-10">
+          <div
+            className={`grid grid-cols-1 md:grid-cols-2 ${FEATURES.blog ? "lg:grid-cols-4" : "lg:grid-cols-3"} gap-8 text-center relative z-10`}
+          >
             <div className="group">
               <div className="bg-card text-card-foreground rounded-2xl p-8 border border-terracotta/20 hover:border-terracotta/50 transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-[0_0_30px_rgba(var(--color-terracotta),0.15)]">
                 <div className="flex items-center justify-center mb-4">
@@ -231,17 +240,19 @@ export default async function Home({
             </div>
 
             <div className="group">
-              <div className="bg-card text-card-foreground rounded-2xl p-8 border border-foreground/20 hover:border-foreground/50 transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-[0_0_30px_rgba(var(--color-parchemin),0.05)]">
-                <div className="flex items-center justify-center mb-4">
-                  <BookOpen className="w-12 h-12 text-foreground opacity-80 group-hover:scale-110 transition-transform" />
+              {FEATURES.blog && (
+                <div className="bg-card text-card-foreground rounded-2xl p-8 border border-foreground/20 hover:border-foreground/50 transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-[0_0_30px_rgba(var(--color-parchemin),0.05)]">
+                  <div className="flex items-center justify-center mb-4">
+                    <BookOpen className="w-12 h-12 text-foreground opacity-80 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div className="text-5xl font-black mb-2 text-foreground drop-shadow-lg">
+                    50+
+                  </div>
+                  <div className="text-foreground/60 font-medium tracking-wide uppercase text-sm">
+                    {dict.home.statsArticles}
+                  </div>
                 </div>
-                <div className="text-5xl font-black mb-2 text-foreground drop-shadow-lg">
-                  50+
-                </div>
-                <div className="text-foreground/60 font-medium tracking-wide uppercase text-sm">
-                  {dict.home.statsArticles}
-                </div>
-              </div>
+              )}
             </div>
 
             <div className="group">

@@ -76,34 +76,34 @@ export async function getPublicCollectionByToken(token: string): Promise<{
 
   const user = await prisma.user.findUnique({
     where: { collectionShareToken: token },
+    select: { name: true, clerkId: true },
+  });
+
+  if (!user) return null;
+
+  const userFavorites = await prisma.userFavorite.findMany({
+    where: { userId: user.clerkId },
     select: {
-      name: true,
-      favorites: {
+      product: {
         select: {
-          product: {
-            select: {
-              id: true,
-              title: true,
-              price: true,
-              category: true,
-              images: {
-                where: { isMain: true },
-                select: { imageUrl: true },
-                take: 1,
-              },
-            },
+          id: true,
+          title: true,
+          price: true,
+          category: true,
+          images: {
+            orderBy: { order: "asc" },
+            select: { imageUrl: true },
+            take: 1,
           },
         },
       },
     },
   });
 
-  if (!user) return null;
-
-  const favorites = user.favorites.map((fav) => ({
+  const favorites = userFavorites.map((fav) => ({
     id: fav.product.id,
     title: fav.product.title,
-    price: fav.product.price,
+    price: fav.product.price.toNumber(),
     category: fav.product.category,
     mainImageUrl: fav.product.images[0]?.imageUrl ?? null,
   }));

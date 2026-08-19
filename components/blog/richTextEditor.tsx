@@ -18,8 +18,6 @@ import Highlight from "@tiptap/extension-highlight";
 import Color from "@tiptap/extension-color";
 import { TextStyle } from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import { common, createLowlight } from "lowlight";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -70,8 +68,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-const lowlight = createLowlight(common);
-
 interface RichTextEditorProps {
   content: string;
   onChange: (content: string) => void;
@@ -107,7 +103,6 @@ export default function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        codeBlock: false,
         bulletList: {
           HTMLAttributes: {
             class: "list-disc list-outside ml-4",
@@ -134,12 +129,6 @@ export default function RichTextEditor({
       Color,
       FontFamily.configure({
         types: ["textStyle"],
-      }),
-      CodeBlockLowlight.configure({
-        lowlight,
-        HTMLAttributes: {
-          class: "bg-gray-100 rounded-lg p-4 my-4 overflow-x-auto",
-        },
       }),
       Image.configure({
         HTMLAttributes: {

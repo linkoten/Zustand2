@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import prisma from "@/lib/prisma";
+import { FEATURES } from "@/lib/config/features";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://paleolitho.com";
@@ -13,7 +14,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPaths = [
     { path: "", priority: 1.0, changeFrequency: "daily" as const },
     { path: "/fossiles", priority: 0.9, changeFrequency: "daily" as const },
-    { path: "/blog", priority: 0.8, changeFrequency: "weekly" as const },
+    ...(FEATURES.blog
+      ? [{ path: "/blog", priority: 0.8, changeFrequency: "weekly" as const }]
+      : []),
     { path: "/sign-in", priority: 0.3, changeFrequency: "monthly" as const },
     { path: "/sign-up", priority: 0.3, changeFrequency: "monthly" as const },
   ];
@@ -50,26 +53,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // ── Blog article pages ──────────────────────────────────────────────
   let blogEntries: MetadataRoute.Sitemap = [];
-  try {
-    const articles = await prisma.articleBlog.findMany({
-      where: {
-        status: "PUBLISHED",
-        publishedAt: { lte: now },
-      },
-      select: { slug: true, updatedAt: true, publishedAt: true },
-      orderBy: { publishedAt: "desc" },
-    });
+  if (FEATURES.blog) {
+    try {
+      const articles = await prisma.articleBlog.findMany({
+        where: {
+          status: "PUBLISHED",
+          publishedAt: { lte: now },
+        },
+        select: { slug: true, updatedAt: true, publishedAt: true },
+        orderBy: { publishedAt: "desc" },
+      });
 
-    blogEntries = LANGS.flatMap((lang) =>
-      articles.map((a) => ({
-        url: `${BASE_URL}/${lang}/blog/${a.slug}`,
-        lastModified: a.updatedAt,
-        changeFrequency: "monthly" as const,
-        priority: 0.6,
-      })),
-    );
-  } catch (e) {
-    console.error("sitemap: failed to fetch articles", e);
+      blogEntries = LANGS.flatMap((lang) =>
+        articles.map((a) => ({
+          url: `${BASE_URL}/${lang}/blog/${a.slug}`,
+          lastModified: a.updatedAt,
+          changeFrequency: "monthly" as const,
+          priority: 0.6,
+        })),
+      );
+    } catch (e) {
+      console.error("sitemap: failed to fetch articles", e);
+    }
   }
 
   return [...staticEntries, ...fossilEntries, ...blogEntries];

@@ -23,6 +23,8 @@ import { redirect } from "next/navigation";
 import { getOrSyncUser } from "@/lib/actions/dashboardActions";
 import { getDictionary } from "../dictionaries";
 import BlogPageClient from "@/components/blog/blogPageClient";
+import { FEATURES } from "@/lib/config/features";
+import { notFound } from "next/navigation";
 
 export default async function BlogPage({
   searchParams,
@@ -36,6 +38,10 @@ export default async function BlogPage({
     tag?: string;
   }>;
 }) {
+  if (!FEATURES.blog) {
+    notFound();
+  }
+
   const { lang } = await params;
 
   const dict = await getDictionary(lang);

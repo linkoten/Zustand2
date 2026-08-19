@@ -68,15 +68,11 @@ export const useBlogStore = create<BlogState>((set, get) => ({
     set({ isLoading: true });
 
     try {
-      console.log("🔄 Chargement blog avec filtres:", filters);
-
       const data = await getBlogPosts(filters.page, {
         search: filters.search,
         category: filters.category,
         tag: filters.tag,
       });
-
-      console.log("✅ Données blog chargées:", data);
 
       set({
         blogData: data,

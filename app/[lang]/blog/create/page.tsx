@@ -7,6 +7,8 @@ import CreateArticleForm from "@/components/blog/createArticleForm";
 import CreateGisementsForm from "@/components/blog/createGisementsForm";
 import CreateActivitesForm from "@/components/blog/createActivitesForm";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { FEATURES } from "@/lib/config/features";
 import {
   Mountain,
   BookOpen,
@@ -81,6 +83,10 @@ export default async function CreateArticlePage({
   params: Promise<{ lang: "en" | "fr" }>;
   searchParams: Promise<{ category?: string }>;
 }) {
+  if (!FEATURES.blog) {
+    notFound();
+  }
+
   const { lang } = await params;
   const { category } = await searchParams;
   const { userId } = await auth();

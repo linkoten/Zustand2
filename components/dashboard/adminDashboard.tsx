@@ -24,6 +24,7 @@ import Image from "next/image";
 import { AdminDashboardData, DashboardUser } from "@/types/dashboardType";
 import AdminNewsletter from "./adminNewsletter";
 import AdminStats from "./adminStats";
+import { FEATURES } from "@/lib/config/features";
 
 const statusColors = {
   PENDING:
@@ -78,9 +79,9 @@ export default function AdminDashboard({
     <div className="relative">
       {/* Background décoratif admin */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-2xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-48 h-48 bg-purple-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-indigo-200/20 rounded-full blur-2xl animate-pulse delay-2000"></div>
+        <div className="absolute top-20 left-10 w-32 h-32 bg-terracotta/10 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-48 h-48 bg-parchemin/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-terracotta/8 rounded-full blur-2xl animate-pulse delay-2000"></div>
       </div>
 
       <div className="container mx-auto px-4 py-12 relative z-10">
@@ -93,7 +94,7 @@ export default function AdminDashboard({
             </span>
           </div>
 
-          <h1 className="text-5xl font-black mb-4 bg-gradient-to-r from-blue-600 via-purple-500 to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-black mb-4 bg-gradient-to-r from-parchemin via-terracotta to-parchemin bg-clip-text text-transparent animate-shimmer-gold">
             Dashboard Admin 🛠️
           </h1>
           <p className="text-xl text-parchemin/70 max-w-2xl mx-auto leading-relaxed">
@@ -104,20 +105,20 @@ export default function AdminDashboard({
 
         {/* Statistiques principales avec design premium */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-blue-50/50 to-blue-100/30 hover:scale-105 transform">
+          <Card className="group hover:shadow-2xl transition-all duration-500 border border-parchemin/10 bg-silex/80 hover:scale-105 transform">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10 rounded-t-lg"></div>
               <CardTitle className="text-sm font-semibold text-parchemin relative z-10">
                 {dict?.dashboard?.users || "Utilisateurs"}
               </CardTitle>
               <div className="relative z-10">
-                <div className="p-2 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl shadow-lg">
-                  <Users className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
+                <div className="p-2 bg-terracotta/20 rounded-xl shadow-lg border border-terracotta/30">
+                  <Users className="h-4 w-4 text-terracotta group-hover:scale-110 transition-transform" />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-black mb-1 bg-gradient-to-br from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              <div className="text-3xl font-black mb-1 text-parchemin">
                 {data.stats.totalUsers}
               </div>
               <p className="text-xs text-parchemin/70 font-medium">
@@ -126,20 +127,20 @@ export default function AdminDashboard({
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-emerald-50/50 to-emerald-100/30 hover:scale-105 transform">
+          <Card className="group hover:shadow-2xl transition-all duration-500 border border-parchemin/10 bg-silex/80 hover:scale-105 transform">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-emerald-600/10 rounded-t-lg"></div>
               <CardTitle className="text-sm font-semibold text-parchemin relative z-10">
                 {dict?.dashboard?.products || "Produits"}
               </CardTitle>
               <div className="relative z-10">
-                <div className="p-2 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl shadow-lg">
-                  <Package className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
+                <div className="p-2 bg-terracotta/20 rounded-xl shadow-lg border border-terracotta/30">
+                  <Package className="h-4 w-4 text-terracotta group-hover:scale-110 transition-transform" />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-black mb-1 bg-gradient-to-br from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
+              <div className="text-3xl font-black mb-1 text-parchemin">
                 {data.stats.totalProducts}
               </div>
               <p className="text-xs text-parchemin/70 font-medium">
@@ -149,20 +150,20 @@ export default function AdminDashboard({
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-purple-50/50 to-purple-100/30 hover:scale-105 transform">
+          <Card className="group hover:shadow-2xl transition-all duration-500 border border-parchemin/10 bg-silex/80 hover:scale-105 transform">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-purple-600/10 rounded-t-lg"></div>
               <CardTitle className="text-sm font-semibold text-parchemin relative z-10">
                 {dict?.dashboard?.articles || "Articles"}
               </CardTitle>
               <div className="relative z-10">
-                <div className="p-2 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl shadow-lg">
-                  <FileText className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
+                <div className="p-2 bg-terracotta/20 rounded-xl shadow-lg border border-terracotta/30">
+                  <FileText className="h-4 w-4 text-terracotta group-hover:scale-110 transition-transform" />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-black mb-1 bg-gradient-to-br from-purple-600 to-purple-800 bg-clip-text text-transparent">
+              <div className="text-3xl font-black mb-1 text-parchemin">
                 {data.stats.totalBlogArticles}
               </div>
               <p className="text-xs text-parchemin/70 font-medium">
@@ -172,20 +173,20 @@ export default function AdminDashboard({
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-orange-50/50 to-orange-100/30 hover:scale-105 transform">
+          <Card className="group hover:shadow-2xl transition-all duration-500 border border-parchemin/10 bg-silex/80 hover:scale-105 transform">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-orange-600/10 rounded-t-lg"></div>
               <CardTitle className="text-sm font-semibold text-parchemin relative z-10">
                 {dict?.dashboard?.requests || "Demandes"}
               </CardTitle>
               <div className="relative z-10">
-                <div className="p-2 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl shadow-lg">
-                  <Search className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
+                <div className="p-2 bg-terracotta/20 rounded-xl shadow-lg border border-terracotta/30">
+                  <Search className="h-4 w-4 text-terracotta group-hover:scale-110 transition-transform" />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-black mb-1 bg-gradient-to-br from-orange-600 to-orange-800 bg-clip-text text-transparent">
+              <div className="text-3xl font-black mb-1 text-parchemin">
                 {data.stats.totalRequests}
               </div>
               <p className="text-xs text-parchemin/70 font-medium">
@@ -197,14 +198,14 @@ export default function AdminDashboard({
         </div>
 
         {/* Actions rapides admin avec design premium */}
-        <Card className="mb-12 border border-[var(--parchemin)]/10 bg-[var(--silex)] shadow-2xl overflow-hidden rounded-xl">
-          <CardHeader className="text-center pb-6 bg-[var(--silex)] border-b border-[var(--parchemin)]/10 relative">
-            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[var(--terracotta)]/30 to-transparent"></div>
-            <CardTitle className="flex items-center justify-center gap-3 text-2xl font-serif text-[var(--parchemin)] tracking-wider">
-              <Shield className="h-6 w-6 text-[var(--terracotta)]" />
+        <Card className="mb-12 border border-parchemin/10 bg-silex shadow-2xl overflow-hidden rounded-xl">
+          <CardHeader className="text-center pb-6 bg-silex border-b border-parchemin/10 relative">
+            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-terracotta/30 to-transparent"></div>
+            <CardTitle className="flex items-center justify-center gap-3 text-2xl font-serif text-parchemin tracking-wider">
+              <Shield className="h-6 w-6 text-terracotta" />
               {dict?.dashboard?.adminActions || "Actions d'administration"}
             </CardTitle>
-            <p className="text-[var(--parchemin)]/60 mt-2 font-sans font-light tracking-wide">
+            <p className="text-parchemin/60 mt-2 font-sans font-light tracking-wide">
               {dict?.dashboard?.adminActionsDesc ||
                 "Gérez efficacement votre plateforme"}
             </p>
@@ -213,7 +214,7 @@ export default function AdminDashboard({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Button
                 asChild
-                className="h-16 bg-transparent border-2 border-terracotta text-terracotta hover:bg-terracotta hover:text-parchemin border-0 shadow-lg group transition-all duration-300 rounded-lg"
+                className="h-16 border-2 border-terracotta text-terracotta bg-transparent hover:bg-terracotta hover:text-primary-foreground shadow-lg group transition-all duration-300 rounded-lg"
               >
                 <Link
                   href={`/${lang}/fossiles/create`}
@@ -226,33 +227,35 @@ export default function AdminDashboard({
                 </Link>
               </Button>
 
-              <Button
-                asChild
-                variant="outline"
-                className="h-16 border-2 border-purple-200 hover:border-purple-300 hover:bg-purple-50 group"
-              >
-                <Link
-                  href={`/${lang}/blog/create`}
-                  className="flex flex-col items-center gap-2"
+              {FEATURES.blog && (
+                <Button
+                  asChild
+                  variant="outline"
+                  className="h-16 border-2 border-parchemin/30 text-parchemin hover:border-terracotta hover:bg-terracotta/10 group"
                 >
-                  <FileText className="h-5 w-5 text-purple-600 group-hover:scale-110 transition-transform" />
-                  <span className="font-semibold text-sm text-purple-700">
-                    {dict?.dashboard?.newArticle || "Nouvel article"}
-                  </span>
-                </Link>
-              </Button>
+                  <Link
+                    href={`/${lang}/blog/create`}
+                    className="flex flex-col items-center gap-2"
+                  >
+                    <FileText className="h-5 w-5 text-terracotta group-hover:scale-110 transition-transform" />
+                    <span className="font-semibold text-sm text-parchemin">
+                      {dict?.dashboard?.newArticle || "Nouvel article"}
+                    </span>
+                  </Link>
+                </Button>
+              )}
 
               <Button
                 asChild
                 variant="outline"
-                className="h-16 border-2 border-cyan-700/50 hover:border-blue-300 hover:bg-cyan-900/30 group group"
+                className="h-16 border-2 border-parchemin/30 text-parchemin hover:border-terracotta hover:bg-terracotta/10 group"
               >
                 <Link
                   href={`/${lang}/dashboard/requests/admin`}
                   className="flex flex-col items-center gap-2"
                 >
-                  <Search className="h-5 w-5 text-blue-600 group-hover:scale-110 transition-transform" />
-                  <span className="font-semibold text-sm text-cyan-300">
+                  <Search className="h-5 w-5 text-terracotta group-hover:scale-110 transition-transform" />
+                  <span className="font-semibold text-sm text-parchemin">
                     {dict?.dashboard?.manageRequests || "Gérer demandes"}
                   </span>
                 </Link>
@@ -261,14 +264,14 @@ export default function AdminDashboard({
               <Button
                 asChild
                 variant="outline"
-                className="h-16 border-2 border-indigo-200 hover:border-indigo-300 hover:bg-indigo-50 group"
+                className="h-16 border-2 border-parchemin/30 text-parchemin hover:border-terracotta hover:bg-terracotta/10 group"
               >
                 <Link
                   href={`/${lang}/dashboard/analytics`}
                   className="flex flex-col items-center gap-2"
                 >
-                  <BarChart3 className="h-5 w-5 text-indigo-600 group-hover:scale-110 transition-transform" />
-                  <span className="font-semibold text-sm text-indigo-700">
+                  <BarChart3 className="h-5 w-5 text-terracotta group-hover:scale-110 transition-transform" />
+                  <span className="font-semibold text-sm text-parchemin">
                     {dict?.dashboard?.analytics || "Analytics"}
                   </span>
                 </Link>
@@ -279,7 +282,7 @@ export default function AdminDashboard({
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Demandes de fossiles avec design amélioré */}
-          <Card className="lg:col-span-2 border-0 bg-silex/50/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
+          <Card className="lg:col-span-2 border-0 bg-silex/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
             <CardHeader className="border-b border-orange-100 bg-gradient-to-r from-orange-50 to-red-50">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-3">
@@ -401,8 +404,8 @@ export default function AdminDashboard({
           {/* Activité récente */}
           <div className="space-y-8">
             {/* Nouveaux utilisateurs */}
-            <Card className="border-0 bg-silex/50/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
-              <CardHeader className="border-b border-parchemin/10 bg-silex border-b border-parchemin/10">
+            <Card className="border-0 bg-silex/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
+              <CardHeader className="border-b border-parchemin/10 bg-silex">
                 <CardTitle className="flex items-center gap-3">
                   <div className="p-2 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl shadow-lg">
                     <Users className="h-4 w-4 text-white" />
@@ -444,8 +447,8 @@ export default function AdminDashboard({
             </Card>
 
             {/* Produits récents */}
-            <Card className="border-0 bg-silex/50/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
-              <CardHeader className="border-b border-emerald-100 bg-silex border-b border-parchemin/10">
+            <Card className="border-0 bg-silex/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500">
+              <CardHeader className="border-b border-parchemin/10 bg-silex">
                 <CardTitle className="flex items-center gap-3">
                   <div className="p-2 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl shadow-lg">
                     <Package className="h-4 w-4 text-white" />
@@ -513,21 +516,23 @@ export default function AdminDashboard({
         </div>
 
         {/* ── Newsletter ───────────────────────────────────────────── */}
-        <div className="mt-12 mb-4">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-gradient-to-br from-terracotta to-orange-600 rounded-xl shadow-lg">
-              <Mail className="h-5 w-5 text-white" />
+        {FEATURES.newsletterAdmin && (
+          <div className="mt-12 mb-4">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-gradient-to-br from-terracotta to-orange-600 rounded-xl shadow-lg">
+                <Mail className="h-5 w-5 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-parchemin">
+                Newsletter
+              </h2>
             </div>
-            <h2 className="text-2xl font-bold text-parchemin">
-              Newsletter
-            </h2>
+            <AdminNewsletter
+              initialSubscribers={newsletterData.subscribers}
+              initialTotal={newsletterData.total}
+              initialActive={newsletterData.active}
+            />
           </div>
-          <AdminNewsletter
-            initialSubscribers={newsletterData.subscribers}
-            initialTotal={newsletterData.total}
-            initialActive={newsletterData.active}
-          />
-        </div>
+        )}
 
       </div>
     </div>

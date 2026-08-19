@@ -21,6 +21,7 @@ import { NotificationButton } from "../notification/notificationButton";
 import { getCartAction } from "@/lib/actions/cart-actions";
 import { useCartStore } from "@/stores/cart-store";
 import { LanguageSwitcher } from "./languageSwitcher";
+import { FEATURES } from "@/lib/config/features";
 
 type NavbarProps = {
   lang: "fr" | "en";
@@ -76,18 +77,26 @@ export default function Navbar({ lang, dict }: NavbarProps) {
       label: dict.navbar.fossils,
       gradient: "from-amber-600 to-orange-600",
     },
-    {
-      href: `/${lang}/blog`,
-      label: dict.navbar.blog,
-      icon: BookOpen,
-      gradient: "from-green-600 to-emerald-600",
-    },
-    {
-      href: `/${lang}/collection`,
-      label: dict.navbar.collection ?? "Collection",
-      icon: Layers,
-      gradient: "from-violet-600 to-purple-600",
-    },
+    ...(FEATURES.blog
+      ? [
+          {
+            href: `/${lang}/blog`,
+            label: dict.navbar.blog,
+            icon: BookOpen,
+            gradient: "from-green-600 to-emerald-600",
+          },
+        ]
+      : []),
+    ...(FEATURES.collection
+      ? [
+          {
+            href: `/${lang}/collection`,
+            label: dict.navbar.collection ?? "Collection",
+            icon: Layers,
+            gradient: "from-violet-600 to-purple-600",
+          },
+        ]
+      : []),
   ];
 
   const userLinks = [

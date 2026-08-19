@@ -18,7 +18,6 @@ function getLocale(request: NextRequest): string {
 
 export default clerkMiddleware(async (_auth, request) => {
   const { pathname } = request.nextUrl;
-  console.log("[middleware] Pathname:", pathname);
 
   // Si déjà sur /fr ou /en, laisse passer (Clerk gère le reste)
   const match = pathname.match(/^\/(fr|en)(\/|$)/);
@@ -29,7 +28,6 @@ export default clerkMiddleware(async (_auth, request) => {
   // Sinon, détecte la locale préférée et redirige
   const locale = getLocale(request);
   const redirectUrl = `/${locale}${pathname === "/" ? "" : pathname}`;
-  console.log("[middleware] Redirection vers:", redirectUrl);
   return NextResponse.redirect(new URL(redirectUrl, request.url));
 });
 

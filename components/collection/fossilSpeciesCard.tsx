@@ -11,15 +11,15 @@ import { Bookmark, CheckCircle, ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 
 const CATEGORY_COLORS = {
-  TRILOBITE: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-  AMMONITE: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  DENT: "bg-red-500/20 text-red-300 border-red-500/30",
-  ECHINODERME: "bg-green-500/20 text-green-300 border-green-500/30",
-  POISSON: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
-  VERTEBRE: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  GASTEROPODE: "bg-pink-500/20 text-pink-300 border-pink-500/30",
-  AUTRE_ARTHROPODE: "bg-orange-500/20 text-orange-300 border-orange-500/30",
-  AUTRES: "bg-zinc-500/20 text-zinc-300 border-zinc-500/30",
+  TRILOBITE: "bg-terracotta/20 text-terracotta border-terracotta/30",
+  AMMONITE: "bg-terracotta/15 text-terracotta border-terracotta/25",
+  DENT: "bg-red-900/30 text-red-300 border-red-700/30",
+  ECHINODERME: "bg-emerald-900/30 text-emerald-300 border-emerald-700/30",
+  POISSON: "bg-sky-900/30 text-sky-300 border-sky-700/30",
+  VERTEBRE: "bg-zinc-800 text-parchemin/80 border-parchemin/20",
+  GASTEROPODE: "bg-terracotta/10 text-parchemin border-terracotta/20",
+  AUTRE_ARTHROPODE: "bg-terracotta/20 text-terracotta border-terracotta/30",
+  AUTRES: "bg-silex/60 text-parchemin/70 border-parchemin/20",
 } as const;
 
 const RARITY_STARS: Record<string, number> = {
@@ -169,8 +169,8 @@ export default function FossilSpeciesCard({
             variant="outline"
             className={`flex-1 text-xs h-7 ${
               isOwned
-                ? "bg-green-500/20 border-green-500/40 text-green-300 hover:bg-green-500/30"
-                : "border-silex/30 text-parchemin/60 hover:text-parchemin hover:border-green-500/40"
+                ? "bg-emerald-900/40 border-emerald-700/40 text-emerald-300 hover:bg-emerald-900/60"
+                : "border-parchemin/30 text-parchemin/60 hover:text-parchemin hover:border-terracotta/40"
             }`}
             onClick={() => toggle("OWNED")}
             disabled={pending}
@@ -183,8 +183,8 @@ export default function FossilSpeciesCard({
             variant="outline"
             className={`flex-1 text-xs h-7 ${
               isWishlisted
-                ? "bg-amber-500/20 border-amber-500/40 text-amber-300 hover:bg-amber-500/30"
-                : "border-silex/30 text-parchemin/60 hover:text-parchemin hover:border-amber-500/40"
+                ? "bg-terracotta/20 border-terracotta/40 text-terracotta hover:bg-terracotta/30"
+                : "border-parchemin/30 text-parchemin/60 hover:text-parchemin hover:border-terracotta/40"
             }`}
             onClick={() => toggle("WISHLIST")}
             disabled={pending}

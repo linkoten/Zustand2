@@ -66,14 +66,14 @@ export default function BlogCard({ article, lang, dict }: BlogCardProps) {
   };
 
   return (
-    <Card className="group relative overflow-hidden bg-[var(--silex)] border border-[var(--parchemin)]/10 hover:border-[var(--terracotta)]/40 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 rounded-3xl">
+    <Card className="group relative overflow-hidden bg-silex border border-parchemin/10 hover:border-terracotta/40 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 rounded-3xl">
       {/* Glow effect */}
-      <div className="absolute inset-0 bg-[var(--terracotta)]/0 group-hover:bg-[var(--terracotta)]/3 rounded-3xl transition-all duration-500" />
+      <div className="absolute inset-0 bg-terracotta/0 group-hover:bg-terracotta/3 rounded-3xl transition-all duration-500" />
 
       <Link href={`/${lang}/blog/${article.slug}`} className="block h-full">
         <CardHeader className="p-0 relative">
           {/* Image container premium */}
-          <div className="relative aspect-[16/10] bg-[var(--silex)] overflow-hidden rounded-t-3xl">
+          <div className="relative aspect-[16/10] bg-silex overflow-hidden rounded-t-3xl">
             {article.featuredImage ? (
               <>
                 <Image
@@ -87,10 +87,10 @@ export default function BlogCard({ article, lang, dict }: BlogCardProps) {
               </>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <div className="text-center text-[var(--parchemin)]/50">
+                <div className="text-center text-parchemin/50">
                   <div className="mb-4 relative">
-                    <div className="relative bg-[var(--parchemin)]/10 p-6 rounded-2xl">
-                      <BookOpen className="w-12 h-12 text-[var(--parchemin)]/40 mx-auto" />
+                    <div className="relative bg-parchemin/10 p-6 rounded-2xl">
+                      <BookOpen className="w-12 h-12 text-parchemin/40 mx-auto" />
                     </div>
                   </div>
                   <p className="text-sm font-semibold">
@@ -116,11 +116,11 @@ export default function BlogCard({ article, lang, dict }: BlogCardProps) {
 
             {/* Quick actions overlay */}
             <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-              <button className="bg-[var(--silex)]/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-[var(--silex)] hover:scale-110 transition-all duration-300">
-                <Heart className="w-4 h-4 text-[var(--parchemin)]/70 hover:text-red-400" />
+              <button className="bg-silex/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-silex hover:scale-110 transition-all duration-300">
+                <Heart className="w-4 h-4 text-parchemin/70 hover:text-red-400" />
               </button>
-              <button className="bg-[var(--silex)]/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-[var(--silex)] hover:scale-110 transition-all duration-300">
-                <Bookmark className="w-4 h-4 text-[var(--parchemin)]/70 hover:text-[var(--terracotta)]" />
+              <button className="bg-silex/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-silex hover:scale-110 transition-all duration-300">
+                <Bookmark className="w-4 h-4 text-parchemin/70 hover:text-terracotta" />
               </button>
             </div>
 
@@ -136,18 +136,18 @@ export default function BlogCard({ article, lang, dict }: BlogCardProps) {
 
         <CardContent className="p-6 relative">
           {/* Titre premium */}
-          <h3 className="font-serif font-black text-xl leading-tight mb-3 line-clamp-2 text-[var(--parchemin)] group-hover:text-[var(--parchemin)] transition-colors duration-300">
+          <h3 className="font-serif font-black text-xl leading-tight mb-3 line-clamp-2 text-parchemin group-hover:text-parchemin transition-colors duration-300">
             {article.title}
           </h3>
 
           {/* Excerpt avec style */}
           {article.excerpt && (
             <div className="relative mb-4">
-              <p className="text-[var(--parchemin)]/60 text-sm leading-relaxed line-clamp-3 group-hover:text-[var(--parchemin)]/70 transition-colors duration-300">
+              <p className="text-parchemin/60 text-sm leading-relaxed line-clamp-3 group-hover:text-parchemin/70 transition-colors duration-300">
                 {article.excerpt}
               </p>
               {/* Gradient fade pour le clamp */}
-              <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-[var(--silex)] to-transparent pointer-events-none" />
+              <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-silex to-transparent pointer-events-none" />
             </div>
           )}
 
@@ -158,7 +158,7 @@ export default function BlogCard({ article, lang, dict }: BlogCardProps) {
                 <Badge
                   key={tag.id}
                   variant="outline"
-                  className="text-xs border-[var(--parchemin)]/20 bg-[var(--parchemin)]/5 hover:bg-[var(--parchemin)]/10 hover:scale-105 transition-all duration-300 px-2 py-1 rounded-lg text-[var(--parchemin)]/70"
+                  className="text-xs border-parchemin/20 bg-parchemin/5 hover:bg-parchemin/10 hover:scale-105 transition-all duration-300 px-2 py-1 rounded-lg text-parchemin/70"
                   style={{
                     borderColor: tag.color ? `${tag.color}40` : undefined,
                     backgroundColor: tag.color ? `${tag.color}15` : undefined,
@@ -171,7 +171,7 @@ export default function BlogCard({ article, lang, dict }: BlogCardProps) {
               {article.tags.length > 2 && (
                 <Badge
                   variant="outline"
-                  className="text-xs bg-[var(--parchemin)]/5 text-[var(--parchemin)]/50 border-[var(--parchemin)]/20 px-2 py-1 rounded-lg"
+                  className="text-xs bg-parchemin/5 text-parchemin/50 border-parchemin/20 px-2 py-1 rounded-lg"
                 >
                   +{article.tags.length - 2}
                 </Badge>
@@ -180,15 +180,15 @@ export default function BlogCard({ article, lang, dict }: BlogCardProps) {
           )}
 
           {/* Métadonnées premium */}
-          <div className="flex items-center gap-4 text-xs text-[var(--parchemin)]/50 mb-4">
-            <div className="flex items-center gap-1.5 bg-[var(--parchemin)]/5 px-2 py-1 rounded-lg">
+          <div className="flex items-center gap-4 text-xs text-parchemin/50 mb-4">
+            <div className="flex items-center gap-1.5 bg-parchemin/5 px-2 py-1 rounded-lg">
               <CalendarDays className="w-3 h-3" />
               <span className="font-medium">
                 {formatDate(article.publishedAt)}
               </span>
             </div>
 
-            <div className="flex items-center gap-1.5 bg-[var(--parchemin)]/5 px-2 py-1 rounded-lg">
+            <div className="flex items-center gap-1.5 bg-parchemin/5 px-2 py-1 rounded-lg">
               <Eye className="w-3 h-3" />
               <span className="font-medium">
                 {article.views.toLocaleString(
@@ -203,14 +203,14 @@ export default function BlogCard({ article, lang, dict }: BlogCardProps) {
           <div className="flex items-center justify-between w-full">
             {/* Auteur premium */}
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[var(--parchemin)]/10 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-[var(--parchemin)]/50" />
+              <div className="w-8 h-8 bg-parchemin/10 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-parchemin/50" />
               </div>
               <div>
-                <p className="text-xs text-[var(--parchemin)]/40 font-medium">
+                <p className="text-xs text-parchemin/40 font-medium">
                   {dict.blog?.blogList?.by || "Par"}
                 </p>
-                <p className="text-sm font-semibold text-[var(--parchemin)]/70 truncate max-w-[120px]">
+                <p className="text-sm font-semibold text-parchemin/70 truncate max-w-[120px]">
                   {article.author.name || article.author.email}
                 </p>
               </div>
@@ -226,9 +226,9 @@ export default function BlogCard({ article, lang, dict }: BlogCardProps) {
           </div>
 
           {/* Performance indicator */}
-          <div className="absolute bottom-0 left-6 right-6 h-1 bg-[var(--parchemin)]/10 rounded-full overflow-hidden">
+          <div className="absolute bottom-0 left-6 right-6 h-1 bg-parchemin/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[var(--terracotta)] rounded-full transition-all duration-1000 group-hover:opacity-80"
+              className="h-full bg-terracotta rounded-full transition-all duration-1000 group-hover:opacity-80"
               style={{
                 width: `${Math.min((article.views / 1000) * 100, 100)}%`,
               }}
@@ -238,7 +238,7 @@ export default function BlogCard({ article, lang, dict }: BlogCardProps) {
       </Link>
 
       {/* Hover border glow */}
-      <div className="absolute inset-0 rounded-3xl border-2 border-transparent group-hover:border-[var(--terracotta)]/30 transition-all duration-500 pointer-events-none" />
+      <div className="absolute inset-0 rounded-3xl border-2 border-transparent group-hover:border-terracotta/30 transition-all duration-500 pointer-events-none" />
     </Card>
   );
 }

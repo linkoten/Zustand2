@@ -32,8 +32,6 @@ export async function POST(req: NextRequest) {
       process.env.STRIPE_WEBHOOK_SECRET!,
     );
 
-    console.log("🔵 Stripe webhook:", event.type);
-
     switch (event.type) {
       case "product.created":
         await handleProductCreated(event.data.object as StripeProduct);
@@ -64,7 +62,7 @@ export async function POST(req: NextRequest) {
         break;
 
       default:
-        console.log(`Événement non géré: ${event.type}`);
+        break;
     }
 
     return new Response("Webhook traité avec succès", { status: 200 });
@@ -77,8 +75,6 @@ export async function POST(req: NextRequest) {
 
 // 🆕 CRÉER UN PRODUIT DEPUIS STRIPE
 async function handleProductCreated(product: StripeProduct) {
-  console.log("🆕 Produit créé dans Stripe:", product.id);
-
   try {
     const { validCategory, validGeologicalPeriod, validStatus, validWeight } =
       validateProductMetadata(product.metadata, product.active);
@@ -121,13 +117,8 @@ async function handleProductCreated(product: StripeProduct) {
       },
     });
 
-    console.log("✅ Produit ajouté à la BDD:", newProduct.id);
-    console.log("📏 Poids sauvegardé:", validWeight, "grammes");
-
-    // ✅ FORCER LA REVALIDATION DU CACHE
     revalidatePath("/fossiles");
     revalidatePath("/");
-    console.log("🔄 Cache invalidé pour /fossiles");
   } catch (error) {
     console.error("❌ Erreur création produit BDD:", error);
   }
@@ -135,8 +126,6 @@ async function handleProductCreated(product: StripeProduct) {
 
 // ✏️ METTRE À JOUR UN PRODUIT DEPUIS STRIPE
 async function handleProductUpdated(product: StripeProduct) {
-  console.log("✏️ Produit modifié dans Stripe:", product.id);
-
   try {
     const existingProduct = await prisma.product.findUnique({
       where: { stripeProductId: product.id },
@@ -206,12 +195,8 @@ async function handleProductUpdated(product: StripeProduct) {
         data: updateData,
       });
 
-      console.log("✅ Produit mis à jour dans la BDD");
-      console.log("📏 Poids mis à jour:", validWeight, "grammes");
-
       revalidatePath("/fossiles");
       revalidatePath("/");
-      console.log("🔄 Cache invalidé après mise à jour");
     }
   } catch (error) {
     console.error("❌ Erreur mise à jour produit:", error);
@@ -220,15 +205,11 @@ async function handleProductUpdated(product: StripeProduct) {
 
 // 🗑️ SUPPRIMER/ARCHIVER UN PRODUIT
 async function handleProductDeleted(product: StripeProduct) {
-  console.log("🗑️ Produit archivé dans Stripe:", product.id);
-
   try {
     await prisma.product.updateMany({
       where: { stripeProductId: product.id },
       data: { status: ProductStatus.INACTIVE },
     });
-
-    console.log("✅ Produit archivé dans la BDD");
 
     revalidatePath("/fossiles");
     revalidatePath("/");
@@ -239,8 +220,6 @@ async function handleProductDeleted(product: StripeProduct) {
 
 // 💰 PRIX CRÉÉ POUR UN PRODUIT
 async function handlePriceCreated(price: StripePrice) {
-  console.log("💰 Prix créé dans Stripe:", price.id);
-
   try {
     if (price.unit_amount) {
       await prisma.product.updateMany({
@@ -251,12 +230,8 @@ async function handlePriceCreated(price: StripePrice) {
         },
       });
 
-      console.log("✅ Prix mis à jour dans la BDD");
-
-      // ✅ FORCER LA REVALIDATION DU CACHE
       revalidatePath("/fossiles");
       revalidatePath("/");
-      console.log("🔄 Cache invalidé après mise à jour prix");
     }
 
     revalidatePath("/fossiles");
@@ -268,8 +243,6 @@ async function handlePriceCreated(price: StripePrice) {
 
 // ✏️ PRIX MODIFIÉ
 async function handlePriceUpdated(price: StripePrice) {
-  console.log("✏️ Prix modifié dans Stripe:", price.id);
-
   if (price.active && price.unit_amount) {
     await handlePriceCreated(price);
   }
@@ -280,11 +253,8 @@ async function handlePriceUpdated(price: StripePrice) {
 
 // 👤 CUSTOMER CRÉÉ - GESTION DES VALEURS NULLABLES
 async function handleCustomerCreated(customer: StripeCustomer) {
-  console.log("👤 Customer créé:", customer.id);
-
   // ✅ Vérifier que l'email n'est pas null
   if (!customer.email) {
-    console.log("⚠️ Customer créé sans email, ignoré");
     return;
   }
 
@@ -298,12 +268,6 @@ async function handleCustomerCreated(customer: StripeCustomer) {
         where: { id: user.id },
         data: { stripeCustomerId: customer.id },
       });
-      console.log("✅ Customer associé à l'utilisateur");
-    } else {
-      console.log(
-        "ℹ️ Aucun utilisateur trouvé avec cet email:",
-        customer.email,
-      );
     }
 
     revalidatePath("/fossiles");
@@ -315,19 +279,13 @@ async function handleCustomerCreated(customer: StripeCustomer) {
 
 // ✅ CHECKOUT COMPLÉTÉ - GESTION DES VALEURS NULLABLES
 async function handleCheckoutCompleted(session: StripeSession) {
-  console.log("✅ Checkout complété:", session);
-
-  console.log("✅ Checkout complété:", session.id);
-
   // ✅ Vérifier que amount_total n'est pas null
   if (!session.amount_total) {
-    console.log("⚠️ Session sans montant, ignorée");
     return;
   }
 
   try {
     const amountInEuros = session.amount_total / 100;
-    console.log("💰 Vente réalisée pour:", amountInEuros, "€");
 
     // 1. Récupérer l'utilisateur via stripeCustomerId
     const clerkId = session.metadata?.userId;
@@ -371,9 +329,6 @@ async function handleCheckoutCompleted(session: StripeSession) {
         },
       });
 
-      console.log(
-        `✅ ${productIds.length} produit(s) marqué(s) comme vendu(s)`,
-      );
     }
 
     // 3. Créer la commande et les OrderItem
@@ -388,8 +343,6 @@ async function handleCheckoutCompleted(session: StripeSession) {
       },
       include: { items: true },
     });
-
-    console.log("✅ Commande créée:", order.id);
 
     await createNotification({
       userId: clerkId,
@@ -447,8 +400,6 @@ function validateProductMetadata(
       validWeight = parsedWeight;
     }
   }
-
-  console.log("📏 Poids validé:", validWeight, "grammes");
 
   return {
     validCategory,

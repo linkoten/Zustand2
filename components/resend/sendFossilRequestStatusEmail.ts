@@ -38,7 +38,6 @@ export async function sendFossilRequestStatusEmail(
       html: emailHtml,
     });
 
-    console.log("✅ Email statut fossile envoyé:", result.data?.id);
     return { success: true, id: result.data?.id };
   } catch (error) {
     console.error("❌ Erreur envoi email statut fossile:", error);

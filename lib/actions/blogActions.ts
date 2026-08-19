@@ -66,11 +66,6 @@ export async function getBlogPosts(
       ];
     }
 
-    console.log(
-      "Conditions de filtrage appliquées:",
-      JSON.stringify(whereConditions, null, 2)
-    );
-
     const [posts, totalPosts] = await Promise.all([
       prisma.articleBlog.findMany({
         where: whereConditions,
@@ -102,9 +97,6 @@ export async function getBlogPosts(
     ]);
 
     const totalPages = Math.ceil(totalPosts / limit);
-
-    console.log(`Filtres appliqués: ${JSON.stringify(filters)}`);
-    console.log(`Articles trouvés: ${posts.length}/${totalPosts}`);
 
     return {
       posts: posts.map((post) => ({
@@ -509,8 +501,6 @@ export async function createBlogArticle(data: CreateArticleData) {
         })
       )
     );
-
-    console.log("✅ Article créé:", article.id);
 
     // Revalider le cache
     revalidatePath("/blog");

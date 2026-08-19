@@ -108,7 +108,6 @@ export async function POST(req: NextRequest) {
       cart = await prisma.cart.create({
         data: { userId: user.id },
       });
-      console.log(`✅ Nouveau panier créé pour l'utilisateur: ${user.id}`);
     }
 
     // Vérifier si le produit est déjà dans le panier

@@ -18,7 +18,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, lang, dict }: ProductCardProps) {
-  const { handleAddToCart, isAdding } = useHandleAddToCart();
+  const { handleAddToCart, isAdding } = useHandleAddToCart(lang);
 
   // ✅ Utiliser la première image ou afficher un placeholder
   const firstImage = product.images?.[0];

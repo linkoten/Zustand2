@@ -23,8 +23,6 @@ export interface OrderEmailData {
 
 export async function sendOrderConfirmationEmail(data: OrderEmailData) {
   try {
-    console.log("📧 Envoi email de confirmation à:", data.customerEmail);
-
     // ✅ Await le render pour obtenir une string
     const emailHtml = await render(
       OrderConfirmationEmail({
@@ -44,7 +42,6 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData) {
       html: emailHtml,
     });
 
-    console.log("✅ Email envoyé avec succès:", result.data?.id);
     return { success: true, id: result.data?.id };
   } catch (error) {
     console.error("❌ Erreur envoi email:", error);
@@ -75,8 +72,6 @@ export async function sendAdminNotificationEmail(data: OrderEmailData) {
         </p>
       `,
     });
-
-    console.log("✅ Email admin envoyé");
   } catch (error) {
     console.error("❌ Erreur email admin:", error);
   }
