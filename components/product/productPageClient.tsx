@@ -55,7 +55,7 @@ export default function ProductPageClient({
 
   return (
     <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
-      {/* Breadcrumb amÃ©liorÃ© avec animation - RESPONSIVE */}
+      {/* Breadcrumb amélioré avec animation - RESPONSIVE */}
       <nav className="mb-4 sm:mb-6 lg:mb-8 bg-silex/50 p-3 rounded-lg border border-parchemin/10 backdrop-blur-sm inline-block">
         <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-parchemin/70 overflow-hidden font-medium">
           <Link
@@ -85,15 +85,15 @@ export default function ProductPageClient({
 
       {/* Layout principal responsive - STACK SUR MOBILE */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-16 items-start">
-        {/* Section Images avec Lens ultra amÃ©liorÃ©e - RESPONSIVE OPTIMISÃ‰E */}
+        {/* Section Images avec Lens ultra améliorée - RESPONSIVE OPTIMISÉE */}
         <div className="space-y-6 order-1 lg:col-span-7 relative lg:sticky lg:top-8">
-          {/* Image principale avec lens - DIMENSIONS DIFFÃ‰RENTES SELON DEVICE */}
+          {/* Image principale avec lens - DIMENSIONS DIFFÉRENTES SELON DEVICE */}
           <Card className="border border-parchemin/10 shadow-2xl bg-silex overflow-hidden group transition-all duration-500 rounded-2xl">
             <CardContent className="p-4 sm:p-6">
               <div className="relative mb-6">
-                {/* âœ… Container d'image avec tailles diffÃ©renciÃ©es */}
+                {/* ✅ Container d'image avec tailles différenciées */}
                 <div className="w-full flex justify-center">
-                  {/* Mobile et Tablet : Image centrÃ©e et rÃ©duite */}
+                  {/* Mobile et Tablet : Image centrée et réduite */}
                   <div className="lg:hidden w-full max-w-lg aspect-square relative bg-black/40 rounded-xl overflow-hidden">
                     <ImageLens
                       src={
@@ -126,7 +126,7 @@ export default function ProductPageClient({
                   </div>
                 </div>
 
-                {/* Badges premium amÃ©liorÃ©s - RESPONSIVE */}
+                {/* Badges premium améliorés - RESPONSIVE */}
                 <div className="absolute top-2 sm:top-3 lg:top-4 left-2 sm:left-3 lg:left-4 flex flex-col gap-1 sm:gap-2">
                   <Badge className="bg-black/80 backdrop-blur-sm text-white border-0 shadow-lg lg:shadow-xl flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm">
                     <ZoomIn className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
@@ -141,9 +141,9 @@ export default function ProductPageClient({
                   </Badge>
                 </div>
 
-                {/* âœ… Bouton favori en overlay - RESPONSIVE */}
+                {/* ✅ Bouton favori en overlay - RESPONSIVE */}
                 <div className="absolute top-2 sm:top-3 lg:top-4 right-2 sm:right-3 lg:right-4 flex flex-col gap-2">
-                  {/* Status badge animÃ© premium */}
+                  {/* Status badge animé premium */}
                   <Badge
                     variant="default"
                     className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 shadow-lg lg:shadow-xl animate-pulse px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm"
@@ -154,7 +154,7 @@ export default function ProductPageClient({
                 </div>
               </div>
 
-              {/* Miniatures - RESPONSIVE OPTIMISÃ‰ES */}
+              {/* Miniatures - RESPONSIVE OPTIMISÉES */}
               {product.images.length > 1 && (
                 <div className="flex flex-wrap gap-4 sm:gap-6 py-4 mt-2 justify-center lg:justify-start">
                   {product.images.map((image, index) => (
@@ -181,7 +181,7 @@ export default function ProductPageClient({
             </CardContent>
           </Card>
 
-          {/* Carte de localisation ultra amÃ©liorÃ©e - RESPONSIVE COMPACTE */}
+          {/* Carte de localisation ultra améliorée - RESPONSIVE COMPACTE */}
           <Card className="border border-parchemin/10 shadow-lg bg-gradient-to-b from-silex to-black/20 transition-all duration-500 group rounded-xl">
             <CardHeader className="pb-3 sm:pb-4 border-b border-parchemin/5 mb-4 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-terracotta/5 to-transparent"></div>
@@ -205,13 +205,13 @@ export default function ProductPageClient({
           </Card>
         </div>
 
-        {/* Informations produit rÃ©organisÃ©es - RESPONSIVE */}
+        {/* Informations produit réorganisées - RESPONSIVE */}
         <div className="space-y-4 sm:space-y-6 order-2 lg:col-span-5">
-          {/* Card principale rÃ©organisÃ©e - RESPONSIVE */}
+          {/* Card principale réorganisée - RESPONSIVE */}
           <Card className="border border-parchemin/10 shadow-2xl bg-silex rounded-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-terracotta/5 rounded-full blur-[80px] pointer-events-none"></div>
             <CardContent className="p-4 sm:p-6 lg:p-8 relative z-10">
-              {/* En-tÃªte avec titre et prix - RESPONSIVE STACK */}
+              {/* En-tête avec titre et prix - RESPONSIVE STACK */}
               <div className="flex flex-col gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
                 <div className="space-y-2 sm:space-y-3 lg:space-y-4">
                   <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-serif font-black text-parchemin leading-tight tracking-wide drop-shadow-md">
@@ -242,7 +242,7 @@ export default function ProductPageClient({
                 </div>
               </div>
 
-              {/* Genre et EspÃ¨ce - RESPONSIVE */}
+              {/* Genre et Espèce - RESPONSIVE */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6 lg:mb-8">
                 <div className="p-4 sm:p-5 bg-gradient-to-br from-blue-900/20 to-transparent rounded-xl border border-blue-500/20 text-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.05)]">
                   <p className="text-xs text-blue-300/80 uppercase tracking-widest font-bold mb-1">
@@ -251,12 +251,12 @@ export default function ProductPageClient({
                   <p className="font-bold text-blue-100 text-base sm:text-lg lg:text-xl truncate drop-shadow-sm">
                     {product.genre ||
                       dict?.fossilRequests?.notSpecified ||
-                      "Non spÃ©cifiÃ©"}
+                      "Non spécifié"}
                   </p>
                 </div>
                 <div className="p-4 sm:p-5 bg-gradient-to-br from-emerald-900/20 to-transparent rounded-xl border border-emerald-500/20 text-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.05)]">
                   <p className="text-xs text-emerald-300/80 uppercase tracking-widest font-bold mb-1">
-                    {dict?.fossils?.species || "EspÃ¨ce"}
+                    {dict?.fossils?.species || "Espèce"}
                   </p>
                   <p className="font-bold text-emerald-100 text-base sm:text-lg lg:text-xl truncate drop-shadow-sm">
                     {product.species}
@@ -282,17 +282,17 @@ export default function ProductPageClient({
                 <Button
                   onClick={() => handleAddToCart(product)}
                   disabled={isAdding}
-                  className="w-full bg-transparent border-2 border-terracotta text-terracotta hover:bg-terracotta hover:text-parchemin font-bold py-3 sm:py-4 rounded-xl shadow-xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group text-sm sm:text-base h-11 sm:h-12 lg:h-14"
+                  className="w-full max-w-[220px] mx-auto sm:max-w-none sm:mx-0 bg-transparent border-2 border-terracotta text-terracotta hover:bg-terracotta hover:text-parchemin font-bold py-2 sm:py-4 rounded-xl shadow-xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group text-xs sm:text-base h-9 sm:h-12 lg:h-14 px-2 sm:px-4"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                  <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  <ShoppingCart className="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" />
                   {isAdding
                     ? dict?.products?.adding || "Ajout..."
                     : dict?.products?.addToCart || "Ajouter au panier"}
                 </Button>
 
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  {/* âœ… Bouton favori w-full */}
+                  {/* ✅ Bouton favori w-full */}
                   <div className="flex w-full">
                     <FavoriteButton
                       productId={product.id}
@@ -311,14 +311,14 @@ export default function ProductPageClient({
                     <span className="hidden sm:inline">
                       {dict?.products?.share || "Partager"}
                     </span>
-                    <span className="sm:hidden">â†—</span>
+                    <span className="sm:hidden">↗</span>
                   </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Informations dÃ©taillÃ©es - RESPONSIVE COMPACTES */}
+          {/* Informations détaillées - RESPONSIVE COMPACTES */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Pays d'origine */}
             <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-amber-900/10 to-transparent rounded-xl border border-amber-500/20 hover:shadow-lg hover:border-amber-500/40 transition-all duration-300 group">
@@ -336,48 +336,48 @@ export default function ProductPageClient({
               </div>
             </div>
 
-            {/* Ã‰tage gÃ©ologique */}
+            {/* Étage géologique */}
             <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-purple-900/10 to-transparent rounded-xl border border-purple-500/20 hover:shadow-lg hover:border-purple-500/40 transition-all duration-300 group">
               <div className="p-2 sm:p-3 lg:p-4 bg-purple-900/40 rounded-xl shadow-inner border border-purple-500/20 flex-shrink-0">
                 <Mountain className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-purple-400" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-purple-400/80 uppercase tracking-widest font-bold mb-1">
-                  {dict?.fossils?.stageLabel || "Ã‰tage gÃ©ologique"}
+                  {dict?.fossils?.stageLabel || "Étage géologique"}
                 </p>
                 <p className="font-bold text-purple-100 text-xs sm:text-sm lg:text-base truncate">
                   {product.geologicalStage ||
                     dict?.fossilRequests?.notSpecified ||
-                    "Non spÃ©cifiÃ©"}
+                    "Non spécifié"}
                 </p>
               </div>
             </div>
 
-            {/* LocalitÃ© */}
+            {/* Localité */}
             <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-green-900/10 to-transparent rounded-xl border border-green-500/20 hover:shadow-lg hover:border-green-500/40 transition-all duration-300 group">
               <div className="p-2 sm:p-3 lg:p-4 bg-green-900/40 rounded-xl shadow-inner border border-green-500/20 flex-shrink-0">
                 <Star className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-500" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-green-500/80 uppercase tracking-widest font-bold mb-1">
-                  {dict?.fossils?.localityLabel || "LocalitÃ©"}
+                  {dict?.fossils?.localityLabel || "Localité"}
                 </p>
                 <p className="font-bold text-green-100 text-xs sm:text-sm lg:text-base truncate">
                   {product.locality?.name ||
                     dict?.fossilRequests?.notSpecified ||
-                    "Non spÃ©cifiÃ©"}
+                    "Non spécifié"}
                 </p>
               </div>
             </div>
 
-            {/* PÃ©riode gÃ©ologique */}
+            {/* Période géologique */}
             <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-cyan-900/10 to-transparent rounded-xl border border-cyan-500/20 hover:shadow-lg hover:border-cyan-500/40 transition-all duration-300 group">
               <div className="p-2 sm:p-3 lg:p-4 bg-cyan-900/40 rounded-xl shadow-inner border border-cyan-500/20 flex-shrink-0">
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-cyan-400" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-cyan-400/80 uppercase tracking-widest font-bold mb-1">
-                  {dict?.fossils?.periodLabel || "PÃ©riode"}
+                  {dict?.fossils?.periodLabel || "Période"}
                 </p>
                 <p className="font-bold text-cyan-100 text-xs sm:text-sm lg:text-base truncate">
                   {product.geologicalPeriod}
@@ -423,7 +423,7 @@ export default function ProductPageClient({
             <p className="text-slate-600 max-w-3xl mx-auto text-sm sm:text-base lg:text-lg leading-relaxed px-4">
               {lang === "en"
                 ? "Discover other specimens from the same period or region that might interest you"
-                : "DÃ©couvrez d'autres spÃ©cimens de la mÃªme pÃ©riode ou rÃ©gion qui pourraient vous intÃ©resser"}
+                : "Découvrez d'autres spécimens de la même période ou région qui pourraient vous intéresser"}
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">

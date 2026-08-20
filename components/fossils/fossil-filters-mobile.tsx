@@ -401,7 +401,7 @@ export default function FossilesFiltersMobile({
                 </div>
               </div>
 
-              {/* SÃ©parateur */}
+              {/* Séparateur */}
               <div className="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
               {/* Catégorie */}
               <div className="space-y-3">
