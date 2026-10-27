@@ -65,26 +65,26 @@ export function CartSidebar({ isOpen, onClose, dict }: CartSidebarProps) {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-lg flex flex-col h-full bg-zinc-950 border-l border-zinc-800 p-0 text-zinc-100">
+      <SheetContent className="w-full sm:max-w-lg flex flex-col h-full bg-[var(--silex)] border-l border-[var(--parchemin)]/10 p-0 text-[var(--parchemin)]">
         {/* En-tête */}
-        <SheetHeader className="p-5 border-b border-zinc-800 flex-shrink-0 bg-zinc-950">
+        <SheetHeader className="p-5 border-b border-[var(--parchemin)]/10 flex-shrink-0 bg-[var(--silex)]">
           <SheetTitle className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-white p-2 rounded-lg border border-zinc-200 shadow-sm">
-                <ShoppingBag className="w-5 h-5 text-zinc-900" />
+              <div className="bg-[var(--terracotta)]/15 p-2 rounded-lg border border-[var(--terracotta)]/40">
+                <ShoppingBag className="w-5 h-5 text-[var(--terracotta)]" />
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-lg font-serif font-bold text-amber-50">
+                <span className="text-lg font-serif font-bold text-[var(--parchemin)]">
                   {dict.cartSidebar.title}
                 </span>
-                <span className="text-xs text-zinc-400">
+                <span className="text-xs text-[var(--parchemin)]/60">
                   Paleolitho Collection
                 </span>
               </div>
             </div>
 
             {totalItems > 0 && (
-              <Badge className="bg-white text-zinc-900 border border-zinc-200 px-3 py-1 font-bold shadow-sm">
+              <Badge className="bg-[var(--terracotta)] text-[var(--silex)] border-0 px-3 py-1 font-bold shadow-sm">
                 {totalItems} {dict.cartSidebar.itemLabel}
                 {totalItems > 1 ? dict.cartSidebar.itemPlural : ""}
               </Badge>
@@ -95,22 +95,22 @@ export function CartSidebar({ isOpen, onClose, dict }: CartSidebarProps) {
         {/* Corps du panier */}
         {!items.length ? (
           <div className="flex flex-col items-center justify-center flex-1 p-8 text-center space-y-6">
-            <div className="bg-zinc-900 p-6 rounded-full border border-zinc-800">
-              <ShoppingCart className="w-12 h-12 text-zinc-600" />
+            <div className="bg-[var(--silex)] p-6 rounded-full border border-[var(--parchemin)]/15">
+              <ShoppingCart className="w-12 h-12 text-[var(--parchemin)]/40" />
             </div>
 
             <div className="space-y-2">
-              <h3 className="font-serif font-bold text-xl text-amber-50">
+              <h3 className="font-serif font-bold text-xl text-[var(--parchemin)]">
                 {dict.cartSidebar.emptyTitle}
               </h3>
-              <p className="text-zinc-400 text-sm max-w-[250px] mx-auto">
+              <p className="text-[var(--parchemin)]/60 text-sm max-w-[250px] mx-auto">
                 {dict.cartSidebar.emptyDesc}
               </p>
             </div>
 
             <Button
               onClick={onClose}
-              className="bg-amber-100/10 text-amber-50 hover:bg-amber-100/20 border border-amber-100/20 px-8 py-6 uppercase tracking-wider text-sm font-bold transition-all"
+              className="bg-[var(--terracotta)] text-[var(--silex)] hover:bg-[var(--terracotta)]/85 border-0 px-8 py-6 uppercase tracking-wider text-sm font-bold transition-all cursor-pointer"
             >
               <Package className="w-4 h-4 mr-2" />
               {dict.cartSidebar.continueShopping}
@@ -130,33 +130,33 @@ export function CartSidebar({ isOpen, onClose, dict }: CartSidebarProps) {
             </div>
 
             {/* Récapitulatif et Boutons */}
-            <div className="p-5 bg-zinc-950 border-t border-zinc-800 flex-shrink-0 flex flex-col gap-5">
-              <div className="space-y-3">
+            <div className="p-4 bg-[var(--silex)] border-t border-[var(--parchemin)]/10 flex-shrink-0 flex flex-col gap-4">
+              <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-zinc-400">
+                  <span className="text-[var(--parchemin)]/60">
                     {dict.cartSidebar.shippingLabel}
                   </span>
-                  <span className="text-emerald-400/90 font-medium">
+                  <span className="text-[var(--terracotta)] font-medium">
                     {dict.cartSidebar.shippingNextStep}
                   </span>
                 </div>
 
-                <Separator className="bg-zinc-800" />
+                <Separator className="bg-[var(--parchemin)]/10" />
 
                 <div className="flex justify-between items-end">
-                  <span className="text-sm font-bold text-amber-100/70 flex items-center gap-2 uppercase tracking-widest">
+                  <span className="text-sm font-bold text-[var(--parchemin)]/70 flex items-center gap-2 uppercase tracking-widest">
                     {dict.cartSidebar.totalLabel}
                   </span>
-                  <span className="text-3xl font-bold font-serif text-amber-50">
+                  <span className="text-3xl font-bold font-serif text-[var(--terracotta)]">
                     {formatPrice(totalPrice)}
                   </span>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 <Button
                   onClick={handleCheckout}
-                  className="w-full bg-transparent border-2 border-terracotta text-terracotta hover:bg-terracotta hover:text-parchemin py-6 text-base font-bold shadow-lg transition-colors"
+                  className="w-full bg-[var(--terracotta)] hover:bg-[var(--terracotta)]/85 text-[var(--silex)] border-0 py-5 text-base font-bold shadow-lg shadow-black/30 transition-all duration-300 cursor-pointer"
                   disabled={!items.length}
                 >
                   <CreditCard className="w-5 h-5 mr-2" />
@@ -167,7 +167,7 @@ export function CartSidebar({ isOpen, onClose, dict }: CartSidebarProps) {
                   <Button
                     onClick={onClose}
                     variant="outline"
-                    className="flex-1 bg-silex border-parchemin/20 text-parchemin font-bold hover:text-terracotta hover:border-terracotta/50 hover:bg-terracotta/10 py-5 transition-colors"
+                    className="flex-1 bg-[var(--terracotta)]/10 border-[var(--parchemin)]/25 text-[var(--parchemin)] font-bold hover:text-[var(--terracotta)] hover:border-[var(--terracotta)]/60 hover:bg-[var(--terracotta)]/20 py-4 transition-colors cursor-pointer"
                   >
                     {dict.cartSidebar.continueShopping}
                   </Button>
@@ -175,7 +175,7 @@ export function CartSidebar({ isOpen, onClose, dict }: CartSidebarProps) {
                   <Button
                     onClick={handleClearCart}
                     variant="outline"
-                    className="flex-1 bg-silex border-parchemin/20 text-parchemin font-bold hover:text-red-400 hover:border-red-900/50 hover:bg-destructive/10 py-5 transition-colors"
+                    className="flex-1 bg-red-950/20 border-[var(--parchemin)]/25 text-[var(--parchemin)] font-bold hover:text-red-400 hover:border-red-500/50 hover:bg-red-950/40 py-4 transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
                     {dict.cartSidebar.clearButton}

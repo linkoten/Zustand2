@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ import { FilterOptions } from "@/types/productType";
 import { useFossilStore } from "@/stores/fossilStore";
 import { Slider } from "@/components/ui/slider";
 import { AdvancedFiltersModal } from "./advanced-filters/advanced-filters-modal";
+import FilterSectionToggle from "./filter-section-toggle";
 
 interface FossilesFiltersProps {
   filterOptions: FilterOptions;
@@ -61,6 +62,16 @@ export default function FossilesFilters({
     parseArray(searchParams.get("geologicalStage")),
   );
 
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    category: false,
+    country: false,
+    locality: false,
+    period: false,
+    stage: false,
+  });
+  const toggleSection = (key: string) =>
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+
   const PRICE_STEP = 10;
   const defaultMinPrice =
     Math.floor((filterOptions.minPrice || 0) / PRICE_STEP) * PRICE_STEP;
@@ -89,12 +100,36 @@ export default function FossilesFilters({
   }, [searchTerm]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedPriceRange(priceRange), 600);
+    const timer = setTimeout(() => {
+      // Évite de recréer une nouvelle référence de tableau si les valeurs n'ont pas changé,
+      // ce qui déclencherait l'effet d'application des filtres juste après le montage
+      setDebouncedPriceRange((prev) =>
+        prev[0] === priceRange[0] && prev[1] === priceRange[1]
+          ? prev
+          : priceRange,
+      );
+    }, 600);
     return () => clearTimeout(timer);
   }, [priceRange]);
 
-  // Handle dynamic apply whenever filters change
+  // Applique les filtres uniquement si leurs valeurs ont réellement changé
+  const lastAppliedKey = useRef<string | null>(null);
   useEffect(() => {
+    const key = JSON.stringify([
+      selectedCategories,
+      selectedCountries,
+      selectedLocalities,
+      selectedPeriods,
+      selectedStages,
+      debouncedSearch,
+      debouncedPriceRange,
+    ]);
+    if (lastAppliedKey.current === null) {
+      lastAppliedKey.current = key;
+      return;
+    }
+    if (lastAppliedKey.current === key) return;
+    lastAppliedKey.current = key;
     applyFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -370,11 +405,15 @@ export default function FossilesFilters({
 
               {/* Catégorie */}
               <div className="space-y-3">
-                <Label className="text-sm font-semibold text-[var(--parchemin)]/80 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-[var(--terracotta)] rounded-full"></div>
-                  {dict?.fossils?.categoryLabel || "Catégorie"}
-                </Label>
-                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                <FilterSectionToggle
+                  title={dict?.fossils?.categoryLabel || "Catégorie"}
+                  count={selectedCategories.length}
+                  open={openSections.category}
+                  onToggle={() => toggleSection("category")}
+                />
+                <div
+                  className={`space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar ${openSections.category ? "" : "hidden"}`}
+                >
                   {filterOptions.categories.map((option) => {
                     const count = facets?.categories[option] || 0;
                     if (
@@ -419,11 +458,15 @@ export default function FossilesFilters({
 
               {/* Pays */}
               <div className="space-y-3">
-                <Label className="text-sm font-semibold text-[var(--parchemin)]/80 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-[var(--terracotta)] rounded-full"></div>
-                  {dict?.fossils?.countryLabel || "Pays d'origine"}
-                </Label>
-                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                <FilterSectionToggle
+                  title={dict?.fossils?.countryLabel || "Pays d'origine"}
+                  count={selectedCountries.length}
+                  open={openSections.country}
+                  onToggle={() => toggleSection("country")}
+                />
+                <div
+                  className={`space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar ${openSections.country ? "" : "hidden"}`}
+                >
                   {filterOptions.countries.map((option) => {
                     const count = facets?.countries[option] || 0;
                     if (
@@ -468,11 +511,15 @@ export default function FossilesFilters({
 
               {/* Localité */}
               <div className="space-y-3">
-                <Label className="text-sm font-semibold text-[var(--parchemin)]/80 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-[var(--terracotta)] rounded-full"></div>
-                  {dict?.fossils?.localityLabel || "Localité"}
-                </Label>
-                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                <FilterSectionToggle
+                  title={dict?.fossils?.localityLabel || "Localité"}
+                  count={selectedLocalities.length}
+                  open={openSections.locality}
+                  onToggle={() => toggleSection("locality")}
+                />
+                <div
+                  className={`space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar ${openSections.locality ? "" : "hidden"}`}
+                >
                   {filterOptions.localities.map((option) => {
                     const count = facets?.localities[option] || 0;
                     if (
@@ -517,11 +564,15 @@ export default function FossilesFilters({
 
               {/* Période géologique */}
               <div className="space-y-3">
-                <Label className="text-sm font-semibold text-[var(--parchemin)]/80 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-[var(--terracotta)] rounded-full"></div>
-                  {dict?.fossils?.periodLabel || "Période géologique"}
-                </Label>
-                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                <FilterSectionToggle
+                  title={dict?.fossils?.periodLabel || "Période géologique"}
+                  count={selectedPeriods.length}
+                  open={openSections.period}
+                  onToggle={() => toggleSection("period")}
+                />
+                <div
+                  className={`space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar ${openSections.period ? "" : "hidden"}`}
+                >
                   {filterOptions.geologicalPeriods.map((option) => {
                     const count = facets?.periods[option] || 0;
                     if (
@@ -580,11 +631,15 @@ export default function FossilesFilters({
                   : filterOptions.geologicalStages;
                 return (
                   <div className="space-y-3">
-                    <Label className="text-sm font-semibold text-[var(--parchemin)]/80 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-[var(--terracotta)] rounded-full"></div>
-                      {dict?.fossils?.stageLabel || "Étage géologique"}
-                    </Label>
-                    <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                    <FilterSectionToggle
+                      title={dict?.fossils?.stageLabel || "Étage géologique"}
+                      count={selectedStages.length}
+                      open={openSections.stage}
+                      onToggle={() => toggleSection("stage")}
+                    />
+                    <div
+                      className={`space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar ${openSections.stage ? "" : "hidden"}`}
+                    >
                       {stagesForPeriods.map((option) => {
                         const count = facets?.stages[option] || 0;
                         if (

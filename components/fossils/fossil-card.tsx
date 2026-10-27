@@ -37,9 +37,49 @@ interface FossilCardProps {
   lang: "fr" | "en";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict?: any;
+  density?: CardDensity;
 }
 
-export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
+export type CardDensity = "comfortable" | "compact" | "dense";
+
+const DENSITY: Record<CardDensity, Record<string, string>> = {
+  comfortable: {
+    pad: "p-3 sm:p-4",
+    title: "text-base sm:text-lg",
+    price: "text-xl sm:text-2xl",
+    meta: "text-xs sm:text-sm mb-3",
+    badge: "text-xs",
+    detail: "text-xs space-y-1",
+    button: "text-[11px] sm:text-sm md:text-base py-2 sm:py-4 px-2 min-h-9 sm:min-h-12",
+    link: "text-xs sm:text-sm",
+    footer: "p-3 sm:p-4 pt-0",
+  },
+  compact: {
+    pad: "p-2.5 sm:p-3",
+    title: "text-sm lg:text-base",
+    price: "text-base lg:text-lg",
+    meta: "text-[11px] mb-2",
+    badge: "text-[10px]",
+    detail: "text-[10px] space-y-0.5",
+    button: "text-[10px] lg:text-xs py-1.5 px-1.5 min-h-7 lg:min-h-9",
+    link: "text-[10px] lg:text-xs",
+    footer: "p-2.5 pt-0",
+  },
+  dense: {
+    pad: "p-2",
+    title: "text-xs leading-snug",
+    price: "text-sm",
+    meta: "text-[10px] mb-1.5",
+    badge: "text-[9px]",
+    detail: "text-[9px] space-y-0.5",
+    button: "text-[9px] py-1 px-1 min-h-6",
+    link: "text-[9px]",
+    footer: "p-2 pt-0",
+  },
+};
+
+export function FossilCard({ fossil, lang, dict, density = "comfortable" }: FossilCardProps) {
+  const d = DENSITY[density];
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const router = useRouter();
 
@@ -145,6 +185,8 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
                 src={fossil.images[0].imageUrl}
                 alt={fossil.images[0].altText || fossil.title}
                 fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                unoptimized
                 className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               />
             ) : (
@@ -233,18 +275,18 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
         )}
       </CardHeader>
 
-      <CardContent className="p-3 sm:p-4">
+      <CardContent className={d.pad}>
         <div className="mb-3">
-          <h3 className="font-serif font-semibold text-base sm:text-lg leading-tight mb-1 line-clamp-2 text-[var(--parchemin)] group-hover:text-[var(--parchemin)] tracking-wide">
+          <h3 className={`font-serif font-semibold leading-tight mb-1 line-clamp-2 text-[var(--parchemin)] group-hover:text-[var(--parchemin)] tracking-wide ${d.title}`}>
             {fossil.title}
           </h3>
-          <p className="text-xl sm:text-2xl font-bold text-[var(--terracotta)] drop-shadow-sm">
+          <p className={`font-bold text-[var(--terracotta)] drop-shadow-sm ${d.price}`}>
             {formatPrice(fossil.price)}
           </p>
         </div>
 
         {fossil.genre && fossil.species && (
-          <p className="text-xs sm:text-sm text-[var(--parchemin)]/50 italic mb-3 line-clamp-1 font-light tracking-wide">
+          <p className={`text-[var(--parchemin)]/50 italic line-clamp-1 font-light tracking-wide ${d.meta}`}>
             <span className="capitalize">{fossil.genre.toLowerCase()}</span>{" "}
             <span className="capitalize">{fossil.species.toLowerCase()}</span>
           </p>
@@ -253,7 +295,7 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
         <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-3">
           <Badge
             variant="secondary"
-            className={`text-xs ${getCategoryColor(fossil.category)} font-medium`}
+            className={`${d.badge} ${getCategoryColor(fossil.category)} font-medium`}
           >
             {fossil.category}
           </Badge>
@@ -261,7 +303,7 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
           {fossil.countryOfOrigin && (
             <Badge
               variant="outline"
-              className="text-xs border-[var(--parchemin)]/20 text-[var(--parchemin)]/70"
+              className={`${d.badge} border-[var(--parchemin)]/20 text-[var(--parchemin)]/70`}
             >
               📍 {fossil.countryOfOrigin}
             </Badge>
@@ -269,13 +311,13 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
 
           <Badge
             variant="outline"
-            className="text-xs border-[var(--terracotta)]/30 text-[var(--terracotta)]/80"
+            className={`${d.badge} border-[var(--terracotta)]/30 text-[var(--terracotta)]/80`}
           >
             ⏳ {fossil.geologicalPeriod}
           </Badge>
         </div>
 
-        <div className="text-xs text-[var(--parchemin)]/50 space-y-1 font-light">
+        <div className={`text-[var(--parchemin)]/50 font-light ${d.detail}`}>
           {fossil.locality && (
             <p className="line-clamp-1">
               <span className="font-medium text-[var(--parchemin)]/70">
@@ -295,16 +337,16 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="p-3 sm:p-4 pt-0 flex gap-2 sm:gap-3">
+      <CardFooter className={`${d.footer} flex gap-2 sm:gap-3`}>
         <div className="flex flex-col gap-2 sm:gap-3 w-full">
           <Button
             onClick={() => handleAddToCart(fossil)}
             size="default"
             disabled={isAdding || !isAvailable}
-            className="w-full bg-transparent border-2 border-terracotta text-terracotta hover:bg-terracotta hover:text-parchemin font-bold text-sm sm:text-base py-5 shadow-lg transition-all duration-300 rounded-xl uppercase tracking-wider group/btn"
+            className={`w-full bg-transparent border-2 border-terracotta text-terracotta hover:bg-terracotta hover:text-parchemin font-bold h-auto shadow-lg transition-all duration-300 rounded-xl uppercase tracking-wide sm:tracking-wider group/btn whitespace-normal leading-tight ${d.button}`}
           >
-            <span className="relative z-10 flex items-center justify-center">
-              <ShoppingCart className="w-5 h-5 mr-2 transition-transform duration-300 group-hover/btn:-translate-y-1 group-hover/btn:translate-x-1" />
+            <span className="relative z-10 flex items-center justify-center gap-1 sm:gap-2">
+              <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0 transition-transform duration-300 group-hover/btn:-translate-y-1 group-hover/btn:translate-x-1" />
               {dict?.products?.cart || "Ajouter au panier"}
             </span>
           </Button>
@@ -313,7 +355,7 @@ export function FossilCard({ fossil, lang, dict }: FossilCardProps) {
             asChild
             variant="ghost"
             size="sm"
-            className="w-full text-[var(--parchemin)]/70 hover:text-[var(--terracotta)] hover:bg-[var(--terracotta)]/5 transition-colors duration-200 text-xs sm:text-sm font-medium"
+            className={`w-full text-[var(--parchemin)]/70 hover:text-[var(--terracotta)] hover:bg-[var(--terracotta)]/5 transition-colors duration-200 font-medium ${d.link}`}
           >
             <Link href={`/${lang}/fossiles/${fossil.id}`}>
               <Eye className="w-4 h-4 mr-2" />

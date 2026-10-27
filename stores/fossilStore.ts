@@ -6,12 +6,15 @@ import {
 import { SerializedProduct } from "@/types/type";
 import { SearchParams } from "@/types/productType";
 
-export interface FossilFilters extends SearchParams {}
+export interface FossilFilters extends SearchParams {
+  page?: string;
+}
 
 interface FossilData {
   fossils: SerializedProduct[];
   totalCount: number;
-  nextCursor: number | null;
+  page: number;
+  totalPages: number;
   hasNextPage: boolean;
 }
 
@@ -38,13 +41,48 @@ interface FossilState {
   loadFossilData: (
     filters: FossilFilters,
     userId?: string | null,
-    cursor?: number | null,
+    page?: number,
   ) => Promise<void>;
   resetFilters: () => void;
   goToNextPage: () => void;
   goToPrevPage: () => void;
-  cursorHistory: (number | null)[];
+  goToPage: (page: number) => void;
 }
+
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const CACHE_MAX_ENTRIES = 30;
+const pageCache = new Map<string, { data: FossilData; at: number }>();
+let latestRequestId = 0;
+
+const buildCacheKey = (filters: FossilFilters, userId: string | null | undefined, page: number) =>
+  JSON.stringify({
+    f: Object.entries(filters)
+      .filter(([, v]) => v !== undefined && v !== "")
+      .sort(([a], [b]) => a.localeCompare(b)),
+    u: userId ?? null,
+    p: page,
+  });
+
+const storePage = (key: string, data: FossilData) => {
+  if (pageCache.size >= CACHE_MAX_ENTRIES) {
+    pageCache.delete(pageCache.keys().next().value as string);
+  }
+  pageCache.set(key, { data, at: Date.now() });
+};
+
+// Précharge une page en arrière-plan pour que la navigation soit instantanée
+const prefetchPage = (
+  filters: FossilFilters,
+  userId: string | null | undefined,
+  page: number,
+) => {
+  const key = buildCacheKey(filters, userId, page);
+  const cached = pageCache.get(key);
+  if (cached && Date.now() - cached.at < CACHE_TTL_MS) return;
+  getFossils({ ...filters, page: String(page) }, userId, 20)
+    .then((data) => storePage(key, data))
+    .catch(() => {});
+};
 
 export const useFossilStore = create<FossilState>((set, get) => ({
   catalogIndex: [],
@@ -68,10 +106,10 @@ export const useFossilStore = create<FossilState>((set, get) => ({
   fossilData: {
     fossils: [],
     totalCount: 0,
-    nextCursor: null,
+    page: 1,
+    totalPages: 1,
     hasNextPage: false,
   },
-  cursorHistory: [null],
   isLoading: false,
   filters: {},
   userId: null,
@@ -86,7 +124,7 @@ export const useFossilStore = create<FossilState>((set, get) => ({
     const currentFilters = get().filters;
     const updatedFilters = { ...currentFilters, ...newFilters };
 
-    // Reset cursor history when filters change (not during navigation)
+    // Un changement de filtre (hors page) ramène toujours à la page 1
     const isFilterChange =
       Object.keys(newFilters).length > 0 &&
       Object.keys(newFilters).some((key) => key !== "page");
@@ -161,49 +199,66 @@ export const useFossilStore = create<FossilState>((set, get) => ({
     set({
       filters: updatedFilters,
       facets: newFacets,
-      ...(isFilterChange ? { cursorHistory: [null] } : {}),
     });
 
     if (Object.keys(newFilters).length > 0) {
       const userId = get().userId;
-      // Auto-load data with new filters (cursor reset to page 1)
-      get().loadFossilData(updatedFilters, userId);
+      const targetPage = isFilterChange
+        ? 1
+        : Number(newFilters.page) || get().fossilData.page || 1;
+      get().loadFossilData(updatedFilters, userId, targetPage);
     }
   },
 
-  loadFossilData: async (filters, userId, cursor) => {
+  loadFossilData: async (filters, userId, page = 1) => {
+    const requestId = ++latestRequestId;
+    const key = buildCacheKey(filters, userId, page);
+    const cached = pageCache.get(key);
+
+    if (cached && Date.now() - cached.at < CACHE_TTL_MS) {
+      set({ fossilData: cached.data, isLoading: false });
+      return;
+    }
+
     set({ isLoading: true });
 
     try {
-      const data = await getFossils(filters, userId, cursor, 20);
-      set({ fossilData: data, isLoading: false });
+      const data = await getFossils({ ...filters, page: String(page) }, userId, 20);
+      storePage(key, data);
+      // Ignore les réponses obsolètes si un autre filtre a été demandé entre-temps
+      if (requestId === latestRequestId) {
+        set({ fossilData: data, isLoading: false });
+        if (data.hasNextPage) prefetchPage(filters, userId, page + 1);
+        if (page > 1) prefetchPage(filters, userId, page - 1);
+      }
     } catch (error) {
       console.error("Failed to load fossil data", error);
-      set({ isLoading: false });
+      if (requestId === latestRequestId) set({ isLoading: false });
     }
   },
 
   resetFilters: () => {
     const newFilters = {};
-    set({ filters: newFilters, cursorHistory: [null] });
+    set({ filters: newFilters });
     const userId = get().userId;
-    get().loadFossilData(newFilters, userId);
+    get().loadFossilData(newFilters, userId, 1);
   },
 
   goToNextPage: () => {
-    const { fossilData, filters, userId, cursorHistory } = get();
-    if (!fossilData.hasNextPage || fossilData.nextCursor == null) return;
-    const newHistory = [...cursorHistory, fossilData.nextCursor];
-    set({ cursorHistory: newHistory });
-    get().loadFossilData(filters, userId, fossilData.nextCursor);
+    const { fossilData, filters, userId } = get();
+    if (!fossilData.hasNextPage) return;
+    get().loadFossilData(filters, userId, fossilData.page + 1);
   },
 
   goToPrevPage: () => {
-    const { cursorHistory, filters, userId } = get();
-    if (cursorHistory.length <= 1) return;
-    const newHistory = cursorHistory.slice(0, -1);
-    const prevCursor = newHistory[newHistory.length - 1];
-    set({ cursorHistory: newHistory });
-    get().loadFossilData(filters, userId, prevCursor ?? undefined);
+    const { fossilData, filters, userId } = get();
+    if (fossilData.page <= 1) return;
+    get().loadFossilData(filters, userId, fossilData.page - 1);
+  },
+
+  goToPage: (page) => {
+    const { filters, userId, fossilData } = get();
+    const target = Math.max(1, Math.min(page, fossilData.totalPages || 1));
+    get().loadFossilData(filters, userId, target);
   },
 }));

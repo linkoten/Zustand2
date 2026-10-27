@@ -11,6 +11,7 @@ interface ImageLensProps {
   className?: string;
   lensSize?: number;
   zoomLevel?: number;
+  unoptimized?: boolean;
 }
 
 export default function ImageLens({
@@ -21,6 +22,7 @@ export default function ImageLens({
   className = "",
   lensSize = 150,
   zoomLevel = 3.5,
+  unoptimized = false,
 }: ImageLensProps) {
   const [showLens, setShowLens] = useState(false);
   const [lensPosition, setLensPosition] = useState({ x: 0, y: 0 });
@@ -84,6 +86,7 @@ export default function ImageLens({
           width={width}
           height={height}
           className="w-full h-full object-contain transition-all duration-500"
+          unoptimized={unoptimized}
           priority
         />
 

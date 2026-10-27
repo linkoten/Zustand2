@@ -349,14 +349,14 @@ export async function deleteProductAction(
 }
 
 export async function getFossils(
-  filters: SearchParams & { search?: string } = {},
+  filters: SearchParams & { search?: string; page?: string } = {},
   userId?: string | null,
-  cursor?: number | null,
   limit: number = 20,
 ): Promise<{
   fossils: SerializedProduct[];
   totalCount: number;
-  nextCursor: number | null;
+  page: number;
+  totalPages: number;
   hasNextPage: boolean;
 }> {
   try {
@@ -435,7 +435,10 @@ export async function getFossils(
       where: whereConditions,
     });
 
-    // ✅ Récupérer les produits avec pagination (cursor-based)
+    const totalPages = totalCount > 0 ? Math.ceil(totalCount / limit) : 1;
+    const page = Math.min(Math.max(1, Number(filters.page) || 1), totalPages);
+
+    // ✅ Récupérer les produits avec pagination (par numéro de page)
     const fossils = await prisma.product.findMany({
       where: whereConditions,
       include: {
@@ -465,15 +468,13 @@ export async function getFossils(
               : filters.sort === "price_desc"
                 ? [{ price: "desc" as const }, { id: "desc" as const }]
                 : [{ createdAt: "desc" as const }, { id: "desc" as const }],
-      ...(cursor != null ? { cursor: { id: cursor }, skip: 1 } : {}),
-      take: limit + 1,
+      skip: (page - 1) * limit,
+      take: limit,
     });
 
-    const hasNextPage = fossils.length > limit;
-    const items = hasNextPage ? fossils.slice(0, limit) : fossils;
-    const nextCursor = items.length > 0 ? items[items.length - 1].id : null;
+    const hasNextPage = page < totalPages;
 
-    const serializedFossils = items.map((fossil) => {
+    const serializedFossils = fossils.map((fossil) => {
       // ✅ Calculer les statistiques de notation
       const ratings = fossil.ratings;
       const averageRating =
@@ -520,7 +521,8 @@ export async function getFossils(
     return {
       fossils: serializedFossils,
       totalCount,
-      nextCursor,
+      page,
+      totalPages,
       hasNextPage,
     };
   } catch (error) {
@@ -528,7 +530,8 @@ export async function getFossils(
     return {
       fossils: [],
       totalCount: 0,
-      nextCursor: null,
+      page: 1,
+      totalPages: 1,
       hasNextPage: false,
     };
   }
@@ -659,15 +662,13 @@ export async function getProduct(
 }
 
 export async function getSimilarProducts(
-  currentProductId: number,
-  category: string,
+  current: SerializedProduct,
   limit: number = 4,
 ): Promise<SerializedProduct[]> {
   try {
-    const products = await prisma.product.findMany({
+    const candidates = await prisma.product.findMany({
       where: {
-        id: { not: currentProductId },
-        category: category as Category,
+        id: { not: current.id },
         status: ProductStatus.AVAILABLE,
       },
       include: {
@@ -681,9 +682,35 @@ export async function getSimilarProducts(
         },
         locality: true,
       },
-      take: limit,
+      take: 200,
       orderBy: { createdAt: "desc" },
     });
+
+    // Priorité : espèce > genre > catégorie > localité > étage > prix proche
+    const norm = (value: string) => value.trim().toLowerCase();
+    const refSpecies = norm(current.species);
+    const refGenus = norm(current.genre);
+    const refStage = norm(current.geologicalStage);
+    const refPrice = current.price;
+
+    const similarityScore = (candidate: (typeof candidates)[number]) => {
+      const price = candidate.price.toNumber();
+      const priceDistance = Math.abs(price - refPrice) / Math.max(refPrice, 1);
+      return (
+        (norm(candidate.species) === refSpecies ? 64 : 0) +
+        (norm(candidate.genre) === refGenus ? 32 : 0) +
+        (candidate.category === current.category ? 16 : 0) +
+        (candidate.localityId === current.locality.id ? 8 : 0) +
+        (norm(candidate.geologicalStage) === refStage ? 4 : 0) +
+        1 / (1 + priceDistance)
+      );
+    };
+
+    const products = candidates
+      .map((candidate) => ({ candidate, score: similarityScore(candidate) }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map(({ candidate }) => candidate);
 
     return products.map((product) => {
       // ✅ Calculer les statistiques pour chaque produit similaire

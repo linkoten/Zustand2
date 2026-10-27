@@ -81,7 +81,7 @@ export default async function ProductPage({
   const [ratingStats, userRating, similarProducts] = await Promise.all([
     getProductRatingStats(product.id),
     userId ? getUserProductRating(product.id) : null,
-    getSimilarProducts(product.id, product.category),
+    getSimilarProducts(product),
   ]);
 
   const productJsonLd = buildProductJsonLd({

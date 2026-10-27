@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -10,20 +11,41 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, Filter, ChevronLeft, ChevronRight, X } from "lucide-react";
+import {
+  Search,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Grid2x2,
+  Grid3x3,
+  LayoutGrid,
+  List,
+} from "lucide-react";
 import { FossilCard } from "./fossil-card";
+import { FossilListItem } from "./fossil-list-item";
 import { SerializedProduct } from "@/types/type";
 import { FilterOptions } from "@/types/productType";
 import FossilesFilters from "./fossil-filters";
-import { Badge } from "@/components/ui/badge";
 import FossilesFiltersMobile from "./fossil-filters-mobile";
 import { useFossilStore } from "@/stores/fossilStore";
+
+type ViewMode = "grid-2" | "grid-3" | "grid-4" | "list";
+
+const VIEW_MODE_STORAGE_KEY = "fossilsViewMode";
+
+const desktopGridColsClass: Record<Exclude<ViewMode, "list">, string> = {
+  "grid-2": "lg:grid-cols-2",
+  "grid-3": "lg:grid-cols-3",
+  "grid-4": "lg:grid-cols-4",
+};
 
 interface FossilesClientProps {
   fossilsData: {
     fossils: SerializedProduct[];
     totalCount: number;
-    nextCursor: number | null;
+    page: number;
+    totalPages: number;
     hasNextPage: boolean;
   };
   filterOptions: FilterOptions;
@@ -32,57 +54,6 @@ interface FossilesClientProps {
   dict?: any;
   userId?: string | null;
   catalogData?: Record<string, string | null>[];
-}
-
-// Composant animé pour chaque fossil card
-function AnimatedFossilCard({
-  fossil,
-  index,
-  dict,
-  lang,
-}: {
-  fossil: SerializedProduct;
-  index: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  dict: any;
-  lang: "en" | "fr";
-}) {
-  const [isVisible, setIsVisible] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            setIsVisible(true);
-          }, index * 50);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 },
-    );
-
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [index]);
-
-  return (
-    <div
-      ref={cardRef}
-      className={`transform transition-all duration-500 ease-out ${
-        isVisible
-          ? "translate-y-0 opacity-100 scale-100"
-          : "translate-y-6 opacity-0 scale-95"
-      }`}
-      style={{ transitionDelay: `${index * 30}ms` }}
-    >
-      <FossilCard fossil={fossil} dict={dict} lang={lang} />
-    </div>
-  );
 }
 
 export default function FossilesClient({
@@ -98,9 +69,25 @@ export default function FossilesClient({
 
   const { setFossilData, setInitialFilters, setUserId, loadCatalogIndex } =
     useFossilStore();
-  const { fossilData, isLoading, cursorHistory, goToNextPage, goToPrevPage } = useFossilStore();
+  const { fossilData, isLoading, goToNextPage, goToPrevPage } = useFossilStore();
 
   const isInitialized = useRef(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("grid-2");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(VIEW_MODE_STORAGE_KEY) as ViewMode | null;
+    if (stored) setViewMode(stored);
+  }, []);
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    window.localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
+  };
 
   useEffect(() => {
     if (!isInitialized.current) {
@@ -111,6 +98,9 @@ export default function FossilesClient({
         locality: searchParams.get("locality") || undefined,
         geologicalPeriod: searchParams.get("geologicalPeriod") || undefined,
         geologicalStage: searchParams.get("geologicalStage") || undefined,
+        sort: searchParams.get("sort") || undefined,
+        minPrice: searchParams.get("minPrice") || undefined,
+        maxPrice: searchParams.get("maxPrice") || undefined,
       });
       setFossilData(initialData);
       setUserId(userId || null);
@@ -129,14 +119,25 @@ export default function FossilesClient({
   ]);
 
   const currentData = isInitialized.current ? fossilData : initialData;
-  const { fossils, totalCount, hasNextPage } = currentData;
-  const currentPage = cursorHistory.length;
-  const estimatedTotalPages = totalCount > 0 ? Math.ceil(totalCount / 20) : 1;
+  const { fossils, totalCount, hasNextPage, page: currentPage, totalPages } =
+    currentData;
 
-  // Compter les filtres actifs pour le badge
-  const activeFiltersCount = Array.from(searchParams.entries()).filter(
+  // Filtres actifs (hors page/sort) pour le badge et les puces affichées
+  const filterLabels: Record<string, string> = {
+    search: dict?.fossils?.searchLabel || "Recherche",
+    category: dict?.fossils?.categoryLabel || "Catégorie",
+    countryOfOrigin: dict?.fossils?.countryLabel || "Pays",
+    locality: dict?.fossils?.localityLabel || "Localité",
+    geologicalPeriod: dict?.fossils?.periodLabel || "Période",
+    geologicalStage: dict?.fossils?.stageLabel || "Étage",
+    minPrice: "Prix min",
+    maxPrice: "Prix max",
+  };
+
+  const activeFilterEntries = Array.from(searchParams.entries()).filter(
     ([key, value]) => {
-      if (key === "page" || !value || value === "all") return false;
+      if (key === "page" || key === "sort" || !value || value === "all")
+        return false;
       if (
         key === "minPrice" &&
         value === (filterOptions.minPrice || 0).toString()
@@ -149,11 +150,49 @@ export default function FossilesClient({
         return false;
       return true;
     },
-  ).length;
+  );
+  const activeFiltersCount = activeFilterEntries.length;
 
   const clearAllFilters = () => {
     useFossilStore.getState().resetFilters();
     window.history.pushState(null, "", `/${lang}/fossiles`);
+  };
+
+  const removeFilterChip = (key: string) => {
+    const params = new URLSearchParams(window.location.search);
+    params.delete(key);
+    params.delete("page");
+    useFossilStore.getState().updateFilters({ [key]: undefined });
+    window.history.pushState(
+      null,
+      "",
+      `/${lang}/fossiles${params.toString() ? `?${params.toString()}` : ""}`,
+    );
+  };
+
+  const updatePageParam = (page: number) => {
+    const params = new URLSearchParams(window.location.search);
+    if (page <= 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(page));
+    }
+    const query = params.toString();
+    window.history.pushState(
+      null,
+      "",
+      `/${lang}/fossiles${query ? `?${query}` : ""}`,
+    );
+  };
+
+  const handleNextPage = () => {
+    goToNextPage();
+    updatePageParam(currentPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    goToPrevPage();
+    updatePageParam(Math.max(1, currentPage - 1));
   };
 
   const handleSortChange = (value: string) => {
@@ -173,7 +212,7 @@ export default function FossilesClient({
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+    <div className="group space-y-4 sm:space-y-6 lg:space-y-8">
       {/* En-tête avec filtres mobile - VISIBLE UNIQUEMENT SUR MOBILE */}
       <div className="lg:hidden">
         <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm">
@@ -199,6 +238,44 @@ export default function FossilesClient({
 
             {/* Bouton filtres + badge */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="flex items-center gap-1 border border-[var(--parchemin)]/20 rounded-lg p-1">
+                <Button
+                  variant={viewMode === "grid-2" ? "default" : "ghost"}
+                  size="icon"
+                  title={dict?.fossils?.view2Cols || "2 colonnes"}
+                  onClick={() => handleViewModeChange("grid-2")}
+                  className="h-8 w-8"
+                >
+                  <Grid2x2 className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "grid-3" ? "default" : "ghost"}
+                  size="icon"
+                  title={dict?.fossils?.view3Cols || "3 colonnes"}
+                  onClick={() => handleViewModeChange("grid-3")}
+                  className="h-8 w-8"
+                >
+                  <Grid3x3 className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "grid-4" ? "default" : "ghost"}
+                  size="icon"
+                  title={dict?.fossils?.view4Cols || "4 colonnes"}
+                  onClick={() => handleViewModeChange("grid-4")}
+                  className="h-8 w-8"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="icon"
+                  title={dict?.fossils?.viewList || "Liste"}
+                  onClick={() => handleViewModeChange("list")}
+                  className="h-8 w-8"
+                >
+                  <List className="w-4 h-4" />
+                </Button>
+              </div>
               <Select
                 value={searchParams.get("sort") || "default"}
                 onValueChange={handleSortChange}
@@ -248,6 +325,33 @@ export default function FossilesClient({
                 onClearFilters={clearAllFilters}
               />
             </div>
+
+            {/* Puces de filtres actifs - mobile */}
+            {activeFilterEntries.length > 0 && (
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                {activeFilterEntries.map(([key, value]) => (
+                  <button
+                    key={key}
+                    onClick={() => removeFilterChip(key)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--terracotta)]/15 border border-[var(--terracotta)]/30 text-[var(--parchemin)] text-xs hover:bg-[var(--terracotta)]/25 transition-colors duration-200"
+                  >
+                    <span className="text-[var(--parchemin)]/60">
+                      {filterLabels[key] || key}:
+                    </span>
+                    <span className="font-medium max-w-[8rem] truncate">
+                      {value}
+                    </span>
+                    <X className="w-3 h-3 flex-shrink-0" />
+                  </button>
+                ))}
+                <button
+                  onClick={clearAllFilters}
+                  className="text-xs text-[var(--parchemin)]/50 hover:text-red-400 underline underline-offset-2 transition-colors"
+                >
+                  {dict?.fossils?.clearFilters || "Tout effacer"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -268,9 +372,9 @@ export default function FossilesClient({
         {/* Contenu principal desktop */}
         <div className="flex-1 space-y-6">
           {/* En-tête avec statistiques - DESKTOP */}
-          <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-8 shadow-xl backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <div>
+          <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-6 shadow-xl backdrop-blur-sm">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0">
                 <h2 className="text-3xl font-serif font-bold text-[var(--parchemin)] mb-2">
                   {dict?.fossils?.catalogTitle || "Catalogue de fossiles"}
                 </h2>
@@ -294,7 +398,54 @@ export default function FossilesClient({
                 </p>
               </div>
 
-              <div className="flex items-center gap-4">
+              {activeFiltersCount > 0 && (
+                <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-[var(--terracotta)] px-4 py-2 text-sm font-semibold text-[var(--parchemin)] shadow-lg">
+                  <Filter className="w-4 h-4" />
+                  {activeFiltersCount}{" "}
+                  {dict?.fossils?.activeFilters || (activeFiltersCount > 1 ? "filtres actifs" : "filtre actif")}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-5 flex flex-col items-end gap-3 border-t border-[var(--parchemin)]/10 pt-4">
+              <div className="flex items-center gap-1 border border-[var(--parchemin)]/20 rounded-lg p-1">
+                  <Button
+                    variant={viewMode === "grid-2" ? "default" : "ghost"}
+                    size="icon"
+                    title={dict?.fossils?.view2Cols || "2 colonnes"}
+                    onClick={() => handleViewModeChange("grid-2")}
+                    className="h-8 w-8"
+                  >
+                    <Grid2x2 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "grid-3" ? "default" : "ghost"}
+                    size="icon"
+                    title={dict?.fossils?.view3Cols || "3 colonnes"}
+                    onClick={() => handleViewModeChange("grid-3")}
+                    className="h-8 w-8"
+                  >
+                    <Grid3x3 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "grid-4" ? "default" : "ghost"}
+                    size="icon"
+                    title={dict?.fossils?.view4Cols || "4 colonnes"}
+                    onClick={() => handleViewModeChange("grid-4")}
+                    className="h-8 w-8"
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="icon"
+                    title={dict?.fossils?.viewList || "Liste"}
+                    onClick={() => handleViewModeChange("list")}
+                    className="h-8 w-8"
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                </div>
                 <Select
                   value={searchParams.get("sort") || "default"}
                   onValueChange={handleSortChange}
@@ -335,20 +486,38 @@ export default function FossilesClient({
                     </SelectItem>
                   </SelectContent>
                 </Select>
-
-                {activeFiltersCount > 0 && (
-                  <Badge className="bg-[var(--terracotta)] text-white border-0 shadow-lg text-base px-4 py-2 animate-pulse max-w-fit flex items-center justify-center min-w-max">
-                    <Filter className="w-4 h-4 mr-2" />
-                    {activeFiltersCount}{" "}
-                    {dict?.fossils?.activeFilters || "filtres actifs"}
-                  </Badge>
-                )}
-              </div>
             </div>
           </div>
 
+          {/* Puces de filtres actifs - desktop */}
+          {activeFilterEntries.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 -mt-2">
+              {activeFilterEntries.map(([key, value]) => (
+                <button
+                  key={key}
+                  onClick={() => removeFilterChip(key)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--terracotta)]/15 border border-[var(--terracotta)]/30 text-[var(--parchemin)] text-sm hover:bg-[var(--terracotta)]/25 transition-colors duration-200"
+                >
+                  <span className="text-[var(--parchemin)]/60">
+                    {filterLabels[key] || key}:
+                  </span>
+                  <span className="font-medium max-w-[10rem] truncate">
+                    {value}
+                  </span>
+                  <X className="w-3 h-3 flex-shrink-0" />
+                </button>
+              ))}
+              <button
+                onClick={clearAllFilters}
+                className="text-sm text-[var(--parchemin)]/50 hover:text-red-400 underline underline-offset-2 transition-colors"
+              >
+                {dict?.fossils?.clearFilters || "Tout effacer"}
+              </button>
+            </div>
+          )}
+
           {/* Grille des fossiles desktop */}
-          {isLoading ? (
+          {isLoading && fossils.length === 0 ? (
             <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-8 w-full">
               {Array.from({ length: 12 }).map((_, i) => (
                 <div
@@ -370,59 +539,32 @@ export default function FossilesClient({
             </div>
           ) : fossils.length > 0 ? (
             <>
-              <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-8">
-                {fossils.map((fossil, index) => (
-                  <AnimatedFossilCard
-                    key={fossil.id}
-                    fossil={fossil}
-                    index={index}
-                    dict={dict}
-                    lang={lang}
-                  />
-                ))}
-              </div>
-                <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-8 shadow-xl backdrop-blur-sm">
-                  <div className="flex items-center justify-between">
-                    <div className="text-[var(--parchemin)]/60 font-medium">
-                      {dict?.fossils?.page || "Page"}{" "}
-                      <span className="font-bold text-[var(--terracotta)]">
-                        {currentPage}
-                      </span>
-                      {estimatedTotalPages > 1 && (
-                        <>
-                          {" "}{dict?.fossils?.of || "sur"}{" "}
-                          <span className="font-bold text-[var(--parchemin)]">
-                            ~{estimatedTotalPages}
-                          </span>
-                        </>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={goToPrevPage}
-                        disabled={cursorHistory.length <= 1}
-                        className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200 transform hover:scale-105"
-                      >
-                        <ChevronLeft className="w-4 h-4 mr-1" />
-                        {dict?.fossils?.previous || "Précédent"}
-                      </Button>
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={goToNextPage}
-                        disabled={!hasNextPage}
-                        className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200 transform hover:scale-105"
-                      >
-                        {dict?.fossils?.next || "Suivant"}
-                        <ChevronRight className="w-4 h-4 ml-1" />
-                      </Button>
-                    </div>
-                  </div>
+              {viewMode === "list" ? (
+                <div className="flex flex-col gap-3">
+                  {fossils.map((fossil) => (
+                    <FossilListItem
+                      key={fossil.id}
+                      fossil={fossil}
+                      dict={dict}
+                      lang={lang}
+                    />
+                  ))}
                 </div>
+              ) : (
+                <div
+                  className={`grid grid-cols-2 ${desktopGridColsClass[viewMode]} gap-4 lg:gap-8 transition-opacity duration-200 ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
+                >
+                  {fossils.map((fossil) => (
+                    <FossilCard
+                      key={fossil.id}
+                      fossil={fossil}
+                      dict={dict}
+                      lang={lang}
+                      density={viewMode === "grid-4" ? "dense" : viewMode === "grid-3" ? "compact" : "comfortable"}
+                    />
+                  ))}
+                </div>
+              )}
             </>
           ) : (
             /* État vide desktop */
@@ -458,7 +600,7 @@ export default function FossilesClient({
       {/* Contenu principal mobile - SANS SIDEBAR */}
       <div className="lg:hidden space-y-4 sm:space-y-6">
         {/* Grille des fossiles mobile avec marges */}
-        {isLoading ? (
+        {isLoading && fossils.length === 0 ? (
           <div className="grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0 w-full">
             {Array.from({ length: 12 }).map((_, i) => (
               <div
@@ -479,63 +621,30 @@ export default function FossilesClient({
           </div>
         ) : fossils.length > 0 ? (
           <>
-            <div className="grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0">
-              {fossils.map((fossil, index) => (
-                <AnimatedFossilCard
-                  key={fossil.id}
-                  fossil={fossil}
-                  index={index}
-                  dict={dict}
-                  lang={lang}
-                />
-              ))}
-            </div>
-
-            {/* Pagination mobile compacte */}
-            {(cursorHistory.length > 1 || hasNextPage) && (
-              <div className="bg-[var(--silex)] border border-[var(--parchemin)]/10 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm mx-2 sm:mx-0">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="text-[var(--parchemin)]/60 font-medium text-sm">
-                    {dict?.fossils?.page || "Page"}{" "}
-                    <span className="font-bold text-[var(--terracotta)]">
-                      {currentPage}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={goToPrevPage}
-                      disabled={cursorHistory.length <= 1}
-                      className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200"
-                    >
-                      <ChevronLeft className="w-4 h-4 sm:mr-1" />
-                      <span className="hidden sm:inline">
-                        {dict?.fossils?.previous || "Précédent"}
-                      </span>
-                    </Button>
-
-                    <div className="px-3 py-1 bg-[var(--terracotta)]/20 rounded-lg text-sm font-medium text-[var(--terracotta)]">
-                      {currentPage}
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={goToNextPage}
-                      disabled={!hasNextPage}
-                      className="border-[var(--parchemin)]/20 text-[var(--parchemin)] hover:border-[var(--terracotta)]/50 hover:bg-[var(--terracotta)]/10 disabled:opacity-50 transition-all duration-200"
-                    >
-                      <span className="hidden sm:inline">
-                        {dict?.fossils?.next || "Suivant"}
-                      </span>
-                      <ChevronRight className="w-4 h-4 sm:ml-1" />
-                    </Button>
-                  </div>
-                </div>
+            {viewMode === "list" ? (
+              <div className="flex flex-col gap-3 px-1 sm:px-0">
+                {fossils.map((fossil) => (
+                  <FossilListItem
+                    key={fossil.id}
+                    fossil={fossil}
+                    dict={dict}
+                    lang={lang}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className={`grid grid-cols-2 gap-3 sm:gap-6 px-1 sm:px-0 transition-opacity duration-200 ${isLoading ? "opacity-50 pointer-events-none" : ""}`}>
+                {fossils.map((fossil) => (
+                  <FossilCard
+                    key={fossil.id}
+                    fossil={fossil}
+                    dict={dict}
+                    lang={lang}
+                  />
+                ))}
               </div>
             )}
+
           </>
         ) : (
           /* État vide mobile */
@@ -566,6 +675,43 @@ export default function FossilesClient({
           </div>
         )}
       </div>
+
+      {/* Pagination flottante, fixée en bas à droite */}
+      {mounted &&
+        !isLoading &&
+        fossils.length > 0 &&
+        (currentPage > 1 || hasNextPage) &&
+        createPortal(
+        <div className="fixed bottom-4 right-4 z-30">
+          <div className="flex items-center gap-1.5 bg-[var(--silex)]/95 border border-[var(--parchemin)]/20 rounded-full px-2 py-1.5 shadow-xl backdrop-blur-sm">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handlePrevPage}
+              disabled={currentPage <= 1}
+              aria-label={dict?.fossils?.previous || "Précédent"}
+              className="h-8 w-8 rounded-full text-[var(--parchemin)] hover:bg-[var(--terracotta)]/20 disabled:opacity-30"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <span className="px-1.5 text-xs font-medium text-[var(--parchemin)]/80 whitespace-nowrap">
+              {currentPage}
+              {totalPages > 1 ? ` / ${totalPages}` : ""}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleNextPage}
+              disabled={!hasNextPage}
+              aria-label={dict?.fossils?.next || "Suivant"}
+              className="h-8 w-8 rounded-full text-[var(--parchemin)] hover:bg-[var(--terracotta)]/20 disabled:opacity-30"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>,
+        document.body,
+        )}
     </div>
   );
 }

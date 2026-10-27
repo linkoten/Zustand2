@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import ProductCard from "./productCard";
-import ImageLens from "@/components/ui/image-lens";
+import ZoomableImage from "@/components/ui/zoomable-image";
 import RatingDisplay from "@/components/rating/ratingDisplay";
 import ProductLocationMap from "./productLocationMap";
 import { SerializedProduct } from "@/types/type";
@@ -52,6 +52,14 @@ export default function ProductPageClient({
 }: ProductPageClientProps) {
   const { handleAddToCart, isAdding } = useHandleAddToCart(lang);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  // Préchargement pour que le changement de photo soit instantané
+  useEffect(() => {
+    product.images.forEach((image) => {
+      const preloaded = new window.Image();
+      preloaded.src = image.imageUrl;
+    });
+  }, [product.images]);
 
   return (
     <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
@@ -95,7 +103,8 @@ export default function ProductPageClient({
                 <div className="w-full flex justify-center">
                   {/* Mobile et Tablet : Image centrée et réduite */}
                   <div className="lg:hidden w-full max-w-lg aspect-square relative bg-black/40 rounded-xl overflow-hidden">
-                    <ImageLens
+                    <ZoomableImage
+                      key={selectedImageIndex}
                       src={
                         product.images[selectedImageIndex]?.imageUrl ||
                         "/placeholder.jpg"
@@ -103,15 +112,13 @@ export default function ProductPageClient({
                       alt={`${product.title} - ${dict?.fossils?.viewDetails || "Vue"} ${selectedImageIndex + 1}`}
                       width={600}
                       height={600}
-                      className="w-full h-full object-contain transition-all duration-300 drop-shadow-2xl"
-                      lensSize={80}
-                      zoomLevel={2}
                     />
                   </div>
 
                   {/* Desktop : Image pleine taille comme avant */}
                   <div className="hidden lg:block w-full aspect-[4/3] relative bg-black/40 rounded-xl overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)]">
-                    <ImageLens
+                    <ZoomableImage
+                      key={selectedImageIndex}
                       src={
                         product.images[selectedImageIndex]?.imageUrl ||
                         "/placeholder.jpg"
@@ -119,9 +126,6 @@ export default function ProductPageClient({
                       alt={`${product.title} - ${dict?.fossils?.viewDetails || "Vue"} ${selectedImageIndex + 1}`}
                       width={1000}
                       height={750}
-                      className="w-full h-full object-contain transition-all duration-300 drop-shadow-2xl"
-                      lensSize={150}
-                      zoomLevel={2.5}
                     />
                   </div>
                 </div>
@@ -160,7 +164,9 @@ export default function ProductPageClient({
                   {product.images.map((image, index) => (
                     <button
                       key={index}
-                      onClick={() => setSelectedImageIndex(index)}
+                      onClick={() =>
+                        startTransition(() => setSelectedImageIndex(index))
+                      }
                       className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-xl overflow-hidden border-2 transition-all duration-300 relative z-0 hover:z-10 ${
                         selectedImageIndex === index
                           ? "border-terracotta ring-2 ring-terracotta/30 shadow-[0_0_15px_rgba(217,119,87,0.5)] opacity-100 scale-105"

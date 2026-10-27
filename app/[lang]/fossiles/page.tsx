@@ -25,7 +25,7 @@ export default async function FossilesPage({
   const { userId } = await auth();
   const user = userId ? await getOrSyncUser(userId) : null;
 
-  // ✅ Passer userId à getFossils pour inclure les infos favoris (cursor-based, page 1 initiale)
+  // ✅ Passer userId à getFossils pour inclure les infos favoris (pagination par numéro de page, respecte ?page=)
   const [fossilsData, filterOptionsRaw, catalogData] = await Promise.all([
     getFossils(resolvedSearchParams, userId),
     getFilterOptions(),

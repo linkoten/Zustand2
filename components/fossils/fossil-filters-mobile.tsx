@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -96,12 +96,36 @@ export default function FossilesFiltersMobile({
   }, [searchTerm]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedPriceRange(priceRange), 600);
+    const timer = setTimeout(() => {
+      // Évite de recréer une nouvelle référence de tableau si les valeurs n'ont pas changé,
+      // ce qui déclencherait l'effet d'application des filtres juste après le montage
+      setDebouncedPriceRange((prev) =>
+        prev[0] === priceRange[0] && prev[1] === priceRange[1]
+          ? prev
+          : priceRange,
+      );
+    }, 600);
     return () => clearTimeout(timer);
   }, [priceRange]);
 
-  // Handle dynamic apply whenever filters change
+  // Applique les filtres uniquement si leurs valeurs ont réellement changé
+  const lastAppliedKey = useRef<string | null>(null);
   useEffect(() => {
+    const key = JSON.stringify([
+      selectedCategories,
+      selectedCountries,
+      selectedLocalities,
+      selectedPeriods,
+      selectedStages,
+      debouncedSearch,
+      debouncedPriceRange,
+    ]);
+    if (lastAppliedKey.current === null) {
+      lastAppliedKey.current = key;
+      return;
+    }
+    if (lastAppliedKey.current === key) return;
+    lastAppliedKey.current = key;
     applyFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
